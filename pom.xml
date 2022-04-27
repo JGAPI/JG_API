@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+        This pom.xml formatting is designed by @FireController1847 (https://github.com/FireController1847)
+        More specifically from his project "javabase" (https://github.com/FireController1847/javabase)
+    -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Project Information -->
+    <name>JGAPI</name>
+    <description>Java Wrapper for the Guilded API.</description>
+    <groupId>dev.moratto</groupId>
+    <artifactId>JGAPI</artifactId>
+    <version>${projectVersion}</version>
+    <packaging>jar</packaging>
+
+    <!-- Project Metadata -->
+    <url>https://github.com/moratto-dev/JGAPI</url>
+    <developers>
+        <developer>
+            <name>Nathaniel Moratto</name>
+            <email>nathaniel@moratto.dev</email>
+            <url>https://github.com/itznxthaniel</url>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>GNU General Public License v3.0</name>
+            <url>https://opensource.org/licenses/GPL-3.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- Project Properties -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <actualVersion>0.0.1-alpha.dev</actualVersion>
+        <fileVersion>INVALID</fileVersion>
+        <projectVersion>INVALID</projectVersion>
+    </properties>
+
+    <!-- Project Profiles -->
+    <profiles>
+        <!-- Snapshot Profile -->
+        <profile>
+            <id>snapshot</id>
+            <properties>
+                <!--suppress UnresolvedMavenProperty -->
+                <fileVersion>${projectVersion}-${git.commit.id.abbrev}</fileVersion>
+                <projectVersion>${actualVersion}-SNAPSHOT</projectVersion>
+            </properties>
+        </profile>
+
+        <!-- Release Profile -->
+        <profile>
+            <id>release</id>
+            <properties>
+                <fileVersion>${projectVersion}</fileVersion>
+                <projectVersion>${actualVersion}</projectVersion>
+            </properties>
+        </profile>
+    </profiles>
+
+    <!-- Distribution -->
+
+    <!-- Build -->
+    <build>
+        <finalName>JGAPI-${fileVersion}</finalName>
+
+        <!-- Plugins -->
+        <plugins>
+
+            <!-- Git Commit ID Plugin -->
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+</project>
