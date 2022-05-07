@@ -5,7 +5,7 @@ import dev.moratto.JGAPI.Websocket.WebSocketManager;
 import dev.moratto.JGAPI.Rest.RestClient;
 import dev.moratto.JGAPI.Entities.Members.User;
 
-public class Client {
+public class JG_API {
     private String parentServerId;
     private String clientToken;
     private String clientId;
@@ -14,7 +14,7 @@ public class Client {
     private WebSocketManager webSocketManager;
     private RestClient restClient;
 
-    private Client(ClientBuilder clientBuilder) {
+    private JG_API(ClientBuilder clientBuilder) {
         this.parentServerId = clientBuilder.parentServerId;
         this.clientToken = clientBuilder.clientToken;
         this.clientId = clientBuilder.clientId;
@@ -89,10 +89,10 @@ public class Client {
          * @return {link Client} object.
          * @throws ClientBuildException If there was a missing property from the required props.
          */
-        public Client build() throws ClientBuildException {
+        public JG_API build() throws ClientBuildException {
             validateClientObject(this);
 
-            return new Client(this);
+            return new JG_API(this);
         }
 
 
