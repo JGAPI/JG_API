@@ -3,7 +3,7 @@ package dev.moratto.JGAPI;
 import dev.moratto.JGAPI.Exceptions.ClientBuildException;
 import dev.moratto.JGAPI.Websocket.WebSocketManager;
 import dev.moratto.JGAPI.Rest.RestClient;
-import dev.moratto.JGAPI.Entities.User;
+import dev.moratto.JGAPI.Entities.Members.User;
 
 public class Client {
     private String parentServerId;
@@ -33,8 +33,7 @@ public class Client {
         /**
          * Build the Client
          */
-        public ClientBuilder() {
-        }
+        public ClientBuilder() {}
 
         /**
          * Set the Client's Token.

@@ -40,6 +40,10 @@ public class WebSocketManager {
         }
     }
 
+    public WebSocketListener getWebSocketListener() {
+        return this.webSocketListener;
+    }
+
     public void disconnect(String reason) {
         webSocket.sendClose(WebSocket.NORMAL_CLOSURE, reason);
     }

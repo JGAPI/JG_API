@@ -1,4 +1,4 @@
-package dev.moratto.JGAPI.Entities;
+package dev.moratto.JGAPI.Entities.Members;
 
 import java.time.Instant;
 
@@ -6,6 +6,8 @@ public class User {
     private String id;
     private String name;
     private String type;
+    private String $avatar_uri;
+    private String banner_uri;
     private Instant createdAt = null;
 
     /**
