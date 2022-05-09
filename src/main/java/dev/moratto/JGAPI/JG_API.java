@@ -27,6 +27,7 @@ public class JG_API {
 
     public static class ClientBuilder {
         private String parentServerId;
+        @Deprecated
         private String clientToken;
         private String clientId;
 
@@ -54,6 +55,7 @@ public class JG_API {
          * @return Returns the current instance of the Client Builder.
          * @implNote This will be deprecated once Guilded API payloads the ID of the Client that is logged in.
          */
+        @Deprecated
         public ClientBuilder setClientId(String clientId) {
             this.clientId = clientId;
 
