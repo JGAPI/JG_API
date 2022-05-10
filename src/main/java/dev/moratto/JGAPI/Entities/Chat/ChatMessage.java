@@ -1,5 +1,7 @@
 package dev.moratto.JGAPI.Entities.Chat;
 
+import java.time.Instant;
+
 public class ChatMessage {
     private String id;
     private String type;
@@ -9,12 +11,12 @@ public class ChatMessage {
     private ChatEmbed[] embeds;
     private String[] replyMessageIds;
     private boolean isPrivate;
-    private String createdAt;
+    private Instant createdAt;
     private String createdBy;
     private String createdByWebhookId;
-    private String updatedAt;
+    private Instant updatedAt;
 
-    public ChatMessage(String id, String type, String serverId, String channelId, String content, ChatEmbed[] embeds, String[] replyMessageIds, boolean isPrivate, String createdAt, String createdBy, String createdByWebhookId, String updatedAt) {
+    public ChatMessage(String id, String type, String serverId, String channelId, String content, ChatEmbed[] embeds, String[] replyMessageIds, boolean isPrivate, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
         this.id = id;
         this.type = type;
         this.serverId = serverId;
@@ -53,7 +55,7 @@ public class ChatMessage {
     public boolean isPrivate() {
         return this.isPrivate;
     }
-    public String getCreatedAt() {
+    public Instant getCreatedAt() {
         return this.createdAt;
     }
     public String getCreatedBy() {
@@ -62,7 +64,7 @@ public class ChatMessage {
     public String getCreatedByWebhookId() {
         return this.createdByWebhookId;
     }
-    public String getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return this.updatedAt;
     }
 }

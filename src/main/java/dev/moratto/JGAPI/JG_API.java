@@ -5,7 +5,7 @@ import dev.moratto.JGAPI.Websocket.WebSocketManager;
 import dev.moratto.JGAPI.Rest.RestClient;
 import dev.moratto.JGAPI.Entities.Members.User;
 
-public class JG_API {
+public class JG_API extends Thread {
     private String parentServerId;
     private String clientToken;
     private String clientId;
@@ -13,6 +13,7 @@ public class JG_API {
 
     private WebSocketManager webSocketManager;
     private RestClient restClient;
+    private boolean running = true;
 
     private JG_API(ClientBuilder clientBuilder) {
         this.parentServerId = clientBuilder.parentServerId;
@@ -23,6 +24,14 @@ public class JG_API {
     public void login() {
         webSocketManager = new WebSocketManager(this.clientToken);
         webSocketManager.connect();
+    }
+
+    @Override
+    public void run() {
+        // We want to send a heartbeat every so often
+        while (this.running) {
+            // keep alive
+        }
     }
 
     public static class ClientBuilder {

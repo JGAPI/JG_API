@@ -1,11 +1,21 @@
 package dev.moratto.JGAPI.Websocket;
 
+import dev.moratto.JGAPI.Entities.Chat.ChatEmbed;
+import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
+import dev.moratto.JGAPI.Events.Chat.ChatMessageCreateEvent;
+import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdateEvent;
+import dev.moratto.JGAPI.ListenerAdapter;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.URI;
 
-public class WebSocketManager {
+public class WebSocketManager extends ListenerAdapter {
     private WebSocket webSocket;
     private WebSocketListener webSocketListener;
     private URI guildedWebSocketUri;
@@ -27,6 +37,84 @@ public class WebSocketManager {
             e.printStackTrace();
         }
 
+    }
+
+    public void parseWebsocketMessage(CharSequence data) {
+        try {
+            Object obj = new JSONParser().parse(data.toString());
+            JSONObject jo = (JSONObject) obj;
+            if (!jo.containsKey("t") || !jo.containsKey("d"))
+                return;
+            String eventType = (String) jo.get("t");
+            JSONObject jsonData = (JSONObject) jo.get("d");
+            switch (eventType) {
+                case "ChatMessageCreated":
+                case "ChatMessageUpdated":
+                    // Set up the ChatMessage, then run the event
+                    String serverId = (String) jsonData.get("serverId");
+                    JSONObject message = (JSONObject) jsonData.get("message");
+                    String messageId = (String) message.get("id");
+                    String messageType = (String) message.get("type");
+                    String channelId = (String) message.get("channelId");
+                    String content = (String) message.get("content");
+                    boolean isPrivate = (boolean) message.get("isPrivate");
+                    Instant createdAt = Instant.parse((String) message.get("createdAt"));
+                    String createdBy = (String) message.get("createdBy");
+                    String mServerId = (String) message.get("serverId");
+                    ChatEmbed[] embeds = new ChatEmbed[] {};
+                    String[] replyMessageIds = new String[] {};
+                    String createdByWebhookId = null;
+                    Instant updatedAt = null;
+                    // TODO Need to parse `embeds` and the rest below it still
+                    if (eventType.equals("ChatMessageCreated"))
+                        onChatMessageCreatedEvent(new ChatMessageCreateEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                    else
+                        onChatMessageUpdatedEvent(new ChatMessageUpdateEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                    break;
+                case "ChatMessageDeleted":
+                    break;
+                case "TeamMemberJoined":
+                    break;
+                case "TeamMemberRemoved":
+                    break;
+                case "TeamMemberBanned":
+                    break;
+                case "TeamMemberUnbanned":
+                    break;
+                case "TeamMemberUpdated":
+                    break;
+                case "teamRolesUpdated":
+                    break;
+                case "TeamChannelCreated":
+                    break;
+                case "TeamChannelUpdated":
+                    break;
+                case "TeamChannelDeleted":
+                    break;
+                case "TeamWebhookCreated":
+                    break;
+                case "TeamWebhookUpdated":
+                    break;
+                case "DocCreated":
+                    break;
+                case "DocUpdated":
+                    break;
+                case "DocDeleted":
+                    break;
+                case "ListItemCreated":
+                    break;
+                case "ListItemUpdated":
+                    break;
+                case "ListItemDeleted":
+                    break;
+                case "ListItemCompleted":
+                    break;
+                case "ListItemUncompleted":
+                    break;
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void connect() {

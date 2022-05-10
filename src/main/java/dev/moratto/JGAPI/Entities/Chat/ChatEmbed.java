@@ -1,5 +1,7 @@
 package dev.moratto.JGAPI.Entities.Chat;
 
+import java.time.Instant;
+
 public class ChatEmbed {
     private String title;
     private String description;
@@ -16,7 +18,7 @@ public class ChatEmbed {
         }
     }
     private Footer footer;
-    private String timestamp;
+    private Instant timestamp;
     private class Thumbnail {
         private String url;
         private String getUrl() {
@@ -76,7 +78,7 @@ public class ChatEmbed {
     private Footer getFooter() {
         return this.footer;
     }
-    private String getTimestamp() {
+    private Instant getTimestamp() {
         return this.timestamp;
     }
     private Thumbnail getThumbnail() {
