@@ -2,7 +2,7 @@ package dev.moratto.JGAPI.Events.Chat;
 
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 
-public class ChatMessageUpdateEvent {
+public class ChatMessageUpdateEvent extends GenericMessageEvent {
     private String serverId;
     private ChatMessage message;
     public ChatMessageUpdateEvent(String serverId, ChatMessage message) {
