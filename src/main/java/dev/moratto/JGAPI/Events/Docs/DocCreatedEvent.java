@@ -1,4 +1,4 @@
 package dev.moratto.JGAPI.Events.Docs;
 
-public class DocDeleteEvent {
+public class DocCreatedEvent {
 }

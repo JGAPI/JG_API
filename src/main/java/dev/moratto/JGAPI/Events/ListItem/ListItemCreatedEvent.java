@@ -1,4 +1,4 @@
 package dev.moratto.JGAPI.Events.ListItem;
 
-public class ListItemUpdateEvent {
+public class ListItemCreatedEvent {
 }

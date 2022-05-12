@@ -1,4 +1,4 @@
 package dev.moratto.JGAPI.Events.TeamMember;
 
-public class TeamMemberRolesUpdateEvent {
+public class TeamMemberBannedEvent {
 }

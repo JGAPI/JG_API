@@ -1,4 +1,4 @@
 package dev.moratto.JGAPI.Events.ListItem;
 
-public class ListItemUncompleteEvent {
+public class ListItemCompletedEvent {
 }

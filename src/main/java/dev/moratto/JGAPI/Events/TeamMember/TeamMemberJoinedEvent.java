@@ -1,4 +1,4 @@
 package dev.moratto.JGAPI.Events.TeamMember;
 
-public class TeamMemberUpdateEvent {
+public class TeamMemberJoinedEvent {
 }

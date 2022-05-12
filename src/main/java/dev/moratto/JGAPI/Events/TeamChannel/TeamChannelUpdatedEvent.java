@@ -1,4 +1,4 @@
 package dev.moratto.JGAPI.Events.TeamChannel;
 
-public class TeamChannelDeleteEvent {
+public class TeamChannelUpdatedEvent {
 }
