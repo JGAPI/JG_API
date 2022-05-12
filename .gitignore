@@ -24,3 +24,6 @@ hs_err_pid*
 
 # Test files
 src/main/java/dev/moratto/JGAPI/TestTheBot.java
+
+# Jetbrains
+/.idea
