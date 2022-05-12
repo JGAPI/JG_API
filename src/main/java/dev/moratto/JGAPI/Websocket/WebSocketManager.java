@@ -2,16 +2,14 @@ package dev.moratto.JGAPI.Websocket;
 
 import dev.moratto.JGAPI.Entities.Chat.ChatEmbed;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
-import dev.moratto.JGAPI.Events.Chat.ChatMessageCreateEvent;
-import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdateEvent;
-import dev.moratto.JGAPI.Events.GenericEvent;
+import dev.moratto.JGAPI.Events.Chat.ChatMessageCreatedEvent;
+import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdatedEvent;
 import dev.moratto.JGAPI.ListenerAdapter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.time.Instant;
-import java.util.concurrent.ExecutionException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.URI;
@@ -68,9 +66,9 @@ public class WebSocketManager extends ListenerAdapter {
                     Instant updatedAt = null;
                     // TODO Need to parse `embeds` and the rest below it still
                     if (eventType.equals("ChatMessageCreated"))
-                        onChatMessageCreatedEvent(new ChatMessageCreateEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                        onChatMessageCreatedEvent(new ChatMessageCreatedEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
                     else
-                        onChatMessageUpdatedEvent(new ChatMessageUpdateEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                        onChatMessageUpdatedEvent(new ChatMessageUpdatedEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
                     break;
                 case "ChatMessageDeleted":
                     break;

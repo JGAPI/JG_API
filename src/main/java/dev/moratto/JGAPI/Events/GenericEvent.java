@@ -1,29 +1,8 @@
 package dev.moratto.JGAPI.Events;
 
-public abstract class GenericEvent {
-    int op;
-    String eventId;
-    String eventType;
-    String serverId;
-    String data;
+import dev.moratto.JGAPI.JG_API;
 
-    public int getOp() {
-        return this.op;
-    }
-
-    public String getEventId() {
-        return this.eventId;
-    }
-
-    public String getEventType() {
-        return this.eventType;
-    }
-
-    public String getServerId() {
-        return this.serverId;
-    }
-
-    public String getData() {
-        return this.data;
-    }
+public interface GenericEvent {
+    JG_API getJGAPI();
+    String getServerId();
 }
