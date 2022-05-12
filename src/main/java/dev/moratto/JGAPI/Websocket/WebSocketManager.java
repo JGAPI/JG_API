@@ -4,6 +4,7 @@ import dev.moratto.JGAPI.Entities.Chat.ChatEmbed;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageCreateEvent;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdateEvent;
+import dev.moratto.JGAPI.Events.GenericEvent;
 import dev.moratto.JGAPI.ListenerAdapter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

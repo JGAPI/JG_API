@@ -1,11 +1,11 @@
 package dev.moratto.JGAPI.Events;
 
 public abstract class GenericEvent {
-    private int op;
-    private String eventId;
-    private String eventType;
-    private String serverId;
-    private String data;
+    int op;
+    String eventId;
+    String eventType;
+    String serverId;
+    String data;
 
     public int getOp() {
         return this.op;

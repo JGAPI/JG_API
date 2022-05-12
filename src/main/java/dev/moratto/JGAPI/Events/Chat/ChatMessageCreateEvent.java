@@ -7,7 +7,7 @@ public class ChatMessageCreateEvent extends GenericMessageEvent {
         super(message);
     }
     public ChatMessage getMessage() {
-        return super.getMessage();
+        return this.message;
     }
     public String getServerId() {
         return super.getServerId();
