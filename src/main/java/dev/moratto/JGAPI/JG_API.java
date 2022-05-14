@@ -36,8 +36,8 @@ public class JG_API extends Thread {
 
     public static class ClientBuilder {
         private String parentServerId;
-        @Deprecated
         private String clientToken;
+        @Deprecated
         private String clientId;
 
         /**
@@ -88,8 +88,6 @@ public class JG_API extends Thread {
         private void validateClientObject(ClientBuilder client) throws ClientBuildException {
             if (client.clientToken == null || client.clientToken.isBlank())
                 throw new ClientBuildException("A Client Token was not provided to the Client Builder.");
-            if (client.clientId == null || client.clientId.isBlank())
-                throw new ClientBuildException("A Client ID was not provided to the Client Builder.");
             if (client.parentServerId == null || client.parentServerId.isBlank())
                 throw new ClientBuildException("A Server ID was not provided to the Client Builder.");
         }
