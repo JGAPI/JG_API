@@ -1,5 +1,6 @@
 package dev.moratto.JGAPI.Rest;
 
+import cn.hutool.json.JSONObject;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 import dev.moratto.JGAPI.Entities.Docs.Doc;
 import dev.moratto.JGAPI.Entities.Forums.ForumThread;
@@ -8,6 +9,7 @@ import dev.moratto.JGAPI.Entities.ListItems.ListItemSummary;
 import dev.moratto.JGAPI.Entities.MemberBans.ServerMemberBan;
 import dev.moratto.JGAPI.Entities.Members.ServerMember;
 import dev.moratto.JGAPI.Entities.Members.ServerMemberSummary;
+import dev.moratto.JGAPI.Entities.Webhooks.Webhook;
 
 public class RestClient {
     public ChatMessage createChannelMessage(long channelId, ChatMessage message) {}
@@ -37,4 +39,18 @@ public class RestClient {
     public Doc getDoc(long channelId, long docId) {}
     public Doc updateDoc(long channelId, long docId) {}
     public boolean deleteDoc(long channelId, long docId) {}
+    public boolean addReactionEmote(long channelId, long contentId, long emoteId) {}
+    public int awardMemberXP(long serverId, long userId) {}
+    public int awardRoleXP(long serverId, long roleId) {}
+    public JSONObject getSocialLinks(long serverId, long userId, String type) {}
+    public boolean addMemberToGroup(long groupId, long userId) {}
+    public boolean removeMemberFromGroup(long groupId, long userId) {}
+    public boolean addRoleToMember(long serverId, long userId, long roleId) {}
+    public boolean removeRoleFromMember(long serverId, long userId, long roleId) {}
+    public int[] getMemberRoles(long serverId, long userId) {}
+    public Webhook createWebhook(long serverId, Webhook webhook) {}
+    public Webhook[] getWebhooks(long serverId) {}
+    public Webhook getWebhook(long serverId, long webhookId) {}
+    public Webhook updateWebhook(long serverId, long webhookId, Webhook webhook) {}
+    public boolean deleteWebhook(long serverId, long webhookId) {}
 }

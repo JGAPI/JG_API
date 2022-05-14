@@ -5,9 +5,6 @@ import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageCreatedEvent;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdatedEvent;
 import dev.moratto.JGAPI.ListenerAdapter;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.time.Instant;
 import java.net.http.HttpClient;
