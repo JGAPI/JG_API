@@ -80,7 +80,7 @@ public class WebSocketManager extends ListenerAdapter {
                     boolean isPrivate = (boolean) message.get("isPrivate");
 
                     onChatMessageDeletedEvent(new ChatMessageDeletedEvent(serverId, new ChatMessage(messageId, mServerId, channelId, deletedAt, isPrivate)));
-                    
+
                     break;
                 case "TeamMemberJoined":
                     break;
