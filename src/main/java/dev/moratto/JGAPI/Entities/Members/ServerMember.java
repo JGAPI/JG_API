@@ -1,9 +1,11 @@
 package dev.moratto.JGAPI.Entities.Members;
 
+import java.time.Instant;
+
 public class ServerMember {
     private User user;
     private int[] roleIds;
     private String nickname;
-    private String joinedAt;
+    private Instant joinedAt;
     private boolean isOwner;
 }

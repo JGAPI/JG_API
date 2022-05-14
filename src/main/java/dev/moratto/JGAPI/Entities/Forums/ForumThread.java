@@ -1,13 +1,15 @@
 package dev.moratto.JGAPI.Entities.Forums;
 
+import java.time.Instant;
+
 public class ForumThread {
     private String id;
     private String serverId;
     private String channelId;
     private String title;
     private String content;
-    private String createdAt;
+    private Instant createdAt;
     private String createdBy;
     private String createdByWebhookId;
-    private String updatedAt;
+    private Instant updatedAt;
 }
