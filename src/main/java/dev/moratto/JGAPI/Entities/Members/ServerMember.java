@@ -5,4 +5,5 @@ public class ServerMember {
     private int[] roleIds;
     private String nickname;
     private String joinedAt;
+    private boolean isOwner;
 }
