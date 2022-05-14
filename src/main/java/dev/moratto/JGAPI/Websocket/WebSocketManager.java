@@ -3,6 +3,7 @@ package dev.moratto.JGAPI.Websocket;
 import dev.moratto.JGAPI.Entities.Chat.ChatEmbed;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageCreatedEvent;
+import dev.moratto.JGAPI.Events.Chat.ChatMessageDeletedEvent;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdatedEvent;
 import dev.moratto.JGAPI.ListenerAdapter;
 
@@ -61,13 +62,25 @@ public class WebSocketManager extends ListenerAdapter {
                     String[] replyMessageIds = new String[] {};
                     String createdByWebhookId = null;
                     Instant updatedAt = null;
+
                     // TODO Need to parse `embeds` and the rest below it still
                     if (eventType.equals("ChatMessageCreated"))
                         onChatMessageCreatedEvent(new ChatMessageCreatedEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
                     else
                         onChatMessageUpdatedEvent(new ChatMessageUpdatedEvent(serverId, new ChatMessage(messageId, messageType, mServerId, channelId, content, embeds, replyMessageIds, isPrivate, createdAt, createdBy, createdByWebhookId, updatedAt)));
+
                     break;
                 case "ChatMessageDeleted":
+                    String serverId = (String) jsonData.get("serverId");
+                    JSONObject message = (JSONObject) jsonData.get("message");
+                    String messageId = (String) message.get("id");
+                    String mServerId = (String) message.get("serverId");
+                    String channelId = (String) message.get("channelId");
+                    Instant deletedAt = Instant.parse((String) message.get("deletedAt"));
+                    boolean isPrivate = (boolean) message.get("isPrivate");
+
+                    onChatMessageDeletedEvent(new ChatMessageDeletedEvent(serverId, new ChatMessage(messageId, mServerId, channelId, deletedAt, isPrivate)));
+                    
                     break;
                 case "TeamMemberJoined":
                     break;
