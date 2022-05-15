@@ -18,4 +18,6 @@ public class Request {
     public JSONObject getBody() {
         return this.body;
     }
+
+    public String execute() {}
 }
