@@ -1,6 +1,6 @@
 package dev.moratto.JGAPI.Rest;
 
-public class RestAction {
+public class RestAction<T> {
     private int sequenceNumber;
     private Request request;
     private String result = null;
@@ -21,9 +21,9 @@ public class RestAction {
         return this.request;
     }
 
-    public RestAction execute() {}
+    public RestAction<T> queue() {}
 
-    public String getResult() {
-        return this.result;
-    }
+    public RestAction<T> submit() {}
+
+    public RestAction<T> complete() {}
 }

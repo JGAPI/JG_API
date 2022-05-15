@@ -12,45 +12,45 @@ import dev.moratto.JGAPI.Entities.Members.ServerMemberSummary;
 import dev.moratto.JGAPI.Entities.Webhooks.Webhook;
 
 public class RestClient {
-    private ChatMessage createChannelMessage(long channelId, ChatMessage message) {}
-    private ChatMessage[] getMessages(long channelId) {}
-    private ChatMessage getMessage(long channelId, long messageId) {}
-    private ChatMessage updateMessage(long channelId, long messageId, ChatMessage message) {}
-    public boolean deleteMessage(long channelId, long messageId) {}
-    private String updateNickname(long serverId, long userId, String nickname) {}
-    private boolean deleteNickname(long serverId, long userId) {}
-    private ServerMember getMember(long serverId, long userId) {}
-    private boolean kickMember(long serverId, long userId) {}
-    private ServerMemberSummary[] getMembers(long serverId) {}
-    private ServerMemberBan createServerBan(long serverId, long userId, ServerMemberBan serverMemberBan) {}
-    private ServerMemberBan getServerBan(long serverId, long userId) {}
-    private boolean deleteServerBan(long serverId, long userId) {}
-    private ServerMemberBan[] getServerBan(long serverId) {}
-    private ForumThread createForumThread(long channelId, ForumThread forumThread) {}
-    private ListItem createListItem(long channelId, ListItem listItem) {}
-    private ListItemSummary[] getListItems(long channelId) {}
-    private ListItem getListItem(long channelId, long listItemId) {}
-    private ListItem updateListItem(long channelId, long listItemId, ListItem listItem) {}
-    private boolean deleteListitem(long channelId, long listItemId) {}
-    private boolean completeListItem(long channelId, long listItemId) {}
-    private boolean uncompleteListItem(long channelId, long listItemId) {}
-    private Doc createDoc(long channelId, Doc doc) {}
-    private Doc[] getDocs(long channelId) {}
-    private Doc getDoc(long channelId, long docId) {}
-    private Doc updateDoc(long channelId, long docId) {}
-    private boolean deleteDoc(long channelId, long docId) {}
-    private boolean addReactionEmote(long channelId, long contentId, long emoteId) {}
-    private int awardMemberXP(long serverId, long userId) {}
-    private int awardRoleXP(long serverId, long roleId) {}
-    private JSONObject getSocialLinks(long serverId, long userId, String type) {}
-    private boolean addMemberToGroup(long groupId, long userId) {}
-    private boolean removeMemberFromGroup(long groupId, long userId) {}
-    private boolean addRoleToMember(long serverId, long userId, long roleId) {}
-    private boolean removeRoleFromMember(long serverId, long userId, long roleId) {}
-    private int[] getMemberRoles(long serverId, long userId) {}
-    private Webhook createWebhook(long serverId, Webhook webhook) {}
-    private Webhook[] getWebhooks(long serverId) {}
-    private Webhook getWebhook(long serverId, long webhookId) {}
-    private Webhook updateWebhook(long serverId, long webhookId, Webhook webhook) {}
-    private boolean deleteWebhook(long serverId, long webhookId) {}
+    public RestAction createChannelMessage(long channelId, ChatMessage message) {}
+    public RestAction getMessages(long channelId) {}
+    public RestAction getMessage(long channelId, long messageId) {}
+    public RestAction updateMessage(long channelId, long messageId, ChatMessage message) {}
+    public RestAction deleteMessage(long channelId, long messageId) {}
+    public RestAction updateNickname(long serverId, long userId, String nickname) {}
+    public RestAction deleteNickname(long serverId, long userId) {}
+    public RestAction getMember(long serverId, long userId) {}
+    public RestAction kickMember(long serverId, long userId) {}
+    public RestAction getMembers(long serverId) {}
+    public RestAction createServerBan(long serverId, long userId, ServerMemberBan serverMemberBan) {}
+    public RestAction getServerBan(long serverId, long userId) {}
+    public RestAction deleteServerBan(long serverId, long userId) {}
+    public RestAction getServerBan(long serverId) {}
+    public RestAction createForumThread(long channelId, ForumThread forumThread) {}
+    public RestAction createListItem(long channelId, ListItem listItem) {}
+    public RestAction getListItems(long channelId) {}
+    public RestAction getListItem(long channelId, long listItemId) {}
+    public RestAction updateListItem(long channelId, long listItemId, ListItem listItem) {}
+    public RestAction deleteListitem(long channelId, long listItemId) {}
+    public RestAction completeListItem(long channelId, long listItemId) {}
+    public RestAction uncompleteListItem(long channelId, long listItemId) {}
+    public RestAction createDoc(long channelId, Doc doc) {}
+    public RestAction getDocs(long channelId) {}
+    public RestAction getDoc(long channelId, long docId) {}
+    public RestAction updateDoc(long channelId, long docId) {}
+    public RestAction deleteDoc(long channelId, long docId) {}
+    public RestAction addReactionEmote(long channelId, long contentId, long emoteId) {}
+    public RestAction awardMemberXP(long serverId, long userId) {}
+    public RestAction awardRoleXP(long serverId, long roleId) {}
+    public RestAction getSocialLinks(long serverId, long userId, String type) {}
+    public RestAction addMemberToGroup(long groupId, long userId) {}
+    public RestAction removeMemberFromGroup(long groupId, long userId) {}
+    public RestAction addRoleToMember(long serverId, long userId, long roleId) {}
+    public RestAction removeRoleFromMember(long serverId, long userId, long roleId) {}
+    public RestAction getMemberRoles(long serverId, long userId) {}
+    public RestAction createWebhook(long serverId, Webhook webhook) {}
+    public RestAction getWebhooks(long serverId) {}
+    public RestAction getWebhook(long serverId, long webhookId) {}
+    public RestAction updateWebhook(long serverId, long webhookId, Webhook webhook) {}
+    public RestAction deleteWebhook(long serverId, long webhookId) {}
 }
