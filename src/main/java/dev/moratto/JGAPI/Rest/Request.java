@@ -5,9 +5,10 @@ import cn.hutool.json.JSONObject;
 import java.util.HashMap;
 
 public class Request {
+    private Routing route;
     private HashMap<String, String> headers;
     private JSONObject body;
-    public Request(HashMap<String, String> headers, JSONObject body) {
+    public Request(Routing route, HashMap<String, String> headers, JSONObject body) {
         this.headers = headers;
         this.body = body;
     }
