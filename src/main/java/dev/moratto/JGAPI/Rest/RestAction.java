@@ -1,5 +1,7 @@
 package dev.moratto.JGAPI.Rest;
 
+import java.util.concurrent.TimeUnit;
+
 public class RestAction<T> {
     private int sequenceNumber;
     private Request request;
@@ -21,9 +23,13 @@ public class RestAction<T> {
         return this.request;
     }
 
+    private class RestActionResponse<T> {}
+
     public RestAction<T> queue() {}
 
     public RestAction<T> submit() {}
 
-    public RestAction<T> complete() {}
+    public RestActionResponse<T> complete() {}
+
+    public RestActionResponse<T> completeAfter(TimeUnit unit, int delay) {}
 }
