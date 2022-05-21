@@ -10,7 +10,7 @@ public class Routing {
         Method(String method) {
             this.method = method;
         }
-        String getMethod() {
+        String getMethodString() {
             return this.method;
         }
     }
@@ -91,5 +91,13 @@ public class Routing {
     public Routing(Method method, String route) {
         this.method = method;
         this.route = route;
+    }
+
+    public String getRoute() {
+        return this.route;
+    }
+
+    public Method getMethod() {
+        return this.method;
     }
 }
