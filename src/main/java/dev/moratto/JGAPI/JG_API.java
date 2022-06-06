@@ -31,6 +31,7 @@ public class JG_API extends Thread {
         // We want to send a heartbeat every so often
         while (this.running) {
             // keep alive
+            // TODO Need to send a heartbeat every so often
         }
     }
 

@@ -1,14 +1,10 @@
 package dev.moratto.JGAPI.Rest;
 
-import cn.hutool.json.JSONObject;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 import dev.moratto.JGAPI.Entities.Docs.Doc;
 import dev.moratto.JGAPI.Entities.Forums.ForumThread;
 import dev.moratto.JGAPI.Entities.ListItems.ListItem;
-import dev.moratto.JGAPI.Entities.ListItems.ListItemSummary;
 import dev.moratto.JGAPI.Entities.MemberBans.ServerMemberBan;
-import dev.moratto.JGAPI.Entities.Members.ServerMember;
-import dev.moratto.JGAPI.Entities.Members.ServerMemberSummary;
 import dev.moratto.JGAPI.Entities.Webhooks.Webhook;
 
 public class RestClient {
@@ -25,7 +21,7 @@ public class RestClient {
     public RestAction createServerBan(long serverId, long userId, ServerMemberBan serverMemberBan) {}
     public RestAction getServerBan(long serverId, long userId) {}
     public RestAction deleteServerBan(long serverId, long userId) {}
-    public RestAction getServerBan(long serverId) {}
+    public RestAction getServerBans(long serverId) {}
     public RestAction createForumThread(long channelId, ForumThread forumThread) {}
     public RestAction createListItem(long channelId, ListItem listItem) {}
     public RestAction getListItems(long channelId) {}
