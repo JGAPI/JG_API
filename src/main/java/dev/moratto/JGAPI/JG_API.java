@@ -22,7 +22,7 @@ public class JG_API extends Thread {
     }
 
     public void login() {
-        webSocketManager = new WebSocketManager(this.clientToken);
+        webSocketManager = new WebSocketManager(this.clientToken, this);
         webSocketManager.connect();
     }
 
