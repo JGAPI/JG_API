@@ -5,6 +5,7 @@ import dev.moratto.JGAPI.Entities.Channels.Mentions;
 import dev.moratto.JGAPI.Entities.Chat.ChatEmbed;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageCreatedEvent;
+import dev.moratto.JGAPI.Events.Chat.ChatMessageDeletedEvent;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdatedEvent;
 import dev.moratto.JGAPI.JG_API;
 import dev.moratto.JGAPI.ListenerAdapter;
@@ -46,24 +47,29 @@ public class WebSocketManager extends ListenerAdapter {
         String msg_data = json.getStr("d"); // Data of any form depending on the underlying event
         String msg_id_replay = json.getStr("s"); // Message ID used for replaying events after a disconnect
         int opcode = json.getInt("op"); // Event name for the given message
+        String server_id = json.getStr("d.serverId");
+
+        /**
+         * ChatMessage Data
+         */
+        String msg_id = json.getStr("d.message.id");
+        String type = json.getStr("d.message.type");
+        String mServer_id = json.getStr("d.message.serverId");
+        String channelId = json.getStr("d.message.channelId");
+        String content = json.getStr("d.message.content");
+        ChatEmbed[] embeds = new ChatEmbed[] {};
+        String[] replyMessageIds = new String[] {};
+        boolean isPrivate = json.getBool("d.message.isPrivate");
+        boolean isSilent = json.getBool("d.message.isSilent");
+        Mentions[] mentions = new Mentions[] {};
+        Instant createdAt = Instant.parse(json.getStr("d.message.createdAt"));
+        String createdBy = json.getStr("d.message.createdBy");
+        String createdByWebhookId = json.getStr("d.message.createdByWebhookId");
+        Instant updatedAt = Instant.parse(json.getStr("d.message.updatedAt"));
+
         switch (eventType) {
             case "ChatMessageCreated":
             case "ChatMessageUpdated":
-                String server_id = json.getStr("d.serverId");
-                String msg_id = json.getStr("d.message.id");
-                String type = json.getStr("d.message.type");
-                String mServer_id = json.getStr("d.message.serverId");
-                String channelId = json.getStr("d.message.channelId");
-                String content = json.getStr("d.message.content");
-                ChatEmbed[] embeds = new ChatEmbed[] {};
-                String[] replyMessageIds = new String[] {};
-                boolean isPrivate = json.getBool("d.message.isPrivate");
-                boolean isSilent = json.getBool("d.message.isSilent");
-                Mentions[] mentions = new Mentions[] {};
-                Instant createdAt = Instant.parse(json.getStr("d.message.createdAt"));
-                String createdBy = json.getStr("d.message.createdBy");
-                String createdByWebhookId = json.getStr("d.message.createdByWebhookId");
-                Instant updatedAt = Instant.parse(json.getStr("d.message.updatedAt"));
                 if (eventType.equals("ChatMessageCreated")) {
                     onChatMessageCreatedEvent(new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
                 } else {
@@ -72,6 +78,7 @@ public class WebSocketManager extends ListenerAdapter {
                 }
                 break;
             case "ChatMessageDeleted":
+                onChatMessageDeletedEvent(new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
                 break;
             case "TeamMemberJoined":
                 break;
