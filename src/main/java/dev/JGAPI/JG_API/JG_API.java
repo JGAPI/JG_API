@@ -8,7 +8,6 @@ import dev.JGAPI.JG_API.Entities.Members.User;
 public class JG_API extends Thread {
     private String parentServerId;
     private String clientToken;
-    private String clientId;
     private User clientUser;
 
     private WebSocketManager webSocketManager;
@@ -18,7 +17,6 @@ public class JG_API extends Thread {
     private JG_API(ClientBuilder clientBuilder) {
         this.parentServerId = clientBuilder.parentServerId;
         this.clientToken = clientBuilder.clientToken;
-        this.clientId = clientBuilder.clientId;
     }
 
     public void login() {
@@ -31,15 +29,13 @@ public class JG_API extends Thread {
         // We want to send a heartbeat every so often
         while (this.running) {
             // keep alive
-            // TODO Need to send a heartbeat every so often
+            // TODO: Need to send a heartbeat every so often
         }
     }
 
     public static class ClientBuilder {
         private String parentServerId;
         private String clientToken;
-        @Deprecated
-        private String clientId;
 
         /**
          * Build the Client
@@ -58,19 +54,6 @@ public class JG_API extends Thread {
             return this;
         }
 
-        /**
-         * Set the Client's ID.
-         *
-         * @param clientId The client's ID.
-         * @return Returns the current instance of the Client Builder.
-         * @implNote This will be deprecated once Guilded API payloads the ID of the Client that is logged in.
-         */
-        @Deprecated
-        public ClientBuilder setClientId(String clientId) {
-            this.clientId = clientId;
-
-            return this;
-        }
 
         public ClientBuilder setParentServerId(String serverId) {
             this.parentServerId = serverId;
