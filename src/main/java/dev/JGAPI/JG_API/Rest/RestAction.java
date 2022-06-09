@@ -20,11 +20,19 @@ public class RestAction<T> {
 
     private class RestActionResponse<T> {}
 
-    public RestAction<T> queue() {}
+    public RestAction<T> queue() {
+        return null;
+    }
 
-    public RestAction<T> submit() {}
+    public RestAction<T> submit() {
+        return null;
+    }
 
-    public RestActionResponse<T> complete() {}
+    public RestActionResponse<T> complete() {
+        return null;
+    }
 
-    public RestActionResponse<T> completeAfter(TimeUnit unit, int delay) {}
+    public RestActionResponse<T> completeAfter(TimeUnit unit, int delay) {
+        return null;
+    }
 }
