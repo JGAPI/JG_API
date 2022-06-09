@@ -7,20 +7,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Project Information -->
-    <name>JGAPI</name>
+    <name>JG_API</name>
     <description>Java Wrapper for the Guilded API.</description>
-    <groupId>dev.moratto</groupId>
-    <artifactId>JGAPI</artifactId>
+    <groupId>dev.JGAPI</groupId>
+    <artifactId>JG_API</artifactId>
     <version>${projectVersion}</version>
     <packaging>jar</packaging>
 
     <!-- Project Metadata -->
-    <url>https://github.com/moratto-dev/JGAPI</url>
+    <url>https://github.com/JGAPI/JG_API</url>
     <developers>
         <developer>
             <name>Nathaniel Moratto</name>
             <email>nathaniel@moratto.dev</email>
             <url>https://github.com/itznxthaniel</url>
+        </developer>
+        <developer>
+            <name>Jared</name>
+            <email>me@jaredscarito.com</email>
+            <url>https://github.com/JaredScar</url>
         </developer>
     </developers>
     <licenses>
