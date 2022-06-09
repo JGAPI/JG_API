@@ -2,11 +2,20 @@ package dev.moratto.JGAPI.Websocket;
 
 import cn.hutool.json.JSONObject;
 import dev.moratto.JGAPI.Entities.Channels.Mentions;
+import dev.moratto.JGAPI.Entities.Channels.ServerChannel;
 import dev.moratto.JGAPI.Entities.Chat.ChatEmbed;
 import dev.moratto.JGAPI.Entities.Chat.ChatMessage;
+import dev.moratto.JGAPI.Entities.MemberBans.ServerMemberBan;
+import dev.moratto.JGAPI.Entities.Members.ServerMember;
+import dev.moratto.JGAPI.Entities.Members.User;
+import dev.moratto.JGAPI.Entities.Members.UserSummary;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageCreatedEvent;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageDeletedEvent;
 import dev.moratto.JGAPI.Events.Chat.ChatMessageUpdatedEvent;
+import dev.moratto.JGAPI.Events.TeamChannel.TeamChannelCreatedEvent;
+import dev.moratto.JGAPI.Events.TeamChannel.TeamChannelDeletedEvent;
+import dev.moratto.JGAPI.Events.TeamChannel.TeamChannelUpdatedEvent;
+import dev.moratto.JGAPI.Events.TeamMember.*;
 import dev.moratto.JGAPI.JG_API;
 import dev.moratto.JGAPI.ListenerAdapter;
 
@@ -41,6 +50,15 @@ public class WebSocketManager extends ListenerAdapter {
 
     }
 
+    private int[] toPrimitive(Integer[] IntegerArray) {
+
+        int[] result = new int[IntegerArray.length];
+        for (int i = 0; i < IntegerArray.length; i++) {
+            result[i] = IntegerArray[i];
+        }
+        return result;
+    }
+
     public void parseWebsocketMessage(CharSequence data) {
         JSONObject json = new JSONObject(data.toString());
         String eventType = json.getStr("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
@@ -67,13 +85,24 @@ public class WebSocketManager extends ListenerAdapter {
         String createdByWebhookId = json.getStr("d.message.createdByWebhookId");
         Instant updatedAt = Instant.parse(json.getStr("d.message.updatedAt"));
 
+        /**
+         * ServerMember Data
+         */
+        String user_id = null;
+        User user = null;
+        int[] roleIds = null;
+        String nickname = null;
+        Instant joinedAt = null;
+        boolean isOwner = false;
+        UserSummary userSummary = null;
+        String reason = null;
         switch (eventType) {
             case "ChatMessageCreated":
             case "ChatMessageUpdated":
                 if (eventType.equals("ChatMessageCreated")) {
                     onChatMessageCreatedEvent(new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
                 } else {
-                    // It's updated
+                    // It's updated, not created
                     onChatMessageUpdatedEvent(new ChatMessageUpdatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
                 }
                 break;
@@ -81,22 +110,69 @@ public class WebSocketManager extends ListenerAdapter {
                 onChatMessageDeletedEvent(new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
                 break;
             case "TeamMemberJoined":
+                user = new User(json.getStr("d.member.user.id"), json.getStr("d.member.user.name"), json.getStr("d.member.user.type"), json.getStr("d.member.user.avatar"), json.getStr("d.member.user.banner"), Instant.parse(json.getStr("d.member.user.createdAt")));
+                roleIds = toPrimitive(json.getJSONArray("d.member.roleIds").toArray(new Integer[0])); // TODO May need a fix for this, may not work
+                nickname = json.getStr("d.member.nickname");
+                joinedAt = Instant.parse(json.getStr("d.member.joinedAt"));
+                isOwner = json.getBool("d.member.isOwner");
+                onTeamMemberJoinedEvent(new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(user, roleIds, nickname, joinedAt, isOwner)));
                 break;
             case "TeamMemberRemoved":
+                user_id = json.getStr("d.userId");
+                boolean isKick = json.getBool("d.isKick");
+                boolean isBan = json.getBool("d.isBan");
+                onTeamMemberRemovedEvent(new TeamMemberRemovedEvent(this.jg_api, server_id, user_id, isKick, isBan));
                 break;
             case "TeamMemberBanned":
-                break;
             case "TeamMemberUnbanned":
+                userSummary = new UserSummary(json.getStr("d.serverMemberBan.user.id"), json.getStr("d.serverMemberBan.user.type"), json.getStr("d.serverMemberBan.user.name"), json.getStr("d.serverMemberBan.user.avatar"));
+                reason = json.getStr("d.serverMemberBan.reason");
+                createdBy = json.getStr("d.serverMemberBan.createdBy");
+                createdAt = Instant.parse(json.getStr("d.serverMemberBan.createdAt"));
+
+                if (eventType.equals("TeamMemberBanned"))
+                    onTeamMemberBannedEvent(new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt)));
+                else
+                    onTeamMemberUnbannedEvent(new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt)));
                 break;
             case "TeamMemberUpdated":
+                Object userInfo = json.getObj("d.userInfo");
+                onTeamMemberUpdatedEvent(new TeamMemberUpdatedEvent(this.jg_api, server_id, userInfo));
                 break;
             case "teamRolesUpdated":
+                Object[] memberRoleIds = json.getJSONArray("d.memberRoleIds").toArray();
+                onTeamRolesUpdatedEvent(new teamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds));
                 break;
             case "TeamChannelCreated":
-                break;
             case "TeamChannelUpdated":
-                break;
             case "TeamChannelDeleted":
+                String channel_id = json.getStr("d.channel.id");
+                type = json.getStr("d.channel.type");
+                String name = json.getStr("d.channel.name");
+                String topic = json.getStr("d.channel.topic");
+                createdAt = Instant.parse(json.getStr("d.channel.createdAt"));
+                createdBy = json.getStr("d.channel.createdBy");
+                updatedAt = Instant.parse(json.getStr("d.channel.updatedAt"));
+                String serverId = json.getStr("d.channel.serverId");
+                String parentId = json.getStr("d.channel.parentId");
+                String categoryId = json.getStr("d.channel.categoryId");
+                String groupId = json.getStr("d.channel.groupId");
+                boolean isPublic = json.getBool("d.channel.isPublic");
+                String archivedBy = json.getStr("d.channel.archivedBy");
+                Instant archivedAt = Instant.parse(json.getStr("d.channel.archivedAt"));
+                ServerChannel serverChannel = new ServerChannel(channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
+
+                switch (eventType) {
+                    case "TeamChannelCreated":
+                        onTeamChannelCreatedEvent(new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel));
+                        break;
+                    case "TeamChannelUpdated":
+                        onTeamChannelUpdatedEvent(new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel));
+                        break;
+                    case "TeamChannelDeleted":
+                        onTeamChannelDeletedEvent(new TeamChannelDeletedEvent(this.jg_api, server_id, serverChannel));
+                        break;
+                }
                 break;
             case "TeamWebhookCreated":
                 break;

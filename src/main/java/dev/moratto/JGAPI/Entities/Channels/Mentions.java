@@ -13,4 +13,24 @@ public class Mentions {
         this.everyone = everyone;
         this.here = here;
     }
+
+    public Object[] getUsers() {
+        return this.users;
+    }
+
+    public Object[] getChannels() {
+        return this.channels;
+    }
+
+    public Object[] getRoles() {
+        return this.roles;
+    }
+
+    public boolean isEveryone() {
+        return this.everyone;
+    }
+
+    public boolean isHere() {
+        return this.here;
+    }
 }

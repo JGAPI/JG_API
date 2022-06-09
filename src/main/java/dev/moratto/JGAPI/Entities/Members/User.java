@@ -6,9 +6,9 @@ public class User {
     private String id;
     private String name;
     private String type;
-    private String $avatar_uri;
+    private String avatar_uri;
     private String banner_uri;
-    private Instant createdAt = null;
+    private Instant createdAt;
 
     /**
      * Created a User Object.
@@ -17,11 +17,13 @@ public class User {
      * @param type The type of User. Either "client" or "bot".
      * @param createdAt The date of User Creation. Parsed to an {@link Instant} value.
      */
-    protected User(String id, String name, String type, String createdAt) {
+    public User(String id, String name, String type, String avatar_uri, String banner_uri, Instant createdAt) {
         this.id = id;
         this.name = name;
         this.type = type != null ? type : "user";
-        this.createdAt = Instant.parse(createdAt);
+        this.avatar_uri = avatar_uri;
+        this.banner_uri = banner_uri;
+        this.createdAt = createdAt;
     }
 
     /**
@@ -50,5 +52,13 @@ public class User {
      */
     public Instant getCreatedAt() {
         return this.createdAt;
+    }
+
+    public String getAvatar_uri() {
+        return this.avatar_uri;
+    }
+
+    public String getBanner_uri() {
+        return this.banner_uri;
     }
 }

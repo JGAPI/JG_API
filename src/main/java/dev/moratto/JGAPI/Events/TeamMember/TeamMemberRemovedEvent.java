@@ -7,7 +7,7 @@ public class TeamMemberRemovedEvent extends Event {
     private String userId;
     private boolean isKick;
     private boolean isBan;
-    public TeamMemberRemovedEvent(String serverId, JG_API jg_api, String userId, boolean isKick, boolean isBan) {
+    public TeamMemberRemovedEvent(JG_API jg_api, String serverId, String userId, boolean isKick, boolean isBan) {
         super(jg_api, serverId);
         this.userId = userId;
         this.isKick = isKick;
