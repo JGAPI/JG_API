@@ -1,5 +1,8 @@
 package dev.JGAPI.JG_API.Websocket;
 
+import cn.hutool.json.JSONObject;
+import dev.JGAPI.JG_API.Exceptions.InvalidOperationException;
+
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletionStage;
@@ -12,14 +15,28 @@ public class WebSocketListener implements WebSocket.Listener {
     }
 
     @Override
-    public void onOpen(WebSocket webSocket) {
-        WebSocket.Listener.super.onOpen(webSocket);
-    }
+    public void onOpen(WebSocket webSocket) { WebSocket.Listener.super.onOpen(webSocket); }
 
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         System.out.println("Text: " + data);
-        this.webSocketManager.parseWebsocketMessage(data);
+        JSONObject json = new JSONObject(data.toString());
+        int opcode = json.getInt("op");
+        switch (opcode) {
+            case 0:
+                this.webSocketManager.parseWebsocketMessage(json);
+                break;
+            case 1:
+                try {
+                    this.webSocketManager.parseWebsocketWelcome(json);
+                } catch (InvalidOperationException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
+            default:
+                System.out.println("Unhandled OpCode: " + opcode);
+        }
+
         return WebSocket.Listener.super.onText(webSocket, data, last);
     }
 

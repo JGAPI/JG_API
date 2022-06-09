@@ -1,8 +1,6 @@
 package dev.JGAPI.JG_API.Websocket;
 
 import cn.hutool.json.JSONObject;
-import dev.JGAPI.JG_API.Events.TeamMember.*;
-import dev.JGAPI.JG_API.JG_API;
 import dev.JGAPI.JG_API.Entities.Channels.Mentions;
 import dev.JGAPI.JG_API.Entities.Channels.ServerChannel;
 import dev.JGAPI.JG_API.Entities.Chat.ChatEmbed;
@@ -17,11 +15,14 @@ import dev.JGAPI.JG_API.Events.Chat.ChatMessageUpdatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelDeletedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelUpdatedEvent;
+import dev.JGAPI.JG_API.Events.TeamMember.*;
+import dev.JGAPI.JG_API.Exceptions.InvalidOperationException;
+import dev.JGAPI.JG_API.JG_API;
 import dev.JGAPI.JG_API.ListenerAdapter;
 
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
-import java.net.URI;
 import java.time.Instant;
 
 public class WebSocketManager extends ListenerAdapter {
@@ -59,8 +60,7 @@ public class WebSocketManager extends ListenerAdapter {
         return result;
     }
 
-    public void parseWebsocketMessage(CharSequence data) {
-        JSONObject json = new JSONObject(data.toString());
+    public void parseWebsocketMessage(JSONObject json) {
         String eventType = json.getStr("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
         String msg_data = json.getStr("d"); // Data of any form depending on the underlying event
         String msg_id_replay = json.getStr("s"); // Message ID used for replaying events after a disconnect
@@ -70,20 +70,37 @@ public class WebSocketManager extends ListenerAdapter {
         /**
          * ChatMessage Data
          */
-        String msg_id = json.getStr("d.message.id");
-        String type = json.getStr("d.message.type");
-        String mServer_id = json.getStr("d.message.serverId");
-        String channelId = json.getStr("d.message.channelId");
-        String content = json.getStr("d.message.content");
+        String msg_id = null;
+        String type = null;
+        String mServer_id = null;
+        String channelId = null;
+        String content = null;
         ChatEmbed[] embeds = new ChatEmbed[] {};
         String[] replyMessageIds = new String[] {};
-        boolean isPrivate = json.getBool("d.message.isPrivate");
-        boolean isSilent = json.getBool("d.message.isSilent");
+        boolean isPrivate = false;
+        boolean isSilent = false;
         Mentions[] mentions = new Mentions[] {};
-        Instant createdAt = Instant.parse(json.getStr("d.message.createdAt"));
-        String createdBy = json.getStr("d.message.createdBy");
-        String createdByWebhookId = json.getStr("d.message.createdByWebhookId");
-        Instant updatedAt = Instant.parse(json.getStr("d.message.updatedAt"));
+        Instant createdAt = null;
+        String createdBy = null;
+        String createdByWebhookId = null;
+        Instant updatedAt = null;
+
+        if (json.containsKey("d.message")) {
+            msg_id = json.getStr("d.message.id");
+            type = json.getStr("d.message.type");
+            mServer_id = json.getStr("d.message.serverId");
+            channelId = json.getStr("d.message.channelId");
+            content = json.getStr("d.message.content");
+            embeds = new ChatEmbed[] {};
+            replyMessageIds = new String[] {};
+            isPrivate = json.getBool("d.message.isPrivate");
+            isSilent = json.getBool("d.message.isSilent");
+            mentions = new Mentions[] {};
+            createdAt = Instant.parse(json.getStr("d.message.createdAt"));
+            createdBy = json.getStr("d.message.createdBy");
+            createdByWebhookId = json.getStr("d.message.createdByWebhookId");
+            updatedAt = Instant.parse(json.getStr("d.message.updatedAt"));
+        }
 
         /**
          * ServerMember Data
@@ -96,6 +113,7 @@ public class WebSocketManager extends ListenerAdapter {
         boolean isOwner = false;
         UserSummary userSummary = null;
         String reason = null;
+
         switch (eventType) {
             case "ChatMessageCreated":
             case "ChatMessageUpdated":
@@ -195,6 +213,16 @@ public class WebSocketManager extends ListenerAdapter {
             case "ListItemUncompleted":
                 break;
         }
+    }
+
+    public void parseWebsocketWelcome(JSONObject json) throws InvalidOperationException {
+        String user_id = json.getByPath("d.user.id").toString();
+        String name = json.getByPath("d.user.name").toString();
+        String type = "bot";
+        Instant createdAt = Instant.parse(json.getByPath("d.user.createdAt").toString());
+
+        User clientUser = new User(user_id, name, type, null, null, createdAt);
+        this.jg_api.setupClientUser(clientUser);
     }
 
     public void connect() {

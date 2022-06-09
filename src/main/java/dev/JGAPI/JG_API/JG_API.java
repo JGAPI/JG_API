@@ -1,9 +1,10 @@
 package dev.JGAPI.JG_API;
 
-import dev.JGAPI.JG_API.Exceptions.ClientBuildException;
-import dev.JGAPI.JG_API.Websocket.WebSocketManager;
-import dev.JGAPI.JG_API.Rest.RestClient;
 import dev.JGAPI.JG_API.Entities.Members.User;
+import dev.JGAPI.JG_API.Exceptions.ClientBuildException;
+import dev.JGAPI.JG_API.Exceptions.InvalidOperationException;
+import dev.JGAPI.JG_API.Rest.RestClient;
+import dev.JGAPI.JG_API.Websocket.WebSocketManager;
 
 public class JG_API extends Thread {
     private String parentServerId;
@@ -24,6 +25,15 @@ public class JG_API extends Thread {
         webSocketManager.connect();
     }
 
+    public void setupClientUser(User clientUser) throws InvalidOperationException {
+        if (this.clientUser == null) {
+            this.clientUser = clientUser;
+        } else {
+            throw new InvalidOperationException("Attempt to change Client User. Only the Library can do this.");
+        }
+
+    }
+
     @Override
     public void run() {
         // We want to send a heartbeat every so often
@@ -31,6 +41,10 @@ public class JG_API extends Thread {
             // keep alive
             // TODO: Need to send a heartbeat every so often
         }
+    }
+
+    public User getClientUser() {
+        return clientUser;
     }
 
     public static class ClientBuilder {
