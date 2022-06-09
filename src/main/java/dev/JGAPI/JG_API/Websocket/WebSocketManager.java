@@ -17,7 +17,6 @@ import dev.JGAPI.JG_API.Events.Chat.ChatMessageUpdatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelDeletedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelUpdatedEvent;
-import dev.moratto.JGAPI.Events.TeamMember.*;
 import dev.JGAPI.JG_API.ListenerAdapter;
 
 import java.net.http.HttpClient;

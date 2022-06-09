@@ -19,5 +19,9 @@ public class Request {
         return this.body;
     }
 
-    public String execute() {}
+    public String execute() {
+
+        // TODO: RETURN SOMETHING BETTER THAN NULL;
+        return null;
+    }
 }
