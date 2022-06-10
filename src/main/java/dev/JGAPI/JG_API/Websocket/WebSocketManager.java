@@ -97,12 +97,12 @@ public class WebSocketManager extends ListenerAdapter {
             embeds = new ChatEmbed[] {};
             replyMessageIds = new String[] {};
             isPrivate = messageObj.getBool("isPrivate");
-            isSilent = messageObj.getBool("isSilent");
+            isSilent = messageObj.containsKey("isSilent") ? messageObj.getBool("isSilent") : false;
             mentions = new Mentions[] {};
             createdAt = Instant.parse(messageObj.getStr("createdAt"));
             createdBy = messageObj.getStr("createdBy");
             createdByWebhookId = messageObj.getStr("createdByWebhookId");
-            updatedAt = Instant.parse(messageObj.getStr("updatedAt"));
+            updatedAt = messageObj.containsKey("updatedAt") ? Instant.parse(messageObj.getStr("updatedAt")) : null;
         }
 
         /**
