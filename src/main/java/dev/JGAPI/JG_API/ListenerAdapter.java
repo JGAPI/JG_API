@@ -13,8 +13,6 @@ import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelUpdatedEvent;
 import dev.JGAPI.JG_API.Events.TeamMember.*;
 import dev.JGAPI.JG_API.Events.TeamWebhook.TeamWebhookCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamWebhook.TeamWebhookUpdatedEvent;
-import dev.JGAPI.JG_API.Events.ListItem.*;
-import dev.JGAPI.JG_API.Events.TeamMember.*;
 
 public abstract class ListenerAdapter {
     /**

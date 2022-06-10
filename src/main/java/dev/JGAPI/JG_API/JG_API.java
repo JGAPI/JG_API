@@ -13,7 +13,7 @@ public class JG_API extends Thread {
     private String parentServerId;
     private String clientToken;
     private User clientUser;
-    private List<ListenerAdapter> listenerAdapters = new ArrayList<ListenerAdapter>();
+    private List<ListenerAdapter> listenerAdapters;
 
     private WebSocketManager webSocketManager;
     private RestClient restClient;

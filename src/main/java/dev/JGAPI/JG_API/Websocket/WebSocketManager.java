@@ -202,15 +202,12 @@ public class WebSocketManager extends ListenerAdapter {
                 ServerChannel serverChannel = new ServerChannel(channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
 
                 switch (eventType) {
-                    case "TeamChannelCreated":
-                        onTeamChannelCreatedEvent(new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel));
-                        break;
-                    case "TeamChannelUpdated":
-                        onTeamChannelUpdatedEvent(new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel));
-                        break;
-                    case "TeamChannelDeleted":
-                        onTeamChannelDeletedEvent(new TeamChannelDeletedEvent(this.jg_api, server_id, serverChannel));
-                        break;
+                    case "TeamChannelCreated" ->
+                            onTeamChannelCreatedEvent(new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel));
+                    case "TeamChannelUpdated" ->
+                            onTeamChannelUpdatedEvent(new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel));
+                    case "TeamChannelDeleted" ->
+                            onTeamChannelDeletedEvent(new TeamChannelDeletedEvent(this.jg_api, server_id, serverChannel));
                 }
                 break;
             case "TeamWebhookCreated":
