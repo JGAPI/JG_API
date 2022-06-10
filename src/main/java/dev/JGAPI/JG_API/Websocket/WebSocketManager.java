@@ -63,13 +63,15 @@ public class WebSocketManager extends ListenerAdapter {
     public void parseWebsocketMessage(JSONObject json) {
         String eventType = json.getStr("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
         String msg_data = json.getStr("d"); // Data of any form depending on the underlying event
+        JSONObject dataObj = (JSONObject) json.getByPath("d");
         String msg_id_replay = json.getStr("s"); // Message ID used for replaying events after a disconnect
         int opcode = json.getInt("op"); // Event name for the given message
-        String server_id = json.getStr("d.serverId");
+        String server_id = dataObj.getStr("serverId");
 
         /**
          * ChatMessage Data
          */
+        JSONObject messageObj = null;
         String msg_id = null;
         String type = null;
         String mServer_id = null;
@@ -85,26 +87,29 @@ public class WebSocketManager extends ListenerAdapter {
         String createdByWebhookId = null;
         Instant updatedAt = null;
 
-        if (json.containsKey("d.message")) {
-            msg_id = json.getStr("d.message.id");
-            type = json.getStr("d.message.type");
-            mServer_id = json.getStr("d.message.serverId");
-            channelId = json.getStr("d.message.channelId");
-            content = json.getStr("d.message.content");
+        if (dataObj.containsKey("message")) {
+            messageObj = (JSONObject) dataObj.getByPath("message");
+            msg_id = messageObj.getStr("id");
+            type = messageObj.getStr("type");
+            mServer_id = messageObj.getStr("serverId");
+            channelId = messageObj.getStr("channelId");
+            content = messageObj.getStr("content");
             embeds = new ChatEmbed[] {};
             replyMessageIds = new String[] {};
-            isPrivate = json.getBool("d.message.isPrivate");
-            isSilent = json.getBool("d.message.isSilent");
+            isPrivate = messageObj.getBool("isPrivate");
+            isSilent = messageObj.getBool("isSilent");
             mentions = new Mentions[] {};
-            createdAt = Instant.parse(json.getStr("d.message.createdAt"));
-            createdBy = json.getStr("d.message.createdBy");
-            createdByWebhookId = json.getStr("d.message.createdByWebhookId");
-            updatedAt = Instant.parse(json.getStr("d.message.updatedAt"));
+            createdAt = Instant.parse(messageObj.getStr("createdAt"));
+            createdBy = messageObj.getStr("createdBy");
+            createdByWebhookId = messageObj.getStr("createdByWebhookId");
+            updatedAt = Instant.parse(messageObj.getStr("updatedAt"));
         }
 
         /**
          * ServerMember Data
          */
+        JSONObject memberObj = null;
+        JSONObject userObj = null;
         String user_id = null;
         User user = null;
         int[] roleIds = null;
@@ -113,6 +118,16 @@ public class WebSocketManager extends ListenerAdapter {
         boolean isOwner = false;
         UserSummary userSummary = null;
         String reason = null;
+
+        /**
+         * ServerMemberBan Data
+         */
+        JSONObject serverBanObj = null;
+
+        /**
+         * ServerChannel Data
+         */
+        JSONObject serverChannelObj = null;
 
         switch (eventType) {
             case "ChatMessageCreated":
@@ -128,25 +143,30 @@ public class WebSocketManager extends ListenerAdapter {
                 onChatMessageDeletedEvent(new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
                 break;
             case "TeamMemberJoined":
-                user = new User(json.getStr("d.member.user.id"), json.getStr("d.member.user.name"), json.getStr("d.member.user.type"), json.getStr("d.member.user.avatar"), json.getStr("d.member.user.banner"), Instant.parse(json.getStr("d.member.user.createdAt")));
-                roleIds = toPrimitive(json.getJSONArray("d.member.roleIds").toArray(new Integer[0])); // TODO May need a fix for this, may not work
-                nickname = json.getStr("d.member.nickname");
-                joinedAt = Instant.parse(json.getStr("d.member.joinedAt"));
-                isOwner = json.getBool("d.member.isOwner");
+                memberObj = (JSONObject) json.getByPath("d.member");
+                userObj = (JSONObject) json.getByPath("d.member.user");
+                user = new User(userObj.getStr("id"), userObj.getStr("name"), userObj.getStr("type"), userObj.getStr("avatar"), userObj.getStr("banner"), Instant.parse(userObj.getStr("createdAt")));
+
+                roleIds = toPrimitive(memberObj.getJSONArray("roleIds").toArray(new Integer[0])); // TODO May need a fix for this, may not work
+                nickname = memberObj.getStr("nickname");
+                joinedAt = Instant.parse(memberObj.getStr("joinedAt"));
+                isOwner = memberObj.getBool("isOwner");
                 onTeamMemberJoinedEvent(new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(user, roleIds, nickname, joinedAt, isOwner)));
                 break;
             case "TeamMemberRemoved":
-                user_id = json.getStr("d.userId");
-                boolean isKick = json.getBool("d.isKick");
-                boolean isBan = json.getBool("d.isBan");
+                user_id = dataObj.getStr("userId");
+                boolean isKick = dataObj.getBool("isKick");
+                boolean isBan = dataObj.getBool("isBan");
                 onTeamMemberRemovedEvent(new TeamMemberRemovedEvent(this.jg_api, server_id, user_id, isKick, isBan));
                 break;
             case "TeamMemberBanned":
             case "TeamMemberUnbanned":
-                userSummary = new UserSummary(json.getStr("d.serverMemberBan.user.id"), json.getStr("d.serverMemberBan.user.type"), json.getStr("d.serverMemberBan.user.name"), json.getStr("d.serverMemberBan.user.avatar"));
-                reason = json.getStr("d.serverMemberBan.reason");
-                createdBy = json.getStr("d.serverMemberBan.createdBy");
-                createdAt = Instant.parse(json.getStr("d.serverMemberBan.createdAt"));
+                serverBanObj = (JSONObject) json.getByPath("d.serverMemberBan");
+                userObj = (JSONObject) json.getByPath("d.serverMemberBan.user");
+                userSummary = new UserSummary(userObj.getStr("id"), userObj.getStr("type"), userObj.getStr("name"), userObj.getStr("avatar"));
+                reason = serverBanObj.getStr("reason");
+                createdBy = serverBanObj.getStr("createdBy");
+                createdAt = Instant.parse(serverBanObj.getStr("createdAt"));
 
                 if (eventType.equals("TeamMemberBanned"))
                     onTeamMemberBannedEvent(new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt)));
@@ -154,30 +174,31 @@ public class WebSocketManager extends ListenerAdapter {
                     onTeamMemberUnbannedEvent(new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt)));
                 break;
             case "TeamMemberUpdated":
-                Object userInfo = json.getObj("d.userInfo");
+                Object userInfo = dataObj.getObj("userInfo");
                 onTeamMemberUpdatedEvent(new TeamMemberUpdatedEvent(this.jg_api, server_id, userInfo));
                 break;
             case "teamRolesUpdated":
-                Object[] memberRoleIds = json.getJSONArray("d.memberRoleIds").toArray();
+                Object[] memberRoleIds = dataObj.getJSONArray("memberRoleIds").toArray();
                 onTeamRolesUpdatedEvent(new teamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds));
                 break;
             case "TeamChannelCreated":
             case "TeamChannelUpdated":
             case "TeamChannelDeleted":
-                String channel_id = json.getStr("d.channel.id");
-                type = json.getStr("d.channel.type");
-                String name = json.getStr("d.channel.name");
-                String topic = json.getStr("d.channel.topic");
-                createdAt = Instant.parse(json.getStr("d.channel.createdAt"));
-                createdBy = json.getStr("d.channel.createdBy");
-                updatedAt = Instant.parse(json.getStr("d.channel.updatedAt"));
-                String serverId = json.getStr("d.channel.serverId");
-                String parentId = json.getStr("d.channel.parentId");
-                String categoryId = json.getStr("d.channel.categoryId");
-                String groupId = json.getStr("d.channel.groupId");
-                boolean isPublic = json.getBool("d.channel.isPublic");
-                String archivedBy = json.getStr("d.channel.archivedBy");
-                Instant archivedAt = Instant.parse(json.getStr("d.channel.archivedAt"));
+                serverChannelObj = (JSONObject) json.getByPath("d.channel");
+                String channel_id = serverChannelObj.getStr("id");
+                type = serverChannelObj.getStr("type");
+                String name = serverChannelObj.getStr("name");
+                String topic = serverChannelObj.getStr("topic");
+                createdAt = Instant.parse(serverChannelObj.getStr("createdAt"));
+                createdBy = serverChannelObj.getStr("createdBy");
+                updatedAt = Instant.parse(serverChannelObj.getStr("updatedAt"));
+                String serverId = serverChannelObj.getStr("serverId");
+                String parentId = serverChannelObj.getStr("parentId");
+                String categoryId = serverChannelObj.getStr("categoryId");
+                String groupId = serverChannelObj.getStr("groupId");
+                boolean isPublic = serverChannelObj.getBool("isPublic");
+                String archivedBy = serverChannelObj.getStr("archivedBy");
+                Instant archivedAt = Instant.parse(serverChannelObj.getStr("archivedAt"));
                 ServerChannel serverChannel = new ServerChannel(channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
 
                 switch (eventType) {
