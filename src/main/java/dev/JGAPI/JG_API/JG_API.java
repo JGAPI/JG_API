@@ -25,8 +25,8 @@ public class JG_API extends Thread {
         this.parentServerId = clientBuilder.parentServerId;
         this.clientToken = clientBuilder.clientToken;
         this.listenerAdapters = clientBuilder.listenerAdapters;
-        this.restClient = new RestClient(this);
         this.restQueue = new RestQueue();
+        this.restClient = new RestClient(this);
     }
 
     public long getNextSeqNumber() {
@@ -105,7 +105,6 @@ public class JG_API extends Thread {
 
         /**
          * Validates the Client Object.
-         * TODO: Remove requirement for ClientID.
          * REVIEW: Is ServerID needed?
          *
          * @param client @{link Client} object.
