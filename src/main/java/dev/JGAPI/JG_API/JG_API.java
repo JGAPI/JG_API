@@ -4,6 +4,7 @@ import dev.JGAPI.JG_API.Entities.Members.User;
 import dev.JGAPI.JG_API.Exceptions.ClientBuildException;
 import dev.JGAPI.JG_API.Exceptions.InvalidOperationException;
 import dev.JGAPI.JG_API.Rest.RestClient;
+import dev.JGAPI.JG_API.Rest.RestQueue;
 import dev.JGAPI.JG_API.Websocket.WebSocketManager;
 
 import java.util.ArrayList;
@@ -17,12 +18,23 @@ public class JG_API extends Thread {
 
     private WebSocketManager webSocketManager;
     private RestClient restClient;
+    private RestQueue restQueue;
     private boolean running = true;
 
     private JG_API(ClientBuilder clientBuilder) {
         this.parentServerId = clientBuilder.parentServerId;
         this.clientToken = clientBuilder.clientToken;
         this.listenerAdapters = clientBuilder.listenerAdapters;
+        this.restClient = new RestClient(this);
+        this.restQueue = new RestQueue();
+    }
+
+    public long getNextSeqNumber() {
+        return this.restQueue.getNextSequenceNumber();
+    }
+
+    public RestClient getRestClient() {
+        return this.restClient;
     }
 
     public void login() {

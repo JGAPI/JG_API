@@ -1,15 +1,35 @@
 package dev.JGAPI.JG_API.Rest;
 
+import cn.hutool.json.JSONObject;
 import dev.JGAPI.JG_API.Entities.Chat.ChatMessage;
 import dev.JGAPI.JG_API.Entities.Docs.Doc;
 import dev.JGAPI.JG_API.Entities.Forums.ForumThread;
 import dev.JGAPI.JG_API.Entities.ListItems.ListItem;
 import dev.JGAPI.JG_API.Entities.MemberBans.ServerMemberBan;
 import dev.JGAPI.JG_API.Entities.Webhooks.Webhook;
+import dev.JGAPI.JG_API.JG_API;
+
+import java.util.HashMap;
 
 public class RestClient {
+    private JG_API jg_api;
+
+    public RestClient(JG_API jg_api) {
+        this.jg_api = jg_api;
+    }
+
+    private HashMap<String, String> getHeaders() {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer ");
+        headers.put("Accept", "application/json");
+        headers.put("Content-type", "application/json");
+        return headers;
+    }
     public RestAction createChannelMessage(long channelId, ChatMessage message) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Messages.CREATE_MESSAGE, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getMessages(long channelId) {
         return null;
