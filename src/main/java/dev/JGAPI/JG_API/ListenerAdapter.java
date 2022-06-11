@@ -6,6 +6,7 @@ import dev.JGAPI.JG_API.Events.Chat.ChatMessageUpdatedEvent;
 import dev.JGAPI.JG_API.Events.Docs.DocCreatedEvent;
 import dev.JGAPI.JG_API.Events.Docs.DocDeletedEvent;
 import dev.JGAPI.JG_API.Events.Docs.DocUpdatedEvent;
+import dev.JGAPI.JG_API.Events.Library.ReadyEvent;
 import dev.JGAPI.JG_API.Events.ListItem.*;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelDeletedEvent;
@@ -15,6 +16,11 @@ import dev.JGAPI.JG_API.Events.TeamWebhook.TeamWebhookCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamWebhook.TeamWebhookUpdatedEvent;
 
 public abstract class ListenerAdapter {
+    /**
+     * Ready Event
+     */
+    public void onReadyEvent(ReadyEvent event) {}
+
     /**
      * ChatMessage Events
      */

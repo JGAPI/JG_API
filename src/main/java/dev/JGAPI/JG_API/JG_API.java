@@ -1,6 +1,7 @@
 package dev.JGAPI.JG_API;
 
 import dev.JGAPI.JG_API.Entities.Members.User;
+import dev.JGAPI.JG_API.Events.Library.ReadyEvent;
 import dev.JGAPI.JG_API.Exceptions.ClientBuildException;
 import dev.JGAPI.JG_API.Exceptions.InvalidOperationException;
 import dev.JGAPI.JG_API.Rest.RestClient;
@@ -45,6 +46,10 @@ public class JG_API extends Thread {
     public void setupClientUser(User clientUser) throws InvalidOperationException {
         if (this.clientUser == null) {
             this.clientUser = clientUser;
+
+            for (ListenerAdapter adapter : this.getListenerAdapters()) {
+                adapter.onReadyEvent(new ReadyEvent(this));
+            }
         } else {
             throw new InvalidOperationException("Attempt to change Client User. Only the Library can do this.");
         }

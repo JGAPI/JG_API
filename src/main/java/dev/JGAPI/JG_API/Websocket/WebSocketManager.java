@@ -8,7 +8,6 @@ import dev.JGAPI.JG_API.Entities.Chat.ChatMessage;
 import dev.JGAPI.JG_API.Entities.Docs.Doc;
 import dev.JGAPI.JG_API.Entities.ListItems.ListItem;
 import dev.JGAPI.JG_API.Entities.ListItems.ListItemNote;
-import dev.JGAPI.JG_API.Entities.ListItems.ListItemSummary;
 import dev.JGAPI.JG_API.Entities.MemberBans.ServerMemberBan;
 import dev.JGAPI.JG_API.Entities.Members.ServerMember;
 import dev.JGAPI.JG_API.Entities.Members.User;
