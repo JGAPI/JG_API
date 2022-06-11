@@ -15,10 +15,5 @@ public class ListItemSummary {
     private String parentListItemId;
     private Instant completedAt;
     private String completedby;
-    private class Note {
-        private Instant createdAt;
-        private String createdBy;
-        private Instant updatedAt;
-        private String updatedBy;
-    }
+    private ListItemNote note;
 }

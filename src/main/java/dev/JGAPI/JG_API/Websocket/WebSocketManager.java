@@ -328,7 +328,7 @@ public class WebSocketManager {
                 serverId = listItemObj.getStr("serverId");
                 channelId = listItemObj.getStr("channelId");
                 String message = listItemObj.getStr("message");
-                mentions = null; // TODO
+                mentions = null; // TODO Set up
                 createdAt = Instant.parse(listItemObj.getStr("createdAt"));
                 createdBy = listItemObj.getStr("createdBy");
                 createdByWebhookId = listItemObj.getStr("createdByWebhookId");
@@ -338,7 +338,7 @@ public class WebSocketManager {
                 Instant completedAt = Instant.parse(listItemObj.getStr("completedAt"));
                 String completedBy = listItemObj.getStr("completedBy");
                 JSONObject noteObj = listItemObj.getJSONObject("note");
-                Mentions mentions2 = null;
+                Mentions mentions2 = null; // TODO Set up
                 ListItemNote note = new ListItemNote(mentions2, Instant.parse(noteObj.getStr("createdAt")), noteObj.getStr("createdBy"), Instant.parse(noteObj.getStr("updatedAt")), noteObj.getStr("updatedBy"), noteObj.getStr("content"));
                 ListItem listItem = new ListItem(listId, serverId, channelId, message, mentions, createdAt, createdBy, createdByWebhookId, updatedAt, updatedBy, parentListItemId, completedAt, completedBy, note);
                 switch (eventType) {
@@ -378,10 +378,12 @@ public class WebSocketManager {
     }
 
     public void parseWebsocketWelcome(JSONObject json) throws InvalidOperationException {
-        String user_id = json.getByPath("d.user.id").toString();
-        String name = json.getByPath("d.user.name").toString();
+        JSONObject dataObj = json.getJSONObject("d");
+        JSONObject userObj = dataObj.getJSONObject("user");
+        String user_id = userObj.getStr("id");
+        String name = userObj.getStr("name");
         String type = "bot";
-        Instant createdAt = Instant.parse(json.getByPath("d.user.createdAt").toString());
+        Instant createdAt = Instant.parse(userObj.getStr("createdAt"));
 
         User clientUser = new User(user_id, name, type, null, null, createdAt);
         this.jg_api.setupClientUser(clientUser);
