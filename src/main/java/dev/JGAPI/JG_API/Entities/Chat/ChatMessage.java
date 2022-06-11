@@ -14,13 +14,13 @@ public class ChatMessage {
     private String[] replyMessageIds;
     private boolean isPrivate;
     private boolean isSilent;
-    private Mentions[] mentions;
+    private Mentions mentions;
     private Instant createdAt;
     private String createdBy;
     private String createdByWebhookId;
     private Instant updatedAt;
 
-    public ChatMessage(String id, String type, String serverId, String channelId, String content, ChatEmbed[] embeds, String[] replyMessageIds, boolean isPrivate, boolean isSilent, Mentions[] mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+    public ChatMessage(String id, String type, String serverId, String channelId, String content, ChatEmbed[] embeds, String[] replyMessageIds, boolean isPrivate, boolean isSilent, Mentions mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
         this.id = id;
         this.type = type;
         this.serverId = serverId;
@@ -64,7 +64,7 @@ public class ChatMessage {
     public boolean isSilent() {
         return this.isSilent;
     }
-    public Mentions[] getMentions() {
+    public Mentions getMentions() {
         return this.mentions;
     }
     public Instant getCreatedAt() {

@@ -1,4 +1,10 @@
 package dev.JGAPI.JG_API.Events.ListItem;
 
-public class ListItemDeletedEvent {
+import dev.JGAPI.JG_API.Entities.ListItems.ListItem;
+import dev.JGAPI.JG_API.JG_API;
+
+public class ListItemDeletedEvent extends GenericListItemEvent {
+    public ListItemDeletedEvent(JG_API jg_api, String serverId, ListItem listItem) {
+        super(jg_api, serverId, listItem);
+    }
 }

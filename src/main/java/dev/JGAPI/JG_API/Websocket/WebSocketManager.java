@@ -5,6 +5,10 @@ import dev.JGAPI.JG_API.Entities.Channels.Mentions;
 import dev.JGAPI.JG_API.Entities.Channels.ServerChannel;
 import dev.JGAPI.JG_API.Entities.Chat.ChatEmbed;
 import dev.JGAPI.JG_API.Entities.Chat.ChatMessage;
+import dev.JGAPI.JG_API.Entities.Docs.Doc;
+import dev.JGAPI.JG_API.Entities.ListItems.ListItem;
+import dev.JGAPI.JG_API.Entities.ListItems.ListItemNote;
+import dev.JGAPI.JG_API.Entities.ListItems.ListItemSummary;
 import dev.JGAPI.JG_API.Entities.MemberBans.ServerMemberBan;
 import dev.JGAPI.JG_API.Entities.Members.ServerMember;
 import dev.JGAPI.JG_API.Entities.Members.User;
@@ -13,7 +17,11 @@ import dev.JGAPI.JG_API.Entities.Webhooks.Webhook;
 import dev.JGAPI.JG_API.Events.Chat.ChatMessageCreatedEvent;
 import dev.JGAPI.JG_API.Events.Chat.ChatMessageDeletedEvent;
 import dev.JGAPI.JG_API.Events.Chat.ChatMessageUpdatedEvent;
+import dev.JGAPI.JG_API.Events.Docs.DocCreatedEvent;
+import dev.JGAPI.JG_API.Events.Docs.DocDeletedEvent;
+import dev.JGAPI.JG_API.Events.Docs.DocUpdatedEvent;
 import dev.JGAPI.JG_API.Events.Event;
+import dev.JGAPI.JG_API.Events.ListItem.*;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelDeletedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelUpdatedEvent;
@@ -85,7 +93,7 @@ public class WebSocketManager {
         String[] replyMessageIds = new String[] {};
         boolean isPrivate = false;
         boolean isSilent = false;
-        Mentions[] mentions = new Mentions[] {};
+        Mentions mentions = null;
         Instant createdAt = null;
         String createdBy = null;
         String createdByWebhookId = null;
@@ -102,7 +110,7 @@ public class WebSocketManager {
             replyMessageIds = new String[] {};
             isPrivate = messageObj.getBool("isPrivate");
             isSilent = messageObj.containsKey("isSilent") ? messageObj.getBool("isSilent") : false;
-            mentions = new Mentions[] {};
+            mentions = null; // TODO Set up
             createdAt = Instant.parse(messageObj.getStr("createdAt"));
             createdBy = messageObj.getStr("createdBy");
             createdByWebhookId = messageObj.getStr("createdByWebhookId");
@@ -276,20 +284,95 @@ public class WebSocketManager {
                 }
                 break;
             case "DocCreated":
-                break;
             case "DocUpdated":
-                break;
             case "DocDeleted":
+                JSONObject docObj = dataObj.getJSONObject("doc");
+                int docId = docObj.getInt("id");
+                serverId = docObj.getStr("serverId");
+                channelId = docObj.getStr("channelId");
+                String title = docObj.getStr("title");
+                content = docObj.getStr("content");
+                mentions = null; // TODO Set up
+                createdAt = Instant.parse(docObj.getStr("createdAt"));
+                createdBy = docObj.getStr("createdBy");
+                updatedAt = Instant.parse(docObj.getStr("updatedAt"));
+                String updatedBy = docObj.getStr("updatedBy");
+                switch (eventType) {
+                    case "DocCreated":
+                        event = new DocCreatedEvent(this.jg_api, server_id, new Doc(docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onDocCreatedEvent((DocCreatedEvent) event);
+                        }
+                        break;
+                    case "DocUpdated":
+                        event = new DocUpdatedEvent(this.jg_api, server_id, new Doc(docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onDocUpdatedEvent((DocUpdatedEvent) event);
+                        }
+                        break;
+                    case "DocDeleted":
+                        event = new DocDeletedEvent(this.jg_api, server_id, new Doc(docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onDocDeletedEvent((DocDeletedEvent) event);
+                        }
+                        break;
+                }
                 break;
             case "ListItemCreated":
-                break;
             case "ListItemUpdated":
-                break;
             case "ListItemDeleted":
-                break;
             case "ListItemCompleted":
-                break;
             case "ListItemUncompleted":
+                JSONObject listItemObj = dataObj.getJSONObject("listItem");
+                String listId = listItemObj.getStr("id");
+                serverId = listItemObj.getStr("serverId");
+                channelId = listItemObj.getStr("channelId");
+                String message = listItemObj.getStr("message");
+                mentions = null; // TODO
+                createdAt = Instant.parse(listItemObj.getStr("createdAt"));
+                createdBy = listItemObj.getStr("createdBy");
+                createdByWebhookId = listItemObj.getStr("createdByWebhookId");
+                updatedAt = Instant.parse(listItemObj.getStr("updatedAt"));
+                updatedBy = listItemObj.getStr("updatedBy");
+                String parentListItemId = listItemObj.getStr("parentListItemId");
+                Instant completedAt = Instant.parse(listItemObj.getStr("completedAt"));
+                String completedBy = listItemObj.getStr("completedBy");
+                JSONObject noteObj = listItemObj.getJSONObject("note");
+                Mentions mentions2 = null;
+                ListItemNote note = new ListItemNote(mentions2, Instant.parse(noteObj.getStr("createdAt")), noteObj.getStr("createdBy"), Instant.parse(noteObj.getStr("updatedAt")), noteObj.getStr("updatedBy"), noteObj.getStr("content"));
+                ListItem listItem = new ListItem(listId, serverId, channelId, message, mentions, createdAt, createdBy, createdByWebhookId, updatedAt, updatedBy, parentListItemId, completedAt, completedBy, note);
+                switch (eventType) {
+                    case "ListItemCreated":
+                        event = new ListItemCreatedEvent(this.jg_api, server_id, listItem);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onListItemCreatedEvent((ListItemCreatedEvent) event);
+                        }
+                        break;
+                    case "ListItemUpdated":
+                        event = new ListItemUpdatedEvent(this.jg_api, server_id, listItem);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onListItemUpdatedEvent((ListItemUpdatedEvent) event);
+                        }
+                        break;
+                    case "ListItemDeleted":
+                        event = new ListItemDeletedEvent(this.jg_api, server_id, listItem);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onListItemDeletedEvent((ListItemDeletedEvent) event);
+                        }
+                        break;
+                    case "ListItemCompleted":
+                        event = new ListItemCompletedEvent(this.jg_api, server_id, listItem);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onListItemCompletedEvent((ListItemCompletedEvent) event);
+                        }
+                        break;
+                    case "ListItemUncompleted":
+                        event = new ListItemUncompletedEvent(this.jg_api, server_id, listItem);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onListItemUncompletedEvent((ListItemUncompletedEvent) event);
+                        }
+                        break;
+                }
                 break;
         }
     }
