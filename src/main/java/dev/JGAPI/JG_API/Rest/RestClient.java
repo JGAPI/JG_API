@@ -3,7 +3,7 @@ package dev.JGAPI.JG_API.Rest;
 import cn.hutool.json.JSONObject;
 import dev.JGAPI.JG_API.Entities.Chat.ChatMessage;
 import dev.JGAPI.JG_API.Entities.Docs.Doc;
-import dev.JGAPI.JG_API.Entities.Forums.ForumThread;
+import dev.JGAPI.JG_API.Entities.Forums.ForumTopic;
 import dev.JGAPI.JG_API.Entities.ListItems.ListItem;
 import dev.JGAPI.JG_API.Entities.MemberBans.ServerMemberBan;
 import dev.JGAPI.JG_API.Entities.Webhooks.Webhook;
@@ -70,7 +70,7 @@ public class RestClient {
     public RestAction getServerBans(long serverId) {
         return null;
     }
-    public RestAction createForumThread(long channelId, ForumThread forumThread) {
+    public RestAction createForumThread(long channelId, ForumTopic forumTopic) {
         return null;
     }
     public RestAction createListItem(long channelId, ListItem listItem) {

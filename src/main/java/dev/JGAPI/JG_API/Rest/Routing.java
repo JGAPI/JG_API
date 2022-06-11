@@ -78,7 +78,7 @@ public class Routing {
         public static final Routing GET_BANS = new Routing(Method.GET, "/servers/{serverId}/bans");
     }
     public static class Forums {
-        public static final Routing CREATE_THREAD = new Routing(Method.POST, "/channels/{channelId}/forum");
+        public static final Routing CREATE_TOPIC = new Routing(Method.POST, "/channels/{channelId}/topics");
     }
     public static class ListItems {
         public static final Routing CREATE_LIST_ITEM = new Routing(Method.POST, "/channels/{channelId}/items");
