@@ -3,8 +3,10 @@ package dev.JGAPI.JG_API.Rest;
 public class Routing {
     public enum Method {
         GET("GET"),
+        HEAD("HEAD"),
         POST("POST"),
         PUT("PUT"),
+        PATCH("PATCH"),
         DELETE("DELETE");
         private String method;
         Method(String method) {
@@ -14,6 +16,42 @@ public class Routing {
             return this.method;
         }
     }
+
+    public enum Status {
+        CODE_200(200, "The request was successful"),
+        CODE_201(201, "The content was created"),
+        CODE_204(204, "No content returned"),
+        CODE_400(400, "The request was unacceptable, often due to missing parameters"),
+        CODE_401(401, "The access token is missing or invalid"),
+        CODE_403(403, "The bot does not have the necessary permissions"),
+        CODE_404(404, "The requested resource does not exist"),
+        CODE_409(409, "The request conflicted with another request"),
+        CODE_500(500, "Something went wrong on our end"),
+        CODE_502(502, "Server overloaded or unavailable... Please try again in 30+ seconds"),
+        CODE_503(503, "Server overloaded or unavailable... Please try again in 30+ seconds"),
+        CODE_504(504, "Server overloaded or unavailable... Please try again in 30+ seconds");
+        private int statusCode;
+        private String msg;
+        Status(int statusCode, String msg) {
+            this.statusCode = statusCode;
+            this.msg = msg;
+        }
+        int getStatusCode() {
+            return this.statusCode;
+        }
+        String getMsg() {
+            return this.msg;
+        }
+    }
+
+    public Status getStatusFromCode(int code) {
+        for (Status status : Status.values()) {
+            if (status.getStatusCode() == code)
+                return status;
+        }
+        return null;
+    }
+
     public static class Channels {
         public static final Routing CREATE_CHANNEL = new Routing(Method.POST, "/channels");
         public static final Routing GET_CHANNEL = new Routing(Method.GET, "/channels/{channelId}");
