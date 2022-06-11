@@ -9,13 +9,17 @@ import dev.JGAPI.JG_API.Entities.MemberBans.ServerMemberBan;
 import dev.JGAPI.JG_API.Entities.Members.ServerMember;
 import dev.JGAPI.JG_API.Entities.Members.User;
 import dev.JGAPI.JG_API.Entities.Members.UserSummary;
+import dev.JGAPI.JG_API.Entities.Webhooks.Webhook;
 import dev.JGAPI.JG_API.Events.Chat.ChatMessageCreatedEvent;
 import dev.JGAPI.JG_API.Events.Chat.ChatMessageDeletedEvent;
 import dev.JGAPI.JG_API.Events.Chat.ChatMessageUpdatedEvent;
+import dev.JGAPI.JG_API.Events.Event;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelCreatedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelDeletedEvent;
 import dev.JGAPI.JG_API.Events.TeamChannel.TeamChannelUpdatedEvent;
 import dev.JGAPI.JG_API.Events.TeamMember.*;
+import dev.JGAPI.JG_API.Events.TeamWebhook.TeamWebhookCreatedEvent;
+import dev.JGAPI.JG_API.Events.TeamWebhook.TeamWebhookUpdatedEvent;
 import dev.JGAPI.JG_API.Exceptions.InvalidOperationException;
 import dev.JGAPI.JG_API.JG_API;
 import dev.JGAPI.JG_API.ListenerAdapter;
@@ -25,7 +29,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.time.Instant;
 
-public class WebSocketManager extends ListenerAdapter {
+public class WebSocketManager {
     private WebSocket webSocket;
     private WebSocketListener webSocketListener;
     private URI guildedWebSocketUri;
@@ -129,18 +133,34 @@ public class WebSocketManager extends ListenerAdapter {
          */
         JSONObject serverChannelObj = null;
 
+        /**
+         * Webhook Data
+         */
+        JSONObject webhookObj = null;
+
+        Event event = null;
+
         switch (eventType) {
             case "ChatMessageCreated":
             case "ChatMessageUpdated":
+                event = new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
                 if (eventType.equals("ChatMessageCreated")) {
-                    onChatMessageCreatedEvent(new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                        adapter.onChatMessageCreatedEvent((ChatMessageCreatedEvent) event);
+                    }
                 } else {
                     // It's updated, not created
-                    onChatMessageUpdatedEvent(new ChatMessageUpdatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                    event = new ChatMessageUpdatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
+                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                        adapter.onChatMessageUpdatedEvent((ChatMessageUpdatedEvent) event);
+                    }
                 }
                 break;
             case "ChatMessageDeleted":
-                onChatMessageDeletedEvent(new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt)));
+                event = new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
+                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                    adapter.onChatMessageDeletedEvent((ChatMessageDeletedEvent) event);
+                }
                 break;
             case "TeamMemberJoined":
                 memberObj = (JSONObject) json.getByPath("d.member");
@@ -151,13 +171,19 @@ public class WebSocketManager extends ListenerAdapter {
                 nickname = memberObj.getStr("nickname");
                 joinedAt = Instant.parse(memberObj.getStr("joinedAt"));
                 isOwner = memberObj.getBool("isOwner");
-                onTeamMemberJoinedEvent(new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(user, roleIds, nickname, joinedAt, isOwner)));
+                event = new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(user, roleIds, nickname, joinedAt, isOwner));
+                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                    adapter.onTeamMemberJoinedEvent((TeamMemberJoinedEvent) event);
+                }
                 break;
             case "TeamMemberRemoved":
                 user_id = dataObj.getStr("userId");
                 boolean isKick = dataObj.getBool("isKick");
                 boolean isBan = dataObj.getBool("isBan");
-                onTeamMemberRemovedEvent(new TeamMemberRemovedEvent(this.jg_api, server_id, user_id, isKick, isBan));
+                event = new TeamMemberRemovedEvent(this.jg_api, server_id, user_id, isKick, isBan);
+                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                    adapter.onTeamMemberRemovedEvent((TeamMemberRemovedEvent) event);
+                }
                 break;
             case "TeamMemberBanned":
             case "TeamMemberUnbanned":
@@ -168,18 +194,31 @@ public class WebSocketManager extends ListenerAdapter {
                 createdBy = serverBanObj.getStr("createdBy");
                 createdAt = Instant.parse(serverBanObj.getStr("createdAt"));
 
-                if (eventType.equals("TeamMemberBanned"))
-                    onTeamMemberBannedEvent(new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt)));
-                else
-                    onTeamMemberUnbannedEvent(new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt)));
+                if (eventType.equals("TeamMemberBanned")) {
+                    event = new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt));
+                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                        adapter.onTeamMemberBannedEvent((TeamMemberBannedEvent) event);
+                    }
+                } else {
+                    event = new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt));
+                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                        adapter.onTeamMemberUnbannedEvent((TeamMemberUnbannedEvent) event);
+                    }
+                }
                 break;
             case "TeamMemberUpdated":
                 Object userInfo = dataObj.getObj("userInfo");
-                onTeamMemberUpdatedEvent(new TeamMemberUpdatedEvent(this.jg_api, server_id, userInfo));
+                event = new TeamMemberUpdatedEvent(this.jg_api, server_id, userInfo);
+                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                    adapter.onTeamMemberUpdatedEvent((TeamMemberUpdatedEvent) event);
+                }
                 break;
             case "teamRolesUpdated":
                 Object[] memberRoleIds = dataObj.getJSONArray("memberRoleIds").toArray();
-                onTeamRolesUpdatedEvent(new teamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds));
+                event = new teamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds);
+                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                    adapter.onTeamRolesUpdatedEvent((teamRolesUpdatedEvent) event);
+                }
                 break;
             case "TeamChannelCreated":
             case "TeamChannelUpdated":
@@ -200,19 +239,41 @@ public class WebSocketManager extends ListenerAdapter {
                 String archivedBy = serverChannelObj.getStr("archivedBy");
                 Instant archivedAt = Instant.parse(serverChannelObj.getStr("archivedAt"));
                 ServerChannel serverChannel = new ServerChannel(channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
-
                 switch (eventType) {
-                    case "TeamChannelCreated" ->
-                            onTeamChannelCreatedEvent(new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel));
-                    case "TeamChannelUpdated" ->
-                            onTeamChannelUpdatedEvent(new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel));
-                    case "TeamChannelDeleted" ->
-                            onTeamChannelDeletedEvent(new TeamChannelDeletedEvent(this.jg_api, server_id, serverChannel));
+                    case "TeamChannelCreated" -> event = new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel);
+                    case "TeamChannelUpdated" -> event = new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel);
+                    case "TeamChannelDeleted" -> event = new TeamChannelDeletedEvent(this.jg_api, server_id, serverChannel);
+                }
+                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "TeamChannelCreated" -> adapter.onTeamChannelCreatedEvent((TeamChannelCreatedEvent) event);
+                        case "TeamChannelUpdated" -> adapter.onTeamChannelUpdatedEvent((TeamChannelUpdatedEvent) event);
+                        case "TeamChannelDeleted" -> adapter.onTeamChannelDeletedEvent((TeamChannelDeletedEvent) event);
+                    }
                 }
                 break;
             case "TeamWebhookCreated":
-                break;
             case "TeamWebhookUpdated":
+                webhookObj = dataObj.getJSONObject("webhook");
+                String webhook_id = webhookObj.getStr("id");
+                name = webhookObj.getStr("name");
+                serverId = webhookObj.getStr("serverId");
+                channelId = webhookObj.getStr("channelId");
+                createdAt = Instant.parse(webhookObj.getStr("createdAt"));
+                createdBy = webhookObj.getStr("createdBy");
+                Instant deletedAt = Instant.parse(webhookObj.getStr("deletedAt"));
+                String token = webhookObj.getStr("token");
+                if (eventType.equals("TeamWebhookCreated")) {
+                    event = new TeamWebhookCreatedEvent(this.jg_api, server_id, new Webhook(webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
+                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                        adapter.onTeamWebhookCreatedEvent((TeamWebhookCreatedEvent) event);
+                    }
+                } else {
+                    event = new TeamWebhookUpdatedEvent(this.jg_api, server_id, new Webhook(webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
+                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                        adapter.onTeamWebhookUpdatedEvent((TeamWebhookUpdatedEvent) event);
+                    }
+                }
                 break;
             case "DocCreated":
                 break;
