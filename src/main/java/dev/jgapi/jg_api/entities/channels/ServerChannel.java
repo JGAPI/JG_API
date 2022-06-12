@@ -1,8 +1,12 @@
 package dev.jgapi.jg_api.entities.channels;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.rest.RestAction;
+
 import java.time.Instant;
 
-public class ServerChannel {
+public class ServerChannel extends GuildedObject {
     private String id;
     private String type;
     private String name;
@@ -17,7 +21,8 @@ public class ServerChannel {
     private boolean isPublic;
     private String archivedBy;
     private Instant archivedAt;
-    public ServerChannel(String id, String type, String name, String topic, Instant createdAt, String createdBy, Instant updatedAt, String serverId, String parentId, String categoryId, String groupId, boolean isPublic, String archivedBy, Instant archivedAt) {
+    public ServerChannel(JG_API jg_api, String id, String type, String name, String topic, Instant createdAt, String createdBy, Instant updatedAt, String serverId, String parentId, String categoryId, String groupId, boolean isPublic, String archivedBy, Instant archivedAt) {
+        super(jg_api);
         this.id = id;
         this.type = type;
         this.name = name;
@@ -88,5 +93,21 @@ public class ServerChannel {
 
     public Instant getArchivedAt() {
         return this.archivedAt;
+    }
+
+    public RestAction delete() {
+        return this.jg_api.getRestClient().deleteChannel(this.id);
+    }
+    public RestAction update(String name, String topic, boolean isPublic) {
+        return this.jg_api.getRestClient().updateChannel(this.id, name, topic, isPublic);
+    }
+    public RestAction setName(String name) {
+        return this.jg_api.getRestClient().updateChannel(this.id, name, this.topic, this.isPublic);
+    }
+    public RestAction setTopic(String topic) {
+        return this.jg_api.getRestClient().updateChannel(this.id, this.name, topic, this.isPublic);
+    }
+    public RestAction setPublic(boolean isPublic) {
+        return this.jg_api.getRestClient().updateChannel(this.id, this.name, this.topic, isPublic);
     }
 }

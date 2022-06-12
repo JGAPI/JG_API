@@ -55,6 +55,7 @@ public class Routing {
     public static class Channels {
         public static final Routing CREATE_CHANNEL = new Routing(Method.POST, "/channels");
         public static final Routing GET_CHANNEL = new Routing(Method.GET, "/channels/{channelId}");
+        public static final Routing UPDATE_CHANNEL = new Routing(Method.PATCH, "/channels/{channelId}");
         public static final Routing DELETE_CHANNEL = new Routing(Method.POST, "/channels/{channelId}");
     }
     public static class Messages {

@@ -1,10 +1,13 @@
 package dev.jgapi.jg_api.entities.chat;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
+import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
 
-public class ChatMessage {
+public class ChatMessage extends GuildedObject {
     private String id;
     private String type;
     private String serverId;
@@ -20,7 +23,8 @@ public class ChatMessage {
     private String createdByWebhookId;
     private Instant updatedAt;
 
-    public ChatMessage(String id, String type, String serverId, String channelId, String content, ChatEmbed[] embeds, String[] replyMessageIds, boolean isPrivate, boolean isSilent, Mentions mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+    public ChatMessage(JG_API jg_api, String id, String type, String serverId, String channelId, String content, ChatEmbed[] embeds, String[] replyMessageIds, boolean isPrivate, boolean isSilent, Mentions mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+        super(jg_api);
         this.id = id;
         this.type = type;
         this.serverId = serverId;
@@ -78,5 +82,18 @@ public class ChatMessage {
     }
     public Instant getUpdatedAt() {
         return this.updatedAt;
+    }
+
+    public RestAction delete() {
+        return jg_api.getRestClient().deleteMessage(this.channelId, this.id);
+    }
+    public RestAction update(String content, ChatEmbed[] embeds) {
+        return jg_api.getRestClient().updateMessage(this.channelId, this.id, content, embeds);
+    }
+    public RestAction setContent(String content) {
+        return jg_api.getRestClient().updateMessage(this.channelId, this.id, content, this.embeds);
+    }
+    public RestAction setEmbeds(ChatEmbed[] embeds) {
+        return jg_api.getRestClient().updateMessage(this.channelId, this.id, this.content, embeds);
     }
 }

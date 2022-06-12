@@ -27,15 +27,9 @@ import dev.jgapi.jg_api.events.teammember.*;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookCreatedEvent;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
 import dev.jgapi.jg_api.exceptions.InvalidOperationException;
-import dev.JGAPI.jg_api.events.listitem.*;
-import dev.JGAPI.jg_api.events.teammember.*;
 import dev.jgapi.jg_api.events.Event;
-import dev.JGAPI.JG_API.events.listitem.*;
-import dev.JGAPI.JG_API.events.teammember.*;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
-import dev.jgapilow.jg_api.events.listitem.*;
-import dev.jgapilow.jg_api.events.teammember.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -156,21 +150,21 @@ public class WebSocketManager {
         switch (eventType) {
             case "ChatMessageCreated":
             case "ChatMessageUpdated":
-                event = new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
+                event = new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(this.jg_api, msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
                 if (eventType.equals("ChatMessageCreated")) {
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                         adapter.onChatMessageCreatedEvent((ChatMessageCreatedEvent) event);
                     }
                 } else {
                     // It's updated, not created
-                    event = new ChatMessageUpdatedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
+                    event = new ChatMessageUpdatedEvent(this.jg_api, server_id, new ChatMessage(this.jg_api, msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                         adapter.onChatMessageUpdatedEvent((ChatMessageUpdatedEvent) event);
                     }
                 }
                 break;
             case "ChatMessageDeleted":
-                event = new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
+                event = new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(this.jg_api, msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                     adapter.onChatMessageDeletedEvent((ChatMessageDeletedEvent) event);
                 }

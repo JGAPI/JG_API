@@ -1,12 +1,20 @@
 package dev.jgapi.jg_api.entities.chat;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
+
 import java.time.Instant;
 
-public class ChatEmbed {
+public class ChatEmbed extends GuildedObject {
     private String title;
     private String description;
     private String url;
     private int color;
+
+    public ChatEmbed(JG_API jg_api) {
+        super(jg_api);
+    }
+
     private class Footer {
         private String icon_url;
         private String text;

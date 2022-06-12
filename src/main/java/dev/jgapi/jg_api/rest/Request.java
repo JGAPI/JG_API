@@ -15,6 +15,12 @@ public class Request {
         this.headers = headers;
         this.body = body;
     }
+    public Routing getRoute() {
+        return this.route;
+    }
+    public HashMap<String, String> getRouteReplacements() {
+        return this.routeReplacements;
+    }
     public HashMap<String, String> getHeaders() {
         return this.headers;
     }

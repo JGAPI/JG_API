@@ -1,6 +1,7 @@
 package dev.jgapi.jg_api.rest;
 
 import cn.hutool.json.JSONObject;
+import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
@@ -28,6 +29,72 @@ public class RestClient {
         headers.put("Accept", "application/json");
         headers.put("Content-type", "application/json");
         return headers;
+    }
+    public RestAction createChannel(ServerChannel channel) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        // Set up the body of the request
+        body.put("name", channel.getName());
+        body.put("topic", channel.getTopic());
+        body.put("isPublic", channel.isPublic());
+        body.put("type", channel.getType());
+        body.put("serverId", channel.getServerId());
+        body.put("groupId", channel.getGroupId());
+        body.put("categoryId", channel.getCategoryId());
+        Request request = new Request(Routing.Channels.CREATE_CHANNEL, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction createChannel(String name, String topic, boolean isPublic, String type, String serverId, String groupId, String categoryId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        // Set up the body of the request
+        body.put("name", name);
+        body.put("topic", topic);
+        body.put("isPublic", isPublic);
+        body.put("type", type);
+        body.put("serverId", serverId);
+        body.put("groupId", groupId);
+        body.put("categoryId", categoryId);
+        Request request = new Request(Routing.Channels.CREATE_CHANNEL, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction getChannel(String channelId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        // Set up the body of the request
+        Request request = new Request(Routing.Channels.GET_CHANNEL, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction updateChannel(String channelId, ServerChannel channel) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        // Set up the body of the request
+        body.put("name", channel.getName());
+        body.put("topic", channel.getTopic());
+        body.put("isPublic", channel.isPublic());
+        Request request = new Request(Routing.Channels.UPDATE_CHANNEL, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction updateChannel(String channelId, String name, String topic, boolean isPublic) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        // Set up the body of the request
+        body.put("name", name);
+        body.put("topic", topic);
+        body.put("isPublic", isPublic);
+        Request request = new Request(Routing.Channels.UPDATE_CHANNEL, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction deleteChannel(String channelId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        // Set up the body of the request
+        Request request = new Request(Routing.Channels.UPDATE_CHANNEL, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createChannelMessage(String channelId, ChatMessage message) {
         JSONObject body = new JSONObject();
@@ -87,7 +154,7 @@ public class RestClient {
         Request request = new Request(Routing.Messages.UPDATE_MESSAGE, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
-    public RestAction updateMessage(String channelId, String messageId, String content, ChatEmbed embeds) {
+    public RestAction updateMessage(String channelId, String messageId, String content, ChatEmbed[] embeds) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));
