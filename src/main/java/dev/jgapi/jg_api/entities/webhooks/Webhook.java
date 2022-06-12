@@ -1,8 +1,12 @@
 package dev.jgapi.jg_api.entities.webhooks;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.rest.RestAction;
+
 import java.time.Instant;
 
-public class Webhook {
+public class Webhook extends GuildedObject {
     private String id;
     private String name;
     private String serverId;
@@ -11,7 +15,8 @@ public class Webhook {
     private String createdBy;
     private Instant deletedAt;
     private String token;
-    public Webhook(String id, String name, String serverId, String channelId, Instant createdAt, String createdBy, Instant deletedAt, String token) {
+    public Webhook(JG_API jg_api, String id, String name, String serverId, String channelId, Instant createdAt, String createdBy, Instant deletedAt, String token) {
+        super(jg_api);
         this.id = id;
         this.name = name;
         this.serverId = serverId;
@@ -52,5 +57,18 @@ public class Webhook {
 
     public String getToken() {
         return this.token;
+    }
+
+    public RestAction delete() {
+        return jg_api.getRestClient().deleteWebhook(this.serverId, this.id);
+    }
+    public RestAction update(String name, String channelId) {
+        return jg_api.getRestClient().updateWebhook(this.serverId, this.id, name, channelId);
+    }
+    public RestAction setName(String name) {
+        return jg_api.getRestClient().updateWebhook(this.serverId, this.id, name, this.channelId);
+    }
+    public RestAction setChannelId(String channelId) {
+        return jg_api.getRestClient().updateWebhook(this.serverId, this.id, this.name, channelId);
     }
 }

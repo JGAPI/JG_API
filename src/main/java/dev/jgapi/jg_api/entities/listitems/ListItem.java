@@ -1,10 +1,13 @@
 package dev.jgapi.jg_api.entities.listitems;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
+import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
 
-public class ListItem {
+public class ListItem extends GuildedObject {
     private String id;
     private String serverId;
     private String channelId;
@@ -19,7 +22,8 @@ public class ListItem {
     private Instant completedAt;
     private String completedBy;
     private ListItemNote note;
-    public ListItem(String id, String serverId, String channelId, String message, Mentions mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt, String updatedBy, String parentListItemId, Instant completedAt, String completedBy, ListItemNote note) {
+    public ListItem(JG_API jg_api, String id, String serverId, String channelId, String message, Mentions mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt, String updatedBy, String parentListItemId, Instant completedAt, String completedBy, ListItemNote note) {
+        super(jg_api);
         this.id = id;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -90,5 +94,24 @@ public class ListItem {
 
     public ListItemNote getNote() {
         return this.note;
+    }
+
+    public RestAction delete() {
+        return jg_api.getRestClient().deleteListitem(this.channelId, this.id);
+    }
+    public RestAction update(String message, ListItemNote note) {
+        return jg_api.getRestClient().updateListItem(this.channelId, this.id, message, note);
+    }
+    public RestAction setMessage(String message) {
+        return jg_api.getRestClient().updateListItem(this.channelId, this.id, message, this.note);
+    }
+    public RestAction setNote(ListItemNote note) {
+        return jg_api.getRestClient().updateListItem(this.channelId, this.id, this.message, note);
+    }
+    public RestAction complete() {
+        return jg_api.getRestClient().completeListItem(this.channelId, this.id);
+    }
+    public RestAction uncomplete() {
+        return jg_api.getRestClient().uncompleteListItem(this.channelId, this.id);
     }
 }

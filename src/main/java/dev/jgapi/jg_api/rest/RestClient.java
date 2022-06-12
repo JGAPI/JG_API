@@ -93,7 +93,7 @@ public class RestClient {
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", channelId);
         // Set up the body of the request
-        Request request = new Request(Routing.Channels.UPDATE_CHANNEL, routeReplacements, getHeaders(), body);
+        Request request = new Request(Routing.Channels.DELETE_CHANNEL, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createChannelMessage(String channelId, ChatMessage message) {
@@ -339,16 +339,18 @@ public class RestClient {
         routeReplacements.put("{listItemId}", String.valueOf(listItemId));
         // Set up the body of the request
         body.put("message", listItem.getMessage());
+        body.put("note", listItem.getNote());
         Request request = new Request(Routing.ListItems.UPDATE_LIST_ITEM, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
-    public RestAction updateListItem(String channelId, String listItemId, String message) {
+    public RestAction updateListItem(String channelId, String listItemId, String message, ListItemNote note) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));
         routeReplacements.put("{listItemId}", String.valueOf(listItemId));
         // Set up the body of the request
         body.put("message", message);
+        body.put("note", note);
         Request request = new Request(Routing.ListItems.UPDATE_LIST_ITEM, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
@@ -409,42 +411,42 @@ public class RestClient {
         Request request = new Request(Routing.Docs.GET_DOCS, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
-    public RestAction getDoc(String channelId, String docId) {
+    public RestAction getDoc(String channelId, int docId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));
-        routeReplacements.put("{docId}", docId);
+        routeReplacements.put("{docId}", String.valueOf(docId));
         // Set up the body of the request
         Request request = new Request(Routing.Docs.GET_DOC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
-    public RestAction updateDoc(String channelId, String docId, Doc doc) {
+    public RestAction updateDoc(String channelId, int docId, Doc doc) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));
-        routeReplacements.put("{docId}", docId);
+        routeReplacements.put("{docId}", String.valueOf(docId));
         // Set up the body of the request
         body.put("title", doc.getTitle());
         body.put("content", doc.getContent());
         Request request = new Request(Routing.Docs.UPDATE_DOC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
-    public RestAction updateDoc(String channelId, String docId, String title, String content) {
+    public RestAction updateDoc(String channelId, int docId, String title, String content) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));
-        routeReplacements.put("{docId}", docId);
+        routeReplacements.put("{docId}", String.valueOf(docId));
         // Set up the body of the request
         body.put("title", title);
         body.put("content", content);
         Request request = new Request(Routing.Docs.UPDATE_DOC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
-    public RestAction deleteDoc(String channelId, String docId) {
+    public RestAction deleteDoc(String channelId, int docId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));
-        routeReplacements.put("{docId}", docId);
+        routeReplacements.put("{docId}", String.valueOf(docId));
         // Set up the body of the request
         Request request = new Request(Routing.Docs.DELETE_DOC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);

@@ -178,7 +178,7 @@ public class WebSocketManager {
                 nickname = memberObj.getStr("nickname");
                 joinedAt = Instant.parse(memberObj.getStr("joinedAt"));
                 isOwner = memberObj.getBool("isOwner");
-                event = new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(user, roleIds, nickname, joinedAt, isOwner));
+                event = new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(this.jg_api, user, roleIds, nickname, joinedAt, isOwner));
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                     adapter.onTeamMemberJoinedEvent((TeamMemberJoinedEvent) event);
                 }
@@ -202,12 +202,12 @@ public class WebSocketManager {
                 createdAt = Instant.parse(serverBanObj.getStr("createdAt"));
 
                 if (eventType.equals("TeamMemberBanned")) {
-                    event = new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt));
+                    event = new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(this.jg_api, userSummary, reason, createdBy, createdAt));
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                         adapter.onTeamMemberBannedEvent((TeamMemberBannedEvent) event);
                     }
                 } else {
-                    event = new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(userSummary, reason, createdBy, createdAt));
+                    event = new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(this.jg_api, userSummary, reason, createdBy, createdAt));
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                         adapter.onTeamMemberUnbannedEvent((TeamMemberUnbannedEvent) event);
                     }
@@ -245,7 +245,7 @@ public class WebSocketManager {
                 boolean isPublic = serverChannelObj.getBool("isPublic");
                 String archivedBy = serverChannelObj.getStr("archivedBy");
                 Instant archivedAt = Instant.parse(serverChannelObj.getStr("archivedAt"));
-                ServerChannel serverChannel = new ServerChannel(channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
+                ServerChannel serverChannel = new ServerChannel(this.jg_api, channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
                 switch (eventType) {
                     case "TeamChannelCreated" -> event = new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel);
                     case "TeamChannelUpdated" -> event = new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel);
@@ -271,12 +271,12 @@ public class WebSocketManager {
                 Instant deletedAt = Instant.parse(webhookObj.getStr("deletedAt"));
                 String token = webhookObj.getStr("token");
                 if (eventType.equals("TeamWebhookCreated")) {
-                    event = new TeamWebhookCreatedEvent(this.jg_api, server_id, new Webhook(webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
+                    event = new TeamWebhookCreatedEvent(this.jg_api, server_id, new Webhook(this.jg_api, webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                         adapter.onTeamWebhookCreatedEvent((TeamWebhookCreatedEvent) event);
                     }
                 } else {
-                    event = new TeamWebhookUpdatedEvent(this.jg_api, server_id, new Webhook(webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
+                    event = new TeamWebhookUpdatedEvent(this.jg_api, server_id, new Webhook(this.jg_api, webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                         adapter.onTeamWebhookUpdatedEvent((TeamWebhookUpdatedEvent) event);
                     }
@@ -298,19 +298,19 @@ public class WebSocketManager {
                 String updatedBy = docObj.getStr("updatedBy");
                 switch (eventType) {
                     case "DocCreated":
-                        event = new DocCreatedEvent(this.jg_api, server_id, new Doc(docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
+                        event = new DocCreatedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
                         for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
                             adapters.onDocCreatedEvent((DocCreatedEvent) event);
                         }
                         break;
                     case "DocUpdated":
-                        event = new DocUpdatedEvent(this.jg_api, server_id, new Doc(docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
+                        event = new DocUpdatedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
                         for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
                             adapters.onDocUpdatedEvent((DocUpdatedEvent) event);
                         }
                         break;
                     case "DocDeleted":
-                        event = new DocDeletedEvent(this.jg_api, server_id, new Doc(docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
+                        event = new DocDeletedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
                         for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
                             adapters.onDocDeletedEvent((DocDeletedEvent) event);
                         }
@@ -339,7 +339,7 @@ public class WebSocketManager {
                 JSONObject noteObj = listItemObj.getJSONObject("note");
                 Mentions mentions2 = null; // TODO Set up
                 ListItemNote note = new ListItemNote(mentions2, Instant.parse(noteObj.getStr("createdAt")), noteObj.getStr("createdBy"), Instant.parse(noteObj.getStr("updatedAt")), noteObj.getStr("updatedBy"), noteObj.getStr("content"));
-                ListItem listItem = new ListItem(listId, serverId, channelId, message, mentions, createdAt, createdBy, createdByWebhookId, updatedAt, updatedBy, parentListItemId, completedAt, completedBy, note);
+                ListItem listItem = new ListItem(this.jg_api, listId, serverId, channelId, message, mentions, createdAt, createdBy, createdByWebhookId, updatedAt, updatedBy, parentListItemId, completedAt, completedBy, note);
                 switch (eventType) {
                     case "ListItemCreated":
                         event = new ListItemCreatedEvent(this.jg_api, server_id, listItem);

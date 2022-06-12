@@ -1,8 +1,11 @@
 package dev.jgapi.jg_api.entities.forums;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
+
 import java.time.Instant;
 
-public class ForumTopic {
+public class ForumTopic extends GuildedObject {
     private String id;
     private String serverId;
     private String channelId;
@@ -12,7 +15,8 @@ public class ForumTopic {
     private String createdBy;
     private String createdByWebhookId;
     private Instant updatedAt;
-    public ForumTopic(String id, String serverId, String channelId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+    public ForumTopic(JG_API jg_api, String id, String serverId, String channelId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+        super(jg_api);
         this.id = id;
         this.serverId = serverId;
         this.channelId = channelId;

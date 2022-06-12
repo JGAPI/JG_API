@@ -1,10 +1,13 @@
 package dev.jgapi.jg_api.entities.docs;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
+import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
 
-public class Doc {
+public class Doc extends GuildedObject {
     private int id;
     private String serverId;
     private String channelId;
@@ -15,7 +18,8 @@ public class Doc {
     private String createdby;
     private Instant updatedAt;
     private String updatedBy;
-    public Doc(int id, String serverId, String channelId, String title, String content, Mentions mentions, Instant createdAt, String createdBy, Instant updatedAt, String updatedBy) {
+    public Doc(JG_API jg_api, int id, String serverId, String channelId, String title, String content, Mentions mentions, Instant createdAt, String createdBy, Instant updatedAt, String updatedBy) {
+        super(jg_api);
         this.id = id;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -66,5 +70,18 @@ public class Doc {
 
     public String getUpdatedBy() {
         return this.updatedBy;
+    }
+
+    public RestAction delete() {
+        return jg_api.getRestClient().deleteDoc(this.channelId, this.id);
+    }
+    public RestAction update(String title, String content) {
+        return jg_api.getRestClient().updateDoc(this.channelId, this.id, title, content);
+    }
+    public RestAction setTitle(String title) {
+        return jg_api.getRestClient().updateDoc(this.channelId, this.id, title, this.content);
+    }
+    public RestAction setContent(String content) {
+        return jg_api.getRestClient().updateDoc(this.channelId, this.id, this.title, content);
     }
 }

@@ -1,14 +1,19 @@
 package dev.jgapi.jg_api.entities.members;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.rest.RestAction;
+
 import java.time.Instant;
 
-public class ServerMember {
+public class ServerMember extends GuildedObject {
     private User user;
     private int[] roleIds;
     private String nickname;
     private Instant joinedAt;
     private boolean isOwner;
-    public ServerMember(User user, int[] roleIds, String nickname, Instant joinedAt, boolean isOwner) {
+    public ServerMember(JG_API jg_api, User user, int[] roleIds, String nickname, Instant joinedAt, boolean isOwner) {
+        super(jg_api);
         this.user = user;
         this.roleIds = roleIds;
         this.nickname = nickname;
@@ -34,5 +39,18 @@ public class ServerMember {
 
     public boolean isOwner() {
         return this.isOwner;
+    }
+
+    public RestAction setNickname(String serverId, String nickname) {
+        return jg_api.getRestClient().updateNickname(serverId, this.user.getId(), nickname);
+    }
+    public RestAction deleteNickname(String serverId) {
+        return jg_api.getRestClient().deleteNickname(serverId, this.user.getId());
+    }
+    public RestAction kickMember(String serverId) {
+        return jg_api.getRestClient().kickMember(serverId, this.user.getId());
+    }
+    public RestAction banMember(String serverId, String reason) {
+        return jg_api.getRestClient().createServerBan(serverId, this.user.getId(), reason);
     }
 }

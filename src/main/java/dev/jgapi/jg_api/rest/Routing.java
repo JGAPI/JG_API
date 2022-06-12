@@ -132,6 +132,10 @@ public class Routing {
         this.route = route;
     }
 
+    public String getVersion() {
+        return this.version;
+    }
+
     public String getRoute() {
         return this.route;
     }
