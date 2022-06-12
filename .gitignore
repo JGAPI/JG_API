@@ -23,7 +23,7 @@
 hs_err_pid*
 
 # Test files
-src/main/java/dev/JGAPI/JG_API/TestTheBot.java
+src/main/java/dev/jgapi/jg_api/TestTheBot.java
 src/main/java/dev/moratto/JGAPI/TestTheBot.java
 
 # Jetbrains
