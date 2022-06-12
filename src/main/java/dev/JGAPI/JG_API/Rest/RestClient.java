@@ -32,123 +32,243 @@ public class RestClient {
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getMessages(long channelId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Messages.GET_MESSAGES, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getMessage(long channelId, long messageId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Messages.GET_MESSAGE, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction updateMessage(long channelId, long messageId, ChatMessage message) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Messages.UPDATE_MESSAGE, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction deleteMessage(long channelId, long messageId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Messages.DELETE_MESSAGE, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction updateNickname(long serverId, long userId, String nickname) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Members.UPDATE_NICKNAME, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction deleteNickname(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Members.DELETE_NICKNAME, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getMember(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Members.GET_MEMBER, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction kickMember(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Members.KICK_MEMBER, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getMembers(long serverId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Members.GET_MEMBERS, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createServerBan(long serverId, long userId, ServerMemberBan serverMemberBan) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.MemberBans.BAN_MEMBER, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getServerBan(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.MemberBans.GET_MEMBER_BAN, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction deleteServerBan(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.MemberBans.DELETE_MEMBER_BAN, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getServerBans(long serverId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.MemberBans.GET_BANS, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createForumThread(long channelId, ForumTopic forumTopic) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Forums.CREATE_TOPIC, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createListItem(long channelId, ListItem listItem) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.CREATE_LIST_ITEM, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getListItems(long channelId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.GET_LIST_ITEMS, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getListItem(long channelId, long listItemId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.GET_LIST_ITEM, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction updateListItem(long channelId, long listItemId, ListItem listItem) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.UPDATE_LIST_ITEM, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction deleteListitem(long channelId, long listItemId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.DELETE_LIST_ITEM, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction completeListItem(long channelId, long listItemId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.COMPLETE_LIST_ITEM, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction uncompleteListItem(long channelId, long listItemId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.ListItems.UNCOMPLETE_LIST_ITEM, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createDoc(long channelId, Doc doc) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Docs.CREATE_DOC, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getDocs(long channelId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Docs.GET_DOCS, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getDoc(long channelId, long docId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Docs.GET_DOC, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction updateDoc(long channelId, long docId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Docs.UPDATE_DOC, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction deleteDoc(long channelId, long docId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Docs.DELETE_DOC, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction addReactionEmote(long channelId, long contentId, long emoteId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Reactions.ADD_REACTION_EMOTE, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction awardMemberXP(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Server_XP.AWARD_XP_TO_MEMBER, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction awardRoleXP(long serverId, long roleId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Server_XP.AWARD_XP_TO_ROLE, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getSocialLinks(long serverId, long userId, String type) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Social_Links.GET_MEMBER_SOCIAL_LINKS, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction addMemberToGroup(long groupId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Group_Memberships.ADD_MEMBER_TO_GROUP, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction removeMemberFromGroup(long groupId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Group_Memberships.REMOVE_MEMBER_FROM_GROUP, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction addRoleToMember(long serverId, long userId, long roleId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Role_Memberships.ADD_ROLE_TO_MEMBER, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction removeRoleFromMember(long serverId, long userId, long roleId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Role_Memberships.REMOVE_ROLE_FROM_MEMBER, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getMemberRoles(long serverId, long userId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Role_Memberships.GET_MEMBER_ROLES, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction createWebhook(long serverId, Webhook webhook) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Webhooks.CREATE_WEBHOOK, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getWebhooks(long serverId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Webhooks.GET_WEBHOOKS, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction getWebhook(long serverId, long webhookId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Webhooks.GET_WEBHOOK, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction updateWebhook(long serverId, long webhookId, Webhook webhook) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Webhooks.UPDATE_WEBHOOK, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction deleteWebhook(long serverId, long webhookId) {
-        return null;
+        JSONObject body = new JSONObject();
+        // TODO Set up the body of the request
+        Request request = new Request(Routing.Webhooks.DELETE_WEBHOOK, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
 }
