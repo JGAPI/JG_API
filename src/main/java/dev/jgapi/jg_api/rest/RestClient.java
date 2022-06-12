@@ -1,11 +1,14 @@
 package dev.jgapi.jg_api.rest;
 
 import cn.hutool.json.JSONObject;
+import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
 import dev.jgapi.jg_api.entities.forums.ForumTopic;
 import dev.jgapi.jg_api.entities.listitems.ListItem;
+import dev.jgapi.jg_api.entities.listitems.ListItemNote;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
+import dev.jgapi.jg_api.entities.members.ServerMember;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
 import dev.jgapi.jg_api.JG_API;
 
@@ -36,6 +39,19 @@ public class RestClient {
         body.put("replyMessageIds", message.getReplyMessageIds());
         body.put("content", message.getContent());
         body.put("embeds", message.getEmbeds());
+        Request request = new Request(Routing.Messages.CREATE_MESSAGE, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction createChannelMessage(String channelId, boolean isPrivate, boolean isSilent, String[] replyMessageIds, String content, ChatEmbed[] embeds) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        // Set up the body of the request
+        body.put("isPrivate", isPrivate);
+        body.put("isSilent", isSilent);
+        body.put("replyMessageIds", replyMessageIds);
+        body.put("content", content);
+        body.put("embeds", embeds);
         Request request = new Request(Routing.Messages.CREATE_MESSAGE, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
@@ -71,6 +87,17 @@ public class RestClient {
         Request request = new Request(Routing.Messages.UPDATE_MESSAGE, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
+    public RestAction updateMessage(String channelId, String messageId, String content, ChatEmbed embeds) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{messageId}", String.valueOf(messageId));
+        // Set up the body of the request
+        body.put("content", content);
+        body.put("embeds", embeds);
+        Request request = new Request(Routing.Messages.UPDATE_MESSAGE, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
     public RestAction deleteMessage(String channelId, String messageId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
@@ -78,6 +105,16 @@ public class RestClient {
         routeReplacements.put("{messageId}", String.valueOf(messageId));
         // Set up the body of the request
         Request request = new Request(Routing.Messages.DELETE_MESSAGE, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction updateNickname(String serverId, String userId, ServerMember serverMember) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{serverId}", String.valueOf(serverId));
+        routeReplacements.put("{userId}", String.valueOf(userId));
+        // Set up the body of the request
+        body.put("nickname", serverMember.getNickname());
+        Request request = new Request(Routing.Members.UPDATE_NICKNAME, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
     public RestAction updateNickname(String serverId, String userId, String nickname) {
@@ -135,6 +172,16 @@ public class RestClient {
         Request request = new Request(Routing.MemberBans.BAN_MEMBER, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
+    public RestAction createServerBan(String serverId, String userId, String reason) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{serverId}", String.valueOf(serverId));
+        routeReplacements.put("{userId}", String.valueOf(userId));
+        // Set up the body of the request
+        body.put("reason", reason);
+        Request request = new Request(Routing.MemberBans.BAN_MEMBER, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
     public RestAction getServerBan(String serverId, String userId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
@@ -171,6 +218,16 @@ public class RestClient {
         Request request = new Request(Routing.Forums.CREATE_TOPIC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
+    public RestAction createForumTopic(String channelId, String title, String content) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        // Set up the body of the request
+        body.put("title", title);
+        body.put("content", content);
+        Request request = new Request(Routing.Forums.CREATE_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
     public RestAction createListItem(String channelId, ListItem listItem) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
@@ -178,6 +235,16 @@ public class RestClient {
         // Set up the body of the request
         body.put("message", listItem.getMessage());
         body.put("note", listItem.getNote());
+        Request request = new Request(Routing.ListItems.CREATE_LIST_ITEM, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction createListItem(String channelId, String message, ListItemNote note) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        // Set up the body of the request
+        body.put("message", message);
+        body.put("note", note);
         Request request = new Request(Routing.ListItems.CREATE_LIST_ITEM, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
@@ -205,6 +272,16 @@ public class RestClient {
         routeReplacements.put("{listItemId}", String.valueOf(listItemId));
         // Set up the body of the request
         body.put("message", listItem.getMessage());
+        Request request = new Request(Routing.ListItems.UPDATE_LIST_ITEM, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction updateListItem(String channelId, String listItemId, String message) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{listItemId}", String.valueOf(listItemId));
+        // Set up the body of the request
+        body.put("message", message);
         Request request = new Request(Routing.ListItems.UPDATE_LIST_ITEM, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
@@ -245,6 +322,16 @@ public class RestClient {
         Request request = new Request(Routing.Docs.CREATE_DOC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
+    public RestAction createDoc(String channelId, String title, String content) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        // Set up the body of the request
+        body.put("title", title);
+        body.put("content", content);
+        Request request = new Request(Routing.Docs.CREATE_DOC, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
     public RestAction getDocs(String channelId, Instant before, int limit) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
@@ -272,6 +359,17 @@ public class RestClient {
         // Set up the body of the request
         body.put("title", doc.getTitle());
         body.put("content", doc.getContent());
+        Request request = new Request(Routing.Docs.UPDATE_DOC, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction updateDoc(String channelId, String docId, String title, String content) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{docId}", docId);
+        // Set up the body of the request
+        body.put("title", title);
+        body.put("content", content);
         Request request = new Request(Routing.Docs.UPDATE_DOC, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
@@ -381,6 +479,16 @@ public class RestClient {
         Request request = new Request(Routing.Webhooks.CREATE_WEBHOOK, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
+    public RestAction createWebhook(String serverId, String name, String channelId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{serverId}", serverId);
+        // Set up the body of the request
+        body.put("name", name);
+        body.put("channelId", channelId);
+        Request request = new Request(Routing.Webhooks.CREATE_WEBHOOK, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
     public RestAction getWebhooks(String serverId, String channelId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
@@ -407,6 +515,17 @@ public class RestClient {
         // Set up the body of the request
         body.put("name", webhook.getName());
         body.put("channelId", webhook.getChannelId());
+        Request request = new Request(Routing.Webhooks.UPDATE_WEBHOOK, routeReplacements, getHeaders(), body);
+        return new RestAction(this.jg_api.getNextSeqNumber(), request);
+    }
+    public RestAction updateWebhook(String serverId, String webhookId, String name, String channelId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{serverId}", serverId);
+        routeReplacements.put("{webhookId}", webhookId);
+        // Set up the body of the request
+        body.put("name", name);
+        body.put("channelId", channelId);
         Request request = new Request(Routing.Webhooks.UPDATE_WEBHOOK, routeReplacements, getHeaders(), body);
         return new RestAction(this.jg_api.getNextSeqNumber(), request);
     }
