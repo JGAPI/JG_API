@@ -14,12 +14,6 @@ import dev.jgapi.jg_api.events.teamchannel.TeamChannelUpdatedEvent;
 import dev.jgapi.jg_api.events.teammember.*;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookCreatedEvent;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
-import dev.JGAPI.jg_api.events.listitem.*;
-import dev.JGAPI.jg_api.events.teammember.*;
-import dev.JGAPI.JG_API.events.listitem.*;
-import dev.JGAPI.JG_API.events.teammember.*;
-import dev.jgapilow.jg_api.events.listitem.*;
-import dev.jgapilow.jg_api.events.teammember.*;
 
 public abstract class ListenerAdapter {
     /**
