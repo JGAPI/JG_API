@@ -4,6 +4,7 @@ import dev.jgapi.jg_api.entities.members.User;
 import dev.jgapi.jg_api.events.library.ReadyEvent;
 import dev.jgapi.jg_api.exceptions.ClientBuildException;
 import dev.jgapi.jg_api.exceptions.InvalidOperationException;
+import dev.jgapi.jg_api.rest.RestAction;
 import dev.jgapi.jg_api.rest.RestClient;
 import dev.jgapi.jg_api.rest.RestQueue;
 import dev.jgapi.jg_api.websocket.WebSocketManager;
@@ -32,6 +33,10 @@ public class JG_API extends Thread {
 
     public long getNextSeqNumber() {
         return this.restQueue.getNextSequenceNumber();
+    }
+
+    public void queueRestAction(RestAction restAction) {
+        this.restQueue.queue(restAction);
     }
 
     public RestClient getRestClient() {

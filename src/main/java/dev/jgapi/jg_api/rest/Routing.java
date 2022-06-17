@@ -1,21 +1,8 @@
 package dev.jgapi.jg_api.rest;
 
+import cn.hutool.http.Method;
+
 public class Routing {
-    public enum Method {
-        GET("GET"),
-        HEAD("HEAD"),
-        POST("POST"),
-        PUT("PUT"),
-        PATCH("PATCH"),
-        DELETE("DELETE");
-        private String method;
-        Method(String method) {
-            this.method = method;
-        }
-        String getMethodString() {
-            return this.method;
-        }
-    }
 
     public enum Status {
         CODE_200(200, "The request was successful"),
@@ -125,11 +112,16 @@ public class Routing {
     }
 
     private final String version = "v1";
+    private final String url = "https://www.guilded.gg/api/";
     private final String route;
     private final Method method;
     public Routing(Method method, String route) {
         this.method = method;
         this.route = route;
+    }
+
+    public String getUrl() {
+        return this.url;
     }
 
     public String getVersion() {

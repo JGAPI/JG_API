@@ -1,4 +1,3 @@
 package dev.jgapi.jg_api.builders;
 
-public class EmbedBuilder {
-}
+public class EmbedBuilder {}

@@ -1,13 +1,22 @@
 package dev.jgapi.jg_api.rest;
 
+import cn.hutool.json.JSONObject;
+import dev.jgapi.jg_api.JG_API;
+
 import java.util.concurrent.TimeUnit;
 
 public class RestAction {
     private long sequenceNumber;
     private Request request;
-    public RestAction(long sequenceNumber, Request request) {
+    private JG_API jg_api;
+    public RestAction(long sequenceNumber, Request request, JG_API jg_api) {
         this.request = request;
         this.sequenceNumber = sequenceNumber;
+        this.jg_api = jg_api;
+    }
+
+    public Request getRequest() {
+        return this.request;
     }
 
     public long getSequenceNumber() {
@@ -18,18 +27,22 @@ public class RestAction {
         this.sequenceNumber = sequenceNumber;
     }
 
-    private class RestActionResponse {}
+    private class RestActionResponse {
+        private JSONObject response = new JSONObject();
+        public RestActionResponse(JSONObject response) {}
+    }
 
     public RestAction queue() {
-        return null;
+        return this;
     }
 
     public RestAction submit() {
-        return null;
+        return this;
     }
 
     public RestActionResponse complete() {
-        return null;
+        RestActionResponse restAR = new RestActionResponse();
+        return  restAR;
     }
 
     public RestActionResponse completeAfter(TimeUnit unit, int delay) {
