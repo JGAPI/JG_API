@@ -7,17 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RestQueue {
-    private List<RestAction> RestQueue = new ArrayList<>();
+    private List<RestAction<Object>> RestQueue = new ArrayList<>();
     private long seqNumber = 0;
     private final int TIMEOUT = 20000;
-    public void add(RestAction action) {
+    public void add(RestAction<Object> action) {
         this.RestQueue.add(action);
     }
     public long getNextSequenceNumber() {
         this.seqNumber++;
         return (this.seqNumber);
     }
-    public void queue(RestAction restAction) {
+    public void queue(RestAction<Object> restAction) {
         this.RestQueue.add(restAction);
     }
     public void removeBySequenceNumber(long seqNumber) {
@@ -26,7 +26,7 @@ public class RestQueue {
     public void processQueue() {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
-        RestAction action = this.RestQueue.get(0);
+        RestAction<Object> action = this.RestQueue.get(0);
         Request request = action.getRequest();
         String endpointReplace = request.getRoute().getRoute();
         for (String key : request.getRouteReplacements().keySet()) {
@@ -46,13 +46,19 @@ public class RestQueue {
         switch (resp.getStatus()) {
             case 200:
             case 201:
+                // TODO Accept onSuccess consumer with right type of response needed
+                // action.getOnSuccess().accept();
                 break;
             case 204:
+                // Error
+                // TODO Accept onFailure consumer
                 break;
             default:
+                // Error
+                // TODO Accept onFailure consumer
         }
     }
-    public List<RestAction> getQueuedRestActions() {
+    public List<RestAction<Object>> getQueuedRestActions() {
         return this.RestQueue;
     }
     public boolean containsSequenceNumber(long seqNumber) {

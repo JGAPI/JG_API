@@ -1,18 +1,29 @@
 package dev.jgapi.jg_api.rest;
 
-import cn.hutool.json.JSONObject;
 import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.chat.ChatMessage;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-public class RestAction {
+public class RestAction<T> {
     private long sequenceNumber;
     private Request request;
     private JG_API jg_api;
+    private Consumer<? super T> onSuccess;
+    private Consumer<? super Throwable> onFailure;
     public RestAction(long sequenceNumber, Request request, JG_API jg_api) {
         this.request = request;
         this.sequenceNumber = sequenceNumber;
         this.jg_api = jg_api;
+    }
+
+    public Consumer<? super T> getOnSuccess() {
+        return this.onSuccess;
+    }
+
+    public Consumer<? super Throwable> getOnFailure() {
+        return this.onFailure;
     }
 
     public Request getRequest() {
@@ -27,28 +38,27 @@ public class RestAction {
         this.sequenceNumber = sequenceNumber;
     }
 
-    private class RestActionResponse {
-        private JSONObject response = new JSONObject();
-        public RestActionResponse(JSONObject response) {}
-        public JSONObject getResponse() {
-            return this.response;
-        }
-    }
-
-    public RestAction queue() {
+    public RestAction<T> queue() {
         return this;
     }
 
-    public RestAction submit() {
+    public RestAction<T> queue(Consumer<? super T> success) {
+        this.queue(success, null);
         return this;
     }
 
-    public RestActionResponse complete() {
-        RestActionResponse restAR = new RestActionResponse();
-        return  restAR;
+    public RestAction<T> queue(Consumer<? super T> success, Consumer<? super Throwable> failure) {
+        this.onSuccess = success;
+        this.onFailure = failure;
+        this.jg_api.queueRestAction(this);
+        return this;
     }
 
-    public RestActionResponse completeAfter(TimeUnit unit, int delay) {
+    public RestAction<T> submit() {
+        return this;
+    }
+
+    public RestAction<T> completeAfter(TimeUnit unit, int delay) {
         return null;
     }
 }
