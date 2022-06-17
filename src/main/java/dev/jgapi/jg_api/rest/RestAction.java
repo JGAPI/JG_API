@@ -30,6 +30,9 @@ public class RestAction {
     private class RestActionResponse {
         private JSONObject response = new JSONObject();
         public RestActionResponse(JSONObject response) {}
+        public JSONObject getResponse() {
+            return this.response;
+        }
     }
 
     public RestAction queue() {
