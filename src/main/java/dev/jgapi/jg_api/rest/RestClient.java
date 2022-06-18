@@ -15,6 +15,7 @@ import dev.jgapi.jg_api.JG_API;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class RestClient {
     private JG_API jg_api;

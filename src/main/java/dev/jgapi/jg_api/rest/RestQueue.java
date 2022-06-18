@@ -2,12 +2,14 @@ package dev.jgapi.jg_api.rest;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import dev.jgapi.jg_api.entities.chat.ChatMessage;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestQueue {
-    private List<RestAction<Object>> RestQueue = new ArrayList<>();
+    private List<RestAction<?>> RestQueue = new ArrayList<>();
     private long seqNumber = 0;
     private final int TIMEOUT = 20000;
     public void add(RestAction<Object> action) {
@@ -26,7 +28,7 @@ public class RestQueue {
     public void processQueue() {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
-        RestAction<Object> action = this.RestQueue.get(0);
+        RestAction<?> action = this.RestQueue.get(0);
         Request request = action.getRequest();
         String endpointReplace = request.getRoute().getRoute();
         for (String key : request.getRouteReplacements().keySet()) {
@@ -48,6 +50,7 @@ public class RestQueue {
             case 201:
                 // TODO Accept onSuccess consumer with right type of response needed
                 // action.getOnSuccess().accept();
+                action.getOnSuccess().accept();
                 break;
             case 204:
                 // Error
@@ -58,7 +61,13 @@ public class RestQueue {
                 // TODO Accept onFailure consumer
         }
     }
-    public List<RestAction<Object>> getQueuedRestActions() {
+
+    public <T> T processAction() {
+        // Example:
+        // TODO new RestAction<Webhook>(this.jg_api.getNextSeqNumber(), request, this.jg_api).queue(webhook -> { webhook.getServerId(); });
+    }
+
+    public List<RestAction<?>> getQueuedRestActions() {
         return this.RestQueue;
     }
     public boolean containsSequenceNumber(long seqNumber) {
