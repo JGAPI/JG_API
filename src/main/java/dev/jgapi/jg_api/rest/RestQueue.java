@@ -2,9 +2,12 @@ package dev.jgapi.jg_api.rest;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONObject;
+import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
+import dev.jgapi.jg_api.entities.server.ServerModel;
+import dev.jgapi.jg_api.exceptions.ReturnTypeException;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +53,7 @@ public class RestQueue {
             case 201:
                 // TODO Accept onSuccess consumer with right type of response needed
                 // action.getOnSuccess().accept();
-                action.getOnSuccess().accept();
+                action.getOnSuccess().accept(processAction(resp.body(), request.getRoute().getReturnType()));
                 break;
             case 204:
                 // Error
@@ -62,9 +65,57 @@ public class RestQueue {
         }
     }
 
-    public <T> T processAction() {
+    public <T> T processAction(String jsonResponse, Routing.ReturnType returnType) {
         // Example:
-        // TODO new RestAction<Webhook>(this.jg_api.getNextSeqNumber(), request, this.jg_api).queue(webhook -> { webhook.getServerId(); });
+        // new RestAction<Webhook>(this.jg_api.getNextSeqNumber(), request, this.jg_api).queue(webhook -> { webhook.getServerId(); });
+        switch (returnType) {
+            case NONE:
+                return null;
+            case ServerModel:
+                return null;
+            case ServerChannel:
+                return null;
+            case ChatMessage:
+                return null;
+            case ChatMessage_Arr:
+                return null;
+            case Nickname:
+               return "";
+            case ServerMember:
+                return null;
+            case ServerMemberSummary_Arr:
+                return null;
+            case ServerMemberBan:
+                return null;
+            case ServerMemberBan_Arr:
+                return null;
+            case ForumTopic:
+                return null;
+            case ListItem:
+                return null;
+            case ListItemSummary_Arr:
+                return null;
+            case ListItem_Update_Obj:
+                return null;
+            case Doc:
+                return null;
+            case Doc_Arr:
+                return null;
+            case XP_Member_Total:
+                return null;
+            case XP_Role_Total:
+                return null;
+            case Social_Links_Obj:
+                return null;
+            case MemberRoles:
+                return null;
+            case Webhook:
+                return null;
+            case Webhook_Arr:
+                return null;
+
+        }
+        return null;
     }
 
     public List<RestAction<?>> getQueuedRestActions() {

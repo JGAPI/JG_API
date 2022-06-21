@@ -2,7 +2,6 @@ package dev.jgapi.jg_api.rest;
 
 import dev.jgapi.jg_api.JG_API;
 
-import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -39,6 +38,7 @@ public class RestAction<T> {
     }
 
     public RestAction<T> queue() {
+        this.queue(null, null);
         return this;
     }
 

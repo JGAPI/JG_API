@@ -10,12 +10,12 @@ import dev.jgapi.jg_api.entities.listitems.ListItem;
 import dev.jgapi.jg_api.entities.listitems.ListItemNote;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
 import dev.jgapi.jg_api.entities.members.ServerMember;
+import dev.jgapi.jg_api.entities.server.ServerModel;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
 import dev.jgapi.jg_api.JG_API;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 public class RestClient {
     private JG_API jg_api;
@@ -30,6 +30,14 @@ public class RestClient {
         headers.put("Accept", "application/json");
         headers.put("Content-type", "application/json");
         return headers;
+    }
+
+    public RestAction<ServerModel> getServer(String serverId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{serverId}", serverId);
+        Request request = new Request(Routing.Servers.GET_SERVER, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
     public RestAction<ServerChannel> createChannel(ServerChannel channel) {
         JSONObject body = new JSONObject();
