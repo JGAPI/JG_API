@@ -35,7 +35,7 @@ public class RestClient {
     public RestAction<ServerModel> getServer(String serverId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
-        routeReplacements.put("{serverId}", serverId);
+        routeReplacements.put("{serverId}", serverId)
         Request request = new Request(Routing.Servers.GET_SERVER, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }

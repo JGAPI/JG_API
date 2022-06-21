@@ -17,6 +17,10 @@ public class RestAction<T> {
         this.jg_api = jg_api;
     }
 
+    public JG_API get_JGAPI() {
+        return this.jg_api;
+    }
+
     public Consumer<? super T> getOnSuccess() {
         return this.onSuccess;
     }

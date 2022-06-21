@@ -3,7 +3,9 @@ package dev.jgapi.jg_api.rest;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
+import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.entities.StringEntity;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.server.ServerModel;
 import dev.jgapi.jg_api.exceptions.ReturnTypeException;
@@ -70,7 +72,7 @@ public class RestQueue {
         // new RestAction<Webhook>(this.jg_api.getNextSeqNumber(), request, this.jg_api).queue(webhook -> { webhook.getServerId(); });
         switch (returnType) {
             case NONE:
-                return null;
+                return (T) Boolean.TRUE;
             case ServerModel:
                 return null;
             case ServerChannel:
@@ -80,7 +82,7 @@ public class RestQueue {
             case ChatMessage_Arr:
                 return null;
             case Nickname:
-               return "";
+               return (T) "";
             case ServerMember:
                 return null;
             case ServerMemberSummary_Arr:

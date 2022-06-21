@@ -7,4 +7,7 @@ public abstract class GuildedObject {
     public GuildedObject(JG_API jg_api) {
         this.jg_api = jg_api;
     }
+    public JG_API get_JGAPI() {
+        return this.jg_api;
+    }
 }
