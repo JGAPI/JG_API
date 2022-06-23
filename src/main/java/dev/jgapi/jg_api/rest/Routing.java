@@ -62,6 +62,16 @@ public class Routing {
         MemberRoles,
         Webhook,
         Webhook_Arr,
+        CalendarEvent_Arr,
+        CalendarEvent
+    }
+
+    public static class Calendars {
+        public static final Routing CREATE_CALENDAR_EVENT = new Routing(Method.POST, "/channels/{channelId}/events", ReturnType.CalendarEvent);
+        public static final Routing GET_CALENDAR_EVENTS = new Routing(Method.GET, "/channels/{channelId}/events", ReturnType.CalendarEvent_Arr);
+        public static final Routing GET_CALENDAR_EVENT = new Routing(Method.GET, "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
+        public static final Routing UPDATE_CALENDAR_EVENT = new Routing(Method.PATCH, "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
+        public static final Routing DELETE_CALENDAR_EVENT = new Routing(Method.DELETE, "/channels/{channelId}/events/{calendarEventId}", ReturnType.NONE);
     }
 
     public static class Servers {

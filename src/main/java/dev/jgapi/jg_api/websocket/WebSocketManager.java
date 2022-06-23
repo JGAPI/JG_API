@@ -373,6 +373,12 @@ public class WebSocketManager {
                         break;
                 }
                 break;
+            case "CalendarEventCreated":
+                break;
+            case "CalendarEventUpdated":
+                break;
+            case "CalendarEventDeleted":
+                break;
         }
     }
 

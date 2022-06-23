@@ -34,28 +34,11 @@ public class RestQueue {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
         RestAction<?> action = this.RestQueue.get(0);
-        Request request = action.getRequest();
-        String endpointReplace = request.getRoute().getRoute();
-        for (String key : request.getRouteReplacements().keySet()) {
-            String value = request.getRouteReplacements().get(key);
-            endpointReplace = endpointReplace.replace(key, value);
-        }
-        HttpRequest httpRequest = new HttpRequest(request.getRoute().getUrl() + request.getRoute().getVersion() + endpointReplace);
-        httpRequest.method(request.getRoute().getMethod());
-        for (String headerKey : request.getHeaders().keySet()) {
-            String headerVal = request.getHeaders().get(headerKey);
-            httpRequest.header(headerKey, headerVal);
-        }
-        httpRequest.timeout(this.TIMEOUT);
-        String body = "";
-        httpRequest.body(body);
-        HttpResponse resp = httpRequest.execute();
+        HttpResponse resp = action.getRequest().execute();
         switch (resp.getStatus()) {
             case 200:
             case 201:
-                // TODO Accept onSuccess consumer with right type of response needed
-                // action.getOnSuccess().accept();
-                action.getOnSuccess().accept(processAction(resp.body(), request.getRoute().getReturnType()));
+                action.getOnSuccess().accept(processAction(resp.body(), action.getRequest().getRoute().getReturnType()));
                 break;
             case 204:
                 // Error
@@ -115,7 +98,10 @@ public class RestQueue {
                 return null;
             case Webhook_Arr:
                 return null;
-
+            case CalendarEvent:
+                return null;
+            case CalendarEvent_Arr:
+                return null;
         }
         return null;
     }

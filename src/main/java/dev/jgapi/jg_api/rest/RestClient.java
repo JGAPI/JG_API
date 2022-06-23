@@ -1,6 +1,7 @@
 package dev.jgapi.jg_api.rest;
 
 import cn.hutool.json.JSONObject;
+import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
@@ -616,4 +617,9 @@ public class RestClient {
         Request request = new Request(Routing.Webhooks.DELETE_WEBHOOK, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
+    public RestAction<CalendarEvent> createCalendarEvent(CalendarEvent calendarEvent) {}
+    public RestAction<CalendarEvent[]> getCalendarEvents(String channelId) {}
+    public RestAction<CalendarEvent> getCalendarEvent(String channelId, String calendarEventId) {}
+    public RestAction<CalendarEvent> updateCalendarEvent(String channelId, String calendarEventId, CalendarEvent calendarEvent) {}
+    public RestAction<Boolean> deleteCalendarEvent(String channelId, String calendarEventId) {}
 }

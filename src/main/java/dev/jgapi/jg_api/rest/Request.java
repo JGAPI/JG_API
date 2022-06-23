@@ -1,5 +1,7 @@
 package dev.jgapi.jg_api.rest;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 
 import java.util.HashMap;
@@ -28,8 +30,21 @@ public class Request {
         return this.body;
     }
 
-    public String execute() {
-        // TODO RETURN SOMETHING BETTER THAN NULL;
-        return null;
+    public HttpResponse execute(int timeout) {
+        String endpointReplace = this.getRoute().getRoute();
+        for (String key : this.getRouteReplacements().keySet()) {
+            String value = this.getRouteReplacements().get(key);
+            endpointReplace = endpointReplace.replace(key, value);
+        }
+        HttpRequest httpRequest = new HttpRequest(this.getRoute().getUrl() + this.getRoute().getVersion() + endpointReplace);
+        httpRequest.method(this.getRoute().getMethod());
+        for (String headerKey : this.getHeaders().keySet()) {
+            String headerVal = this.getHeaders().get(headerKey);
+            httpRequest.header(headerKey, headerVal);
+        }
+        httpRequest.timeout(timeout);
+        String body = "";
+        httpRequest.body(body);
+        return httpRequest.execute();
     }
 }
