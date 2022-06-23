@@ -1,14 +1,6 @@
 package dev.jgapi.jg_api.rest;
 
-import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSONObject;
-import dev.jgapi.jg_api.JG_API;
-import dev.jgapi.jg_api.entities.GuildedObject;
-import dev.jgapi.jg_api.entities.StringEntity;
-import dev.jgapi.jg_api.entities.chat.ChatMessage;
-import dev.jgapi.jg_api.entities.server.ServerModel;
-import dev.jgapi.jg_api.exceptions.ReturnTypeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +26,7 @@ public class RestQueue {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
         RestAction<?> action = this.RestQueue.get(0);
-        HttpResponse resp = action.getRequest().execute();
+        HttpResponse resp = action.getRequest().execute(TIMEOUT);
         switch (resp.getStatus()) {
             case 200:
             case 201:
@@ -53,57 +45,32 @@ public class RestQueue {
     public <T> T processAction(String jsonResponse, Routing.ReturnType returnType) {
         // Example:
         // new RestAction<Webhook>(this.jg_api.getNextSeqNumber(), request, this.jg_api).queue(webhook -> { webhook.getServerId(); });
-        switch (returnType) {
-            case NONE:
-                return (T) Boolean.TRUE;
-            case ServerModel:
-                return null;
-            case ServerChannel:
-                return null;
-            case ChatMessage:
-                return null;
-            case ChatMessage_Arr:
-                return null;
-            case Nickname:
-               return (T) "";
-            case ServerMember:
-                return null;
-            case ServerMemberSummary_Arr:
-                return null;
-            case ServerMemberBan:
-                return null;
-            case ServerMemberBan_Arr:
-                return null;
-            case ForumTopic:
-                return null;
-            case ListItem:
-                return null;
-            case ListItemSummary_Arr:
-                return null;
-            case ListItem_Update_Obj:
-                return null;
-            case Doc:
-                return null;
-            case Doc_Arr:
-                return null;
-            case XP_Member_Total:
-                return null;
-            case XP_Role_Total:
-                return null;
-            case Social_Links_Obj:
-                return null;
-            case MemberRoles:
-                return null;
-            case Webhook:
-                return null;
-            case Webhook_Arr:
-                return null;
-            case CalendarEvent:
-                return null;
-            case CalendarEvent_Arr:
-                return null;
-        }
-        return null;
+        return switch (returnType) {
+            case NONE -> (T) Boolean.TRUE;
+            case ServerModel -> null;
+            case ServerChannel -> null;
+            case ChatMessage -> null;
+            case ChatMessage_Arr -> null;
+            case Nickname -> (T) "";
+            case ServerMember -> null;
+            case ServerMemberSummary_Arr -> null;
+            case ServerMemberBan -> null;
+            case ServerMemberBan_Arr -> null;
+            case ForumTopic -> null;
+            case ListItem -> null;
+            case ListItemSummary_Arr -> null;
+            case ListItem_Update_Obj -> null;
+            case Doc -> null;
+            case Doc_Arr -> null;
+            case XP_Member_Total -> null;
+            case XP_Role_Total -> null;
+            case Social_Links_Obj -> null;
+            case MemberRoles -> null;
+            case Webhook -> null;
+            case Webhook_Arr -> null;
+            case CalendarEvent -> null;
+            case CalendarEvent_Arr -> null;
+        };
     }
 
     public List<RestAction<?>> getQueuedRestActions() {
