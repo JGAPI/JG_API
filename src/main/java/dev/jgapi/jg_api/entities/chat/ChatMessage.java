@@ -3,6 +3,7 @@ package dev.jgapi.jg_api.entities.chat;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
+import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
@@ -12,6 +13,7 @@ public class ChatMessage extends GuildedObject {
     private String type;
     private String serverId;
     private String channelId;
+    private ServerChannel channel;
     private String content;
     private ChatEmbed[] embeds;
     private String[] replyMessageIds;
@@ -29,6 +31,7 @@ public class ChatMessage extends GuildedObject {
         this.type = type;
         this.serverId = serverId;
         this.channelId = channelId;
+        this.channel = new ServerChannel(jg_api, id, null, null, null, null, null, null, serverId, null, null, null, false, null, null);
         this.content = content;
         this.embeds = embeds;
         this.replyMessageIds = replyMessageIds;
@@ -52,6 +55,9 @@ public class ChatMessage extends GuildedObject {
     }
     public String getChannelId() {
         return this.channelId;
+    }
+    public ServerChannel getChannel() {
+        return this.channel;
     }
     public String getContent() {
         return this.content;

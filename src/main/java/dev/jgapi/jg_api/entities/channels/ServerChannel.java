@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.entities.channels;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
@@ -109,5 +110,18 @@ public class ServerChannel extends GuildedObject {
     }
     public RestAction setPublic(boolean isPublic) {
         return this.jg_api.getRestClient().updateChannel(this.id, this.name, this.topic, isPublic);
+    }
+
+    public RestAction sendMessage(String content, boolean isPrivate, boolean isSilent, String[] replyMessageIds, ChatEmbed[] chatEmbeds) {
+        return this.jg_api.getRestClient().createChannelMessage(this.id, isPrivate, isSilent, replyMessageIds, content, chatEmbeds);
+    }
+
+    public RestAction sendMessage(String content) {
+        System.out.println(content);
+        return this.sendMessage(content, false, false, null, null);
+    }
+
+    public RestAction sendMessage(ChatEmbed[] chatEmbeds) {
+        return this.sendMessage(null, false, false, null, chatEmbeds);
     }
 }
