@@ -617,19 +617,63 @@ public class RestClient {
         Request request = new Request(Routing.Webhooks.DELETE_WEBHOOK, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<CalendarEvent> createCalendarEvent(CalendarEvent calendarEvent) {
-        return null;
+    public RestAction<CalendarEvent> createCalendarEvent(String channelId, CalendarEvent calendarEvent) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        // Set up the body of the request
+        setupCalendarEventBody(calendarEvent, body);
+        Request request = new Request(Routing.CalendarEvents.CREATE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<CalendarEvent[]> getCalendarEvents(String channelId) {
-        return null;
+    public RestAction<CalendarEvent[]> getCalendarEvents(String channelId, Instant before, Instant after, int limit) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        // Set up the body of the request
+        body.set("before", before.toString());
+        body.set("after", after.toString());
+        body.set("limit", limit);
+        Request request = new Request(Routing.CalendarEvents.GET_CALENDAR_EVENTS, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
     public RestAction<CalendarEvent> getCalendarEvent(String channelId, String calendarEventId) {
-        return null;
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        routeReplacements.put("{calendarEventId}", calendarEventId);
+        Request request = new Request(Routing.CalendarEvents.GET_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
     public RestAction<CalendarEvent> updateCalendarEvent(String channelId, String calendarEventId, CalendarEvent calendarEvent) {
-        return null;
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        routeReplacements.put("{calendarEventId}", calendarEventId);
+        // Set up the body of the request
+        setupCalendarEventBody(calendarEvent, body);
+        Request request = new Request(Routing.CalendarEvents.UPDATE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
+
     public RestAction<Boolean> deleteCalendarEvent(String channelId, String calendarEventId) {
-        return null;
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        routeReplacements.put("{calendarEventId}", calendarEventId);
+        Request request = new Request(Routing.CalendarEvents.DELETE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+
+    // Generic body setup to clean up code a bit.
+    private void setupCalendarEventBody(CalendarEvent calendarEvent, JSONObject body) {
+        body.set("name", calendarEvent.getName());
+        body.set("description", calendarEvent.getDescription());
+        body.set("location", calendarEvent.getLocation());
+        body.set("startsAt", calendarEvent.getStartsAt().toString());
+        body.set("url", calendarEvent.getUrl());
+        body.set("color", calendarEvent.getColor());
+        body.set("duration", calendarEvent.getDuration());
+        body.set("isPrivate", calendarEvent.isPrivate());
     }
 }

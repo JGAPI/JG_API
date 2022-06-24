@@ -66,14 +66,6 @@ public class Routing {
         CalendarEvent
     }
 
-    public static class Calendars {
-        public static final Routing CREATE_CALENDAR_EVENT = new Routing(Method.POST, "/channels/{channelId}/events", ReturnType.CalendarEvent);
-        public static final Routing GET_CALENDAR_EVENTS = new Routing(Method.GET, "/channels/{channelId}/events", ReturnType.CalendarEvent_Arr);
-        public static final Routing GET_CALENDAR_EVENT = new Routing(Method.GET, "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
-        public static final Routing UPDATE_CALENDAR_EVENT = new Routing(Method.PATCH, "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
-        public static final Routing DELETE_CALENDAR_EVENT = new Routing(Method.DELETE, "/channels/{channelId}/events/{calendarEventId}", ReturnType.NONE);
-    }
-
     public static class Servers {
         public static final Routing GET_SERVER = new Routing(Method.GET, "/servers/{serverId}", ReturnType.ServerModel);
     }
@@ -148,6 +140,14 @@ public class Routing {
         public static final Routing GET_WEBHOOK = new Routing(Method.GET, "/servers/{serverId}/webhooks/{webhookId}", ReturnType.Webhook);
         public static final Routing UPDATE_WEBHOOK = new Routing(Method.PUT, "/servers/{serverId}/webhooks/{webhookId}", ReturnType.Webhook);
         public static final Routing DELETE_WEBHOOK = new Routing(Method.DELETE, "/servers/{serverId}/webhooks/{webhookId}", ReturnType.Webhook);
+    }
+
+    public static class CalendarEvents {
+        public static final Routing CREATE_CALENDAR_EVENT = new Routing(Method.POST, "/channels/{channelId}/events", ReturnType.CalendarEvent);
+        public static final Routing GET_CALENDAR_EVENTS = new Routing(Method.GET, "/channels/{channelId}/events", ReturnType.CalendarEvent_Arr);
+        public static final Routing GET_CALENDAR_EVENT = new Routing(Method.GET, "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
+        public static final Routing UPDATE_CALENDAR_EVENT = new Routing(Method.PATCH, "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
+        public static final Routing DELETE_CALENDAR_EVENT = new Routing(Method.DELETE, "/channels/{channelId}/events/{calendarEventId}", ReturnType.NONE);
     }
 
     private final String version = "v1";
