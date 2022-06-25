@@ -379,6 +379,10 @@ public class WebSocketManager {
                 break;
             case "CalendarEventDeleted":
                 break;
+            case "ChannelMessageReactionCreated":
+                break;
+            case "ChannelMessageReactionDeleted":
+                break;
         }
     }
 
