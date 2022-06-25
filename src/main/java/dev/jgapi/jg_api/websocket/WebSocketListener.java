@@ -1,7 +1,8 @@
 package dev.jgapi.jg_api.websocket;
 
-import cn.hutool.json.JSONObject;
+
 import dev.jgapi.jg_api.exceptions.InvalidOperationException;
+import org.json.JSONObject;
 
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;

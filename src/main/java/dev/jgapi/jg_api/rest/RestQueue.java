@@ -1,6 +1,6 @@
 package dev.jgapi.jg_api.rest;
 
-import cn.hutool.http.HttpResponse;
+
 import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class RestQueue {
         // It's not empty, we want to process it
         RestAction<?> action = this.RestQueue.get(0);
         HttpResponseEntity resp = action.getRequest().execute(TIMEOUT);
-        switch (resp.getStatus()) {
+        switch (resp.getResponseCode()) {
             case 200:
             case 201:
                 action.getOnSuccess().accept(processAction(resp.getResponse(), action.getRequest().getRoute().getReturnType()));

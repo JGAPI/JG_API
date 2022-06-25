@@ -98,7 +98,7 @@
     <!-- Dependencies  -->
     <dependencies>
 
-        <!-- BUILD: HUTools Json -->
+        <!-- BUILD: ORG Json -->
         <!-- https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
             <groupId>org.json</groupId>

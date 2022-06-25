@@ -6,7 +6,7 @@ import dev.jgapi.jg_api.events.chat.ChatMessageUpdatedEvent;
 import dev.jgapi.jg_api.events.docs.DocCreatedEvent;
 import dev.jgapi.jg_api.events.docs.DocDeletedEvent;
 import dev.jgapi.jg_api.events.docs.DocUpdatedEvent;
-import dev.jgapi.jg_api.events.library.ReadyEvent;
+import dev.jgapi.jg_api.events.library.*;
 import dev.jgapi.jg_api.events.listitem.*;
 import dev.jgapi.jg_api.events.teamchannel.TeamChannelCreatedEvent;
 import dev.jgapi.jg_api.events.teamchannel.TeamChannelDeletedEvent;
@@ -17,9 +17,26 @@ import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
 
 public abstract class ListenerAdapter {
     /**
-     * Ready Event
+     * Library Events
+     * Useful events that we create on the Library that Guilded doesn't provide...
+     */
+
+    /**
+     * Ran when the bot is successfully logged in and the ClientUser has been created.
+     * @param event {@link ReadyEvent}
      */
     public void onReadyEvent(ReadyEvent event) {}
+
+    /**
+     * Ran when the bot has been added to a server.
+     * @param event {@link ServerAddedEvent}
+     */
+    public void onServerAddedEvent(ServerAddedEvent event) {}
+    /**
+     * Ran when the bot has been removed from a server.
+     * @param event {@link ServerRemovedEvent}
+     */
+    public void onServerRemovedEvent(ServerRemovedEvent event) {}
 
     /**
      * ChatMessage Events
