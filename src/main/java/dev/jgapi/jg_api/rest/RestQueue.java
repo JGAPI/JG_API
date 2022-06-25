@@ -1,7 +1,7 @@
 package dev.jgapi.jg_api.rest;
 
 import cn.hutool.http.HttpResponse;
-import dev.jgapi.jg_api.entities.HttpResponseEntity;
+import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;

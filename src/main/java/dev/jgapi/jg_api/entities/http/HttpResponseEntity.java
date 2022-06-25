@@ -1,4 +1,4 @@
-package dev.jgapi.jg_api.entities;
+package dev.jgapi.jg_api.entities.http;
 
 public class HttpResponseEntity {
     private String response;

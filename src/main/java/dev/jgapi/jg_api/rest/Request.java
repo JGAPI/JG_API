@@ -1,14 +1,12 @@
 package dev.jgapi.jg_api.rest;
 
-import dev.jgapi.jg_api.entities.HttpResponseEntity;
+import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
