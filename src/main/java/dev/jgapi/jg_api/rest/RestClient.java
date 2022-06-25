@@ -1,6 +1,5 @@
 package dev.jgapi.jg_api.rest;
 
-import cn.hutool.json.JSONObject;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
@@ -14,6 +13,7 @@ import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
 import dev.jgapi.jg_api.entities.members.ServerMember;
 import dev.jgapi.jg_api.entities.server.ServerModel;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
+import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.HashMap;
