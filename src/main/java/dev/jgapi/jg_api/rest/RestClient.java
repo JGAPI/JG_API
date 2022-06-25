@@ -471,6 +471,16 @@ public class RestClient {
         Request request = new Request(Routing.Reactions.ADD_REACTION_EMOTE, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
+    public RestAction<Boolean> removeReactionEmote(String channelId, String contentId, String emoteId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{contentId}", contentId);
+        routeReplacements.put("{emoteId}", emoteId);
+        // Set up the body of the request
+        Request request = new Request(Routing.Reactions.REMOVE_REACTION_EMOTE, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
     public RestAction<Integer> awardMemberXP(String serverId, String userId, int amount) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();

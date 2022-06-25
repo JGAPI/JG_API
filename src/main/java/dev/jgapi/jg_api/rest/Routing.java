@@ -115,6 +115,7 @@ public class Routing {
     }
     public static class Reactions {
         public static final Routing ADD_REACTION_EMOTE = new Routing("PUT", "/channels/{channelId}/content/{contentId}/emotes/{emoteId}", ReturnType.NONE);
+        public static final Routing REMOVE_REACTION_EMOTE = new Routing("DELETE", "/channels/{channelId}/content/{contentId}/emotes/{emoteId}", ReturnType.NONE);
     }
     public static class Server_XP {
         public static final Routing AWARD_XP_TO_MEMBER = new Routing("POST", "/servers/{serverId}/members/{userId}/xp", ReturnType.XP_Member_Total);
