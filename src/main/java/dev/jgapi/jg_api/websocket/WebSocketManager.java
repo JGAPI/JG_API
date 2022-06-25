@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.websocket;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
+import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
@@ -15,6 +16,8 @@ import dev.jgapi.jg_api.entities.members.User;
 import dev.jgapi.jg_api.entities.members.UserSummary;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
 import dev.jgapi.jg_api.events.Event;
+import dev.jgapi.jg_api.events.calendar.CalendarEventCreatedEvent;
+import dev.jgapi.jg_api.events.calendar.CalendarEventDeletedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageCreatedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageDeletedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageUpdatedEvent;
@@ -401,10 +404,53 @@ public class WebSocketManager {
                 }
                 break;
             case "CalendarEventCreated":
-                break;
-            case "CalendarEventUpdated":
-                break;
+            // TODO: Once CalendarEventupdated actually passes a CalendarEvent this needs to be uncommented.
+            // case "CalendarEventUpdated":
             case "CalendarEventDeleted":
+                JSONObject calendarEventObj = dataObj.getJSONObject("calendarEvent");
+                //TODO: FIX MENTIONS & CANCELLATION
+                CalendarEvent calendarEvent = new CalendarEvent(
+                        this.jg_api,
+                        calendarEventObj.getInt("id"),
+                        calendarEventObj.getString("serverId"),
+                        calendarEventObj.getString("channelId"),
+                        calendarEventObj.getString("name"),
+                        calendarEventObj.optString("description", null),
+                        calendarEventObj.optString("location", null),
+                        calendarEventObj.optString("url", null),
+                        calendarEventObj.optInt("color", 0),
+                        Instant.parse(calendarEventObj.getString("startsAt")),
+                        calendarEventObj.optInt("duration", 1),
+                        calendarEventObj.optBoolean("isPrivate", false),
+                        null,
+                        Instant.parse(calendarEventObj.getString("createdAt")),
+                        null
+                );
+
+                switch (eventType) {
+                    case "CalendarEventCreated" -> {
+                        event = new CalendarEventCreatedEvent(this.jg_api, server_id, calendarEvent);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onCalendarEventCreatedEvent((CalendarEventCreatedEvent) event);
+                        }
+                    }
+                    // TODO: REFER TO COMMENT ON L407
+                    /*
+                    case "CalendarEventUpdated" -> {
+                        event = new CalendarEventUpdatedEvent(this.jg_api, server_id, calendarEvent);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onCalendarEventUpdatedEvent((CalendarEventUpdatedEvent) event);
+                        }
+                    }
+                    */
+                    case "CalendarEventDeleted" -> {
+                        event = new CalendarEventDeletedEvent(this.jg_api, server_id, calendarEvent);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onCalendarEventDeletedEvent((CalendarEventDeletedEvent) event);
+                        }
+                    }
+                }
+
                 break;
             case "ChannelMessageReactionCreated":
                 break;
