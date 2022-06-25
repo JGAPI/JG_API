@@ -1,7 +1,9 @@
 package dev.jgapi.jg_api.rest;
 
 import cn.hutool.http.HttpResponse;
+import dev.jgapi.jg_api.entities.HttpResponseEntity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +24,15 @@ public class RestQueue {
     public void removeBySequenceNumber(long seqNumber) {
         this.RestQueue.removeIf(item -> item.getSequenceNumber() == seqNumber);
     }
-    public void processQueue() {
+    public void processQueue() throws IOException {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
         RestAction<?> action = this.RestQueue.get(0);
-        HttpResponse resp = action.getRequest().execute(TIMEOUT);
+        HttpResponseEntity resp = action.getRequest().execute(TIMEOUT);
         switch (resp.getStatus()) {
             case 200:
             case 201:
-                action.getOnSuccess().accept(processAction(resp.body(), action.getRequest().getRoute().getReturnType()));
+                action.getOnSuccess().accept(processAction(resp.getResponse(), action.getRequest().getRoute().getReturnType()));
                 break;
             case 204:
                 // Error

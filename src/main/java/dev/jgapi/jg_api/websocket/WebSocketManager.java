@@ -1,6 +1,5 @@
 package dev.jgapi.jg_api.websocket;
 
-import cn.hutool.json.JSONObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
@@ -30,6 +29,7 @@ import dev.jgapi.jg_api.exceptions.InvalidOperationException;
 import dev.jgapi.jg_api.events.Event;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
+import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -71,13 +71,13 @@ public class WebSocketManager {
         return result;
     }
 
-    public void parseWebsocketMessage(JSONObject json) {
-        String eventType = json.getStr("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
-        String msg_data = json.getStr("d"); // Data of any form depending on the underlying event
-        JSONObject dataObj = (JSONObject) json.getByPath("d");
-        String msg_id_replay = json.getStr("s"); // Message ID used for replaying events after a disconnect
+    public void parseWebsocketMessage(JSONObject json) { 
+        String eventType = json.getString("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
+        String msg_data = json.getString("d"); // Data of any form depending on the underlying event
+        JSONObject dataObj = json.getJSONObject("d");
+        String msg_id_replay = json.getString("s"); // Message ID used for replaying events after a disconnect
         int opcode = json.getInt("op"); // Event name for the given message
-        String server_id = dataObj.getStr("serverId");
+        String server_id = dataObj.getString("serverId");
 
         /**
          * ChatMessage Data
@@ -98,22 +98,22 @@ public class WebSocketManager {
         String createdByWebhookId = null;
         Instant updatedAt = null;
 
-        if (dataObj.containsKey("message")) {
-            messageObj = (JSONObject) dataObj.getByPath("message");
-            msg_id = messageObj.getStr("id");
-            type = messageObj.getStr("type");
-            mServer_id = messageObj.getStr("serverId");
-            channelId = messageObj.getStr("channelId");
-            content = messageObj.getStr("content");
+        if (dataObj.has("message")) {
+            messageObj = dataObj.getJSONObject("message");
+            msg_id = messageObj.getString("id");
+            type = messageObj.getString("type");
+            mServer_id = messageObj.getString("serverId");
+            channelId = messageObj.getString("channelId");
+            content = messageObj.getString("content");
             embeds = new ChatEmbed[] {};
             replyMessageIds = new String[] {};
-            isPrivate = messageObj.getBool("isPrivate");
-            isSilent = messageObj.containsKey("isSilent") ? messageObj.getBool("isSilent") : false;
+            isPrivate = messageObj.getBoolean("isPrivate");
+            isSilent = messageObj.has("isSilent") && messageObj.getBoolean("isSilent");
             mentions = null; // TODO Set up
-            createdAt = Instant.parse(messageObj.getStr("createdAt"));
-            createdBy = messageObj.getStr("createdBy");
-            createdByWebhookId = messageObj.getStr("createdByWebhookId");
-            updatedAt = messageObj.containsKey("updatedAt") ? Instant.parse(messageObj.getStr("updatedAt")) : null;
+            createdAt = Instant.parse(messageObj.getString("createdAt"));
+            createdBy = messageObj.getString("createdBy");
+            createdByWebhookId = messageObj.getString("createdByWebhookId");
+            updatedAt = messageObj.has("updatedAt") ? Instant.parse(messageObj.getString("updatedAt")) : null;
         }
 
         /**
@@ -170,23 +170,23 @@ public class WebSocketManager {
                 }
                 break;
             case "TeamMemberJoined":
-                memberObj = (JSONObject) json.getByPath("d.member");
-                userObj = (JSONObject) json.getByPath("d.member.user");
-                user = new User(userObj.getStr("id"), userObj.getStr("name"), userObj.getStr("type"), userObj.getStr("avatar"), userObj.getStr("banner"), Instant.parse(userObj.getStr("createdAt")));
+                memberObj = json.getJSONObject("d.member");
+                userObj = json.getJSONObject("d.member.user");
+                user = new User(userObj.getString("id"), userObj.getString("name"), userObj.getString("type"), userObj.getString("avatar"), userObj.getString("banner"), Instant.parse(userObj.getString("createdAt")));
 
-                roleIds = toPrimitive(memberObj.getJSONArray("roleIds").toArray(new Integer[0])); // TODO May need a fix for this, may not work
-                nickname = memberObj.getStr("nickname");
-                joinedAt = Instant.parse(memberObj.getStr("joinedAt"));
-                isOwner = memberObj.getBool("isOwner");
+                roleIds = toPrimitive(memberObj.getJSONArray("roleIds").toList().toArray(new Integer[0])); // TODO May need a fix for this, may not work
+                nickname = memberObj.getString("nickname");
+                joinedAt = Instant.parse(memberObj.getString("joinedAt"));
+                isOwner = memberObj.getBoolean("isOwner");
                 event = new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(this.jg_api, user, roleIds, nickname, joinedAt, isOwner));
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                     adapter.onTeamMemberJoinedEvent((TeamMemberJoinedEvent) event);
                 }
                 break;
             case "TeamMemberRemoved":
-                user_id = dataObj.getStr("userId");
-                boolean isKick = dataObj.getBool("isKick");
-                boolean isBan = dataObj.getBool("isBan");
+                user_id = dataObj.getString("userId");
+                boolean isKick = dataObj.getBoolean("isKick");
+                boolean isBan = dataObj.getBoolean("isBan");
                 event = new TeamMemberRemovedEvent(this.jg_api, server_id, user_id, isKick, isBan);
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                     adapter.onTeamMemberRemovedEvent((TeamMemberRemovedEvent) event);
@@ -194,12 +194,12 @@ public class WebSocketManager {
                 break;
             case "TeamMemberBanned":
             case "TeamMemberUnbanned":
-                serverBanObj = (JSONObject) json.getByPath("d.serverMemberBan");
-                userObj = (JSONObject) json.getByPath("d.serverMemberBan.user");
-                userSummary = new UserSummary(userObj.getStr("id"), userObj.getStr("type"), userObj.getStr("name"), userObj.getStr("avatar"));
-                reason = serverBanObj.getStr("reason");
-                createdBy = serverBanObj.getStr("createdBy");
-                createdAt = Instant.parse(serverBanObj.getStr("createdAt"));
+                serverBanObj = json.getJSONObject("d.serverMemberBan");
+                userObj = json.getJSONObject("d.serverMemberBan.user");
+                userSummary = new UserSummary(userObj.getString("id"), userObj.getString("type"), userObj.getString("name"), userObj.getString("avatar"));
+                reason = serverBanObj.getString("reason");
+                createdBy = serverBanObj.getString("createdBy");
+                createdAt = Instant.parse(serverBanObj.getString("createdAt"));
 
                 if (eventType.equals("TeamMemberBanned")) {
                     event = new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(this.jg_api, userSummary, reason, createdBy, createdAt));
@@ -214,14 +214,14 @@ public class WebSocketManager {
                 }
                 break;
             case "TeamMemberUpdated":
-                Object userInfo = dataObj.getObj("userInfo");
+                Object userInfo = dataObj.get("userInfo");
                 event = new TeamMemberUpdatedEvent(this.jg_api, server_id, userInfo);
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                     adapter.onTeamMemberUpdatedEvent((TeamMemberUpdatedEvent) event);
                 }
                 break;
             case "teamRolesUpdated":
-                Object[] memberRoleIds = dataObj.getJSONArray("memberRoleIds").toArray();
+                Object[] memberRoleIds = dataObj.getJSONArray("memberRoleIds").toList().toArray();
                 event = new teamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds);
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
                     adapter.onTeamRolesUpdatedEvent((teamRolesUpdatedEvent) event);
@@ -230,21 +230,21 @@ public class WebSocketManager {
             case "TeamChannelCreated":
             case "TeamChannelUpdated":
             case "TeamChannelDeleted":
-                serverChannelObj = (JSONObject) json.getByPath("d.channel");
-                String channel_id = serverChannelObj.getStr("id");
-                type = serverChannelObj.getStr("type");
-                String name = serverChannelObj.getStr("name");
-                String topic = serverChannelObj.getStr("topic");
-                createdAt = Instant.parse(serverChannelObj.getStr("createdAt"));
-                createdBy = serverChannelObj.getStr("createdBy");
-                updatedAt = Instant.parse(serverChannelObj.getStr("updatedAt"));
-                String serverId = serverChannelObj.getStr("serverId");
-                String parentId = serverChannelObj.getStr("parentId");
-                String categoryId = serverChannelObj.getStr("categoryId");
-                String groupId = serverChannelObj.getStr("groupId");
-                boolean isPublic = serverChannelObj.getBool("isPublic");
-                String archivedBy = serverChannelObj.getStr("archivedBy");
-                Instant archivedAt = Instant.parse(serverChannelObj.getStr("archivedAt"));
+                serverChannelObj = json.getJSONObject("d.channel");
+                String channel_id = serverChannelObj.getString("id");
+                type = serverChannelObj.getString("type");
+                String name = serverChannelObj.getString("name");
+                String topic = serverChannelObj.getString("topic");
+                createdAt = Instant.parse(serverChannelObj.getString("createdAt"));
+                createdBy = serverChannelObj.getString("createdBy");
+                updatedAt = Instant.parse(serverChannelObj.getString("updatedAt"));
+                String serverId = serverChannelObj.getString("serverId");
+                String parentId = serverChannelObj.getString("parentId");
+                String categoryId = serverChannelObj.getString("categoryId");
+                String groupId = serverChannelObj.getString("groupId");
+                boolean isPublic = serverChannelObj.getBoolean("isPublic");
+                String archivedBy = serverChannelObj.getString("archivedBy");
+                Instant archivedAt = Instant.parse(serverChannelObj.getString("archivedAt"));
                 ServerChannel serverChannel = new ServerChannel(this.jg_api, channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
                 switch (eventType) {
                     case "TeamChannelCreated" -> event = new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel);
@@ -262,14 +262,14 @@ public class WebSocketManager {
             case "TeamWebhookCreated":
             case "TeamWebhookUpdated":
                 webhookObj = dataObj.getJSONObject("webhook");
-                String webhook_id = webhookObj.getStr("id");
-                name = webhookObj.getStr("name");
-                serverId = webhookObj.getStr("serverId");
-                channelId = webhookObj.getStr("channelId");
-                createdAt = Instant.parse(webhookObj.getStr("createdAt"));
-                createdBy = webhookObj.getStr("createdBy");
-                Instant deletedAt = Instant.parse(webhookObj.getStr("deletedAt"));
-                String token = webhookObj.getStr("token");
+                String webhook_id = webhookObj.getString("id");
+                name = webhookObj.getString("name");
+                serverId = webhookObj.getString("serverId");
+                channelId = webhookObj.getString("channelId");
+                createdAt = Instant.parse(webhookObj.getString("createdAt"));
+                createdBy = webhookObj.getString("createdBy");
+                Instant deletedAt = Instant.parse(webhookObj.getString("deletedAt"));
+                String token = webhookObj.getString("token");
                 if (eventType.equals("TeamWebhookCreated")) {
                     event = new TeamWebhookCreatedEvent(this.jg_api, server_id, new Webhook(this.jg_api, webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
@@ -287,15 +287,15 @@ public class WebSocketManager {
             case "DocDeleted":
                 JSONObject docObj = dataObj.getJSONObject("doc");
                 int docId = docObj.getInt("id");
-                serverId = docObj.getStr("serverId");
-                channelId = docObj.getStr("channelId");
-                String title = docObj.getStr("title");
-                content = docObj.getStr("content");
+                serverId = docObj.getString("serverId");
+                channelId = docObj.getString("channelId");
+                String title = docObj.getString("title");
+                content = docObj.getString("content");
                 mentions = null; // TODO Set up
-                createdAt = Instant.parse(docObj.getStr("createdAt"));
-                createdBy = docObj.getStr("createdBy");
-                updatedAt = Instant.parse(docObj.getStr("updatedAt"));
-                String updatedBy = docObj.getStr("updatedBy");
+                createdAt = Instant.parse(docObj.getString("createdAt"));
+                createdBy = docObj.getString("createdBy");
+                updatedAt = Instant.parse(docObj.getString("updatedAt"));
+                String updatedBy = docObj.getString("updatedBy");
                 switch (eventType) {
                     case "DocCreated":
                         event = new DocCreatedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
@@ -323,22 +323,22 @@ public class WebSocketManager {
             case "ListItemCompleted":
             case "ListItemUncompleted":
                 JSONObject listItemObj = dataObj.getJSONObject("listItem");
-                String listId = listItemObj.getStr("id");
-                serverId = listItemObj.getStr("serverId");
-                channelId = listItemObj.getStr("channelId");
-                String message = listItemObj.getStr("message");
+                String listId = listItemObj.getString("id");
+                serverId = listItemObj.getString("serverId");
+                channelId = listItemObj.getString("channelId");
+                String message = listItemObj.getString("message");
                 mentions = null; // TODO Set up
-                createdAt = Instant.parse(listItemObj.getStr("createdAt"));
-                createdBy = listItemObj.getStr("createdBy");
-                createdByWebhookId = listItemObj.getStr("createdByWebhookId");
-                updatedAt = Instant.parse(listItemObj.getStr("updatedAt"));
-                updatedBy = listItemObj.getStr("updatedBy");
-                String parentListItemId = listItemObj.getStr("parentListItemId");
-                Instant completedAt = Instant.parse(listItemObj.getStr("completedAt"));
-                String completedBy = listItemObj.getStr("completedBy");
+                createdAt = Instant.parse(listItemObj.getString("createdAt"));
+                createdBy = listItemObj.getString("createdBy");
+                createdByWebhookId = listItemObj.getString("createdByWebhookId");
+                updatedAt = Instant.parse(listItemObj.getString("updatedAt"));
+                updatedBy = listItemObj.getString("updatedBy");
+                String parentListItemId = listItemObj.getString("parentListItemId");
+                Instant completedAt = Instant.parse(listItemObj.getString("completedAt"));
+                String completedBy = listItemObj.getString("completedBy");
                 JSONObject noteObj = listItemObj.getJSONObject("note");
                 Mentions mentions2 = null; // TODO Set up
-                ListItemNote note = new ListItemNote(mentions2, Instant.parse(noteObj.getStr("createdAt")), noteObj.getStr("createdBy"), Instant.parse(noteObj.getStr("updatedAt")), noteObj.getStr("updatedBy"), noteObj.getStr("content"));
+                ListItemNote note = new ListItemNote(mentions2, Instant.parse(noteObj.getString("createdAt")), noteObj.getString("createdBy"), Instant.parse(noteObj.getString("updatedAt")), noteObj.getString("updatedBy"), noteObj.getString("content"));
                 ListItem listItem = new ListItem(this.jg_api, listId, serverId, channelId, message, mentions, createdAt, createdBy, createdByWebhookId, updatedAt, updatedBy, parentListItemId, completedAt, completedBy, note);
                 switch (eventType) {
                     case "ListItemCreated":
@@ -385,10 +385,10 @@ public class WebSocketManager {
     public void parseWebsocketWelcome(JSONObject json) throws InvalidOperationException {
         JSONObject dataObj = json.getJSONObject("d");
         JSONObject userObj = dataObj.getJSONObject("user");
-        String user_id = userObj.getStr("id");
-        String name = userObj.getStr("name");
+        String user_id = userObj.getString("id");
+        String name = userObj.getString("name");
         String type = "bot";
-        Instant createdAt = Instant.parse(userObj.getStr("createdAt"));
+        Instant createdAt = Instant.parse(userObj.getString("createdAt"));
 
         User clientUser = new User(user_id, name, type, null, null, createdAt);
         this.jg_api.setupClientUser(clientUser);

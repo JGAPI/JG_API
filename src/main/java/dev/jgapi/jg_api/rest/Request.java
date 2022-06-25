@@ -1,9 +1,15 @@
 package dev.jgapi.jg_api.rest;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
+import dev.jgapi.jg_api.entities.HttpResponseEntity;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 public class Request {
@@ -30,21 +36,30 @@ public class Request {
         return this.body;
     }
 
-    public HttpResponse execute(int timeout) {
+    public HttpResponseEntity execute(int timeout) throws IOException {
         String endpointReplace = this.getRoute().getRoute();
         for (String key : this.getRouteReplacements().keySet()) {
             String value = this.getRouteReplacements().get(key);
             endpointReplace = endpointReplace.replace(key, value);
         }
-        HttpRequest httpRequest = new HttpRequest(this.getRoute().getUrl() + this.getRoute().getVersion() + endpointReplace);
-        httpRequest.method(this.getRoute().getMethod());
+        URL url = new URL(this.getRoute().getUrl() + this.getRoute().getVersion() + endpointReplace);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod(this.route.getMethod());
+        con.setDoOutput(true);
         for (String headerKey : this.getHeaders().keySet()) {
             String headerVal = this.getHeaders().get(headerKey);
-            httpRequest.header(headerKey, headerVal);
+            con.setRequestProperty(headerKey, headerVal);
         }
-        httpRequest.timeout(timeout);
-        String body = "";
-        httpRequest.body(body);
-        return httpRequest.execute();
+        String json = this.body.toString();
+        byte[] out = json.getBytes(StandardCharsets.UTF_8);
+        try(OutputStream os = con.getOutputStream()) {
+            os.write(out);
+        }
+        con.setConnectTimeout(timeout);
+        con.connect();
+        String responseMessage = con.getResponseMessage();
+        int responseCode = con.getResponseCode();
+        con.disconnect();
+        return new HttpResponseEntity(responseMessage, responseCode);
     }
 }
