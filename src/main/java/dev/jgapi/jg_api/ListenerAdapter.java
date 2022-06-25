@@ -55,6 +55,8 @@ public abstract class ListenerAdapter {
     public void onTeamChannelCreatedEvent(TeamChannelCreatedEvent event) {}
     public void onTeamChannelUpdatedEvent(TeamChannelUpdatedEvent event) {}
     public void onTeamChannelDeletedEvent(TeamChannelDeletedEvent event) {}
+    public void onChannelMessageReactionCreatedEvent(ChannelMessageReactionCreatedEvent event) {}
+    public void onChannelMessageReactionDeletedEvent(ChannelMessageReactionDeletedEvent event) {}
 
     /**
      * TeamWebhook Events

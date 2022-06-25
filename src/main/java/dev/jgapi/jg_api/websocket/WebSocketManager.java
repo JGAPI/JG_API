@@ -3,11 +3,13 @@ package dev.jgapi.jg_api.websocket;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
+import dev.jgapi.jg_api.entities.channels.ChannelReaction;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
+import dev.jgapi.jg_api.entities.emotes.Emote;
 import dev.jgapi.jg_api.entities.listitems.ListItem;
 import dev.jgapi.jg_api.entities.listitems.ListItemNote;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
@@ -27,9 +29,7 @@ import dev.jgapi.jg_api.events.docs.DocUpdatedEvent;
 import dev.jgapi.jg_api.events.library.ServerAddedEvent;
 import dev.jgapi.jg_api.events.library.ServerRemovedEvent;
 import dev.jgapi.jg_api.events.listitem.*;
-import dev.jgapi.jg_api.events.teamchannel.TeamChannelCreatedEvent;
-import dev.jgapi.jg_api.events.teamchannel.TeamChannelDeletedEvent;
-import dev.jgapi.jg_api.events.teamchannel.TeamChannelUpdatedEvent;
+import dev.jgapi.jg_api.events.teamchannel.*;
 import dev.jgapi.jg_api.events.teammember.*;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookCreatedEvent;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
@@ -453,8 +453,37 @@ public class WebSocketManager {
 
                 break;
             case "ChannelMessageReactionCreated":
-                break;
             case "ChannelMessageReactionDeleted":
+                JSONObject reactionObj = dataObj.getJSONObject("reaction");
+                JSONObject emoteObj = reactionObj.getJSONObject("emote");
+                ChannelReaction reaction = new ChannelReaction(
+                        this.jg_api,
+                        reactionObj.getString("channelId"),
+                        reactionObj.getString("messageId"),
+                        reactionObj.getString("createdBy"),
+                        new Emote(
+                                this.jg_api,
+                                emoteObj.getInt("id"),
+                                emoteObj.getString("name"),
+                                emoteObj.getString("url")
+                        )
+                );
+
+                switch (eventType) {
+                    case "ChannelMessageReactionCreated" -> {
+                        event = new ChannelMessageReactionCreatedEvent(this.jg_api, server_id, reaction);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onChannelMessageReactionCreatedEvent((ChannelMessageReactionCreatedEvent) event);
+                        }
+                    }
+                    case "ChannelMessageReactionDeleted" -> {
+                        event = new ChannelMessageReactionDeletedEvent(this.jg_api, server_id, reaction);
+                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
+                            adapters.onChannelMessageReactionDeletedEvent((ChannelMessageReactionDeletedEvent) event);
+                        }
+                    }
+                }
+
                 break;
         }
     }

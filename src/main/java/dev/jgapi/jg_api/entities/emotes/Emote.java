@@ -7,9 +7,14 @@ public class Emote extends GuildedObject {
     private int id;
     private String name;
     private String url;
-    public Emote(JG_API jg_api) {
+
+    public Emote(JG_API jg_api, int id, String name, String url) {
         super(jg_api);
+        this.id = id;
+        this.name = name;
+        this.url = url;
     }
+
     public int getId() {
         return this.id;
     }
