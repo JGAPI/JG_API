@@ -1,19 +1,13 @@
 package dev.jgapi.jg_api;
 
-import dev.jgapi.jg_api.events.chat.ChatMessageCreatedEvent;
-import dev.jgapi.jg_api.events.chat.ChatMessageDeletedEvent;
-import dev.jgapi.jg_api.events.chat.ChatMessageUpdatedEvent;
-import dev.jgapi.jg_api.events.docs.DocCreatedEvent;
-import dev.jgapi.jg_api.events.docs.DocDeletedEvent;
-import dev.jgapi.jg_api.events.docs.DocUpdatedEvent;
+import dev.jgapi.jg_api.events.calendar.*;
+import dev.jgapi.jg_api.events.chat.*;
+import dev.jgapi.jg_api.events.docs.*;
 import dev.jgapi.jg_api.events.library.*;
 import dev.jgapi.jg_api.events.listitem.*;
-import dev.jgapi.jg_api.events.teamchannel.TeamChannelCreatedEvent;
-import dev.jgapi.jg_api.events.teamchannel.TeamChannelDeletedEvent;
-import dev.jgapi.jg_api.events.teamchannel.TeamChannelUpdatedEvent;
+import dev.jgapi.jg_api.events.teamchannel.*;
 import dev.jgapi.jg_api.events.teammember.*;
-import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookCreatedEvent;
-import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
+import dev.jgapi.jg_api.events.teamwebhook.*;
 
 public abstract class ListenerAdapter {
     /**
@@ -83,4 +77,11 @@ public abstract class ListenerAdapter {
     public void onListItemDeletedEvent(ListItemDeletedEvent event) {}
     public void onListItemCompletedEvent(ListItemCompletedEvent event) {}
     public void onListItemUncompletedEvent(ListItemUncompletedEvent event) {}
+
+    /**
+     * Calendar Events
+     */
+    public void onCalendarEventCreatedEvent(CalendarEventCreatedEvent event) {}
+    public void onCalendarEventUpdatedEvent(CalendarEventUpdatedEvent event) {}
+    public void onCalendarEventDeletedEvent(CalendarEventDeletedEvent event) {}
 }
