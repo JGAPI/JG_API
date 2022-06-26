@@ -252,9 +252,9 @@ public class WebSocketManager {
                 break;
             case "teamRolesUpdated":
                 Object[] memberRoleIds = dataObj.getJSONArray("memberRoleIds").toList().toArray();
-                event = new teamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds);
+                event = new TeamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds);
                 for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                    adapter.onTeamRolesUpdatedEvent((teamRolesUpdatedEvent) event);
+                    adapter.onTeamRolesUpdatedEvent((TeamRolesUpdatedEvent) event);
                 }
                 break;
             case "TeamChannelCreated":

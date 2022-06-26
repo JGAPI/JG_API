@@ -47,7 +47,7 @@ public abstract class ListenerAdapter {
     public void onTeamMemberUpdatedEvent(TeamMemberUpdatedEvent event) {}
     public void onTeamMemberBannedEvent(TeamMemberBannedEvent event) {}
     public void onTeamMemberUnbannedEvent(TeamMemberUnbannedEvent event) {}
-    public void onTeamRolesUpdatedEvent(teamRolesUpdatedEvent event) {}
+    public void onTeamRolesUpdatedEvent(TeamRolesUpdatedEvent event) {}
 
     /**
      * TeamChannel Events
