@@ -17,12 +17,12 @@ public class ServerChannel extends GuildedObject {
     private Instant updatedAt;
     private String serverId;
     private String parentId;
-    private String categoryId;
+    private int categoryId;
     private String groupId;
     private boolean isPublic;
     private String archivedBy;
     private Instant archivedAt;
-    public ServerChannel(JG_API jg_api, String id, String type, String name, String topic, Instant createdAt, String createdBy, Instant updatedAt, String serverId, String parentId, String categoryId, String groupId, boolean isPublic, String archivedBy, Instant archivedAt) {
+    public ServerChannel(JG_API jg_api, String id, String type, String name, String topic, Instant createdAt, String createdBy, Instant updatedAt, String serverId, String parentId, int categoryId, String groupId, boolean isPublic, String archivedBy, Instant archivedAt) {
         super(jg_api);
         this.id = id;
         this.type = type;
@@ -76,7 +76,7 @@ public class ServerChannel extends GuildedObject {
         return this.parentId;
     }
 
-    public String getCategoryId() {
+    public int getCategoryId() {
         return this.categoryId;
     }
 

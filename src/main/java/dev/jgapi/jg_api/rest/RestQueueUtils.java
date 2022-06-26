@@ -5,6 +5,7 @@ import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
+import dev.jgapi.jg_api.util.InstantHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,7 +26,22 @@ public class RestQueueUtils {
             }
             case ServerChannel -> {
                 JSONObject channel = json.getJSONObject("channel");
-                return (T) new ServerChannel(jg_api, channel.getString("id"), channel.getString("type"), channel.getString("name"), channel.optString("topic", ""), Instant.parse(channel.getString("createdAt")), channel.getString("createdBy"), Instant.parse(channel.optString("updatedAt", "")), channel.getString("serverId"), channel.optString("parentId", ""), channel.optString("parentId", ""), channel.getString("groupId"), channel.optBoolean("isPublic", false), channel.optString("archivedBy", null), Instant.parse(channel.optString("archivedAt", "")));
+                return (T) new ServerChannel(
+                        jg_api,
+                        channel.getString("id"),
+                        channel.getString("type"),
+                        channel.getString("name"),
+                        channel.optString("topic", null),
+                        Instant.parse(channel.getString("createdAt")),
+                        channel.getString("createdBy"),
+                        InstantHelper.parseStringOrNull(channel.optString("updatedAt", null)),
+                        channel.getString("serverId"),
+                        channel.optString("parentId", null),
+                        channel.optInt("categoryId", -1),
+                        channel.getString("groupId"),
+                        channel.optBoolean("isPublic", false),
+                        channel.optString("archivedBy", null),
+                        InstantHelper.parseStringOrNull(channel.optString("archivedAt", null)));
             }
             case ChatMessage -> {
                 JSONObject chatMessage = json.getJSONObject("message");
@@ -33,7 +49,29 @@ public class RestQueueUtils {
                 String[] replyMessageIds = null;
                 ChatEmbed[] embeds = null;
                 Mentions mentions = null;
-                return (T) new ChatMessage(jg_api, chatMessage.getString("id"), chatMessage.getString("type"), chatMessage.optString("serverId", ""), chatMessage.getString("channelId"), chatMessage.getString("content"), embeds, replyMessageIds, chatMessage.optBoolean("isPrivate", false), chatMessage.optBoolean("isSilent", false), mentions, Instant.parse(chatMessage.getString("createdAt")), chatMessage.getString("createdBy"), chatMessage.optString("createdByWebhookId", null), Instant.parse(chatMessage.optString("updatedAt", null)));
+                return (T) new ChatMessage(
+                        jg_api,
+                        chatMessage.getString("id"),
+                        chatMessage.getString("type"),
+                        chatMessage.optString("serverId", null),
+                        new ServerChannel(
+                                jg_api,
+                                chatMessage.getString("channelId"),
+                                null, null, null, null, null, null,
+                                chatMessage.optString("serverId", null),
+                                null, -1, null, false, null, null
+                        ),
+                        chatMessage.getString("content"),
+                        null, null,
+                        chatMessage.optBoolean("isPrivate", false),
+                        chatMessage.optBoolean("isSilent", false),
+                        null,
+                        Instant.parse(chatMessage.getString("createdAt")),
+                        chatMessage.getString("createdBy"),
+                        chatMessage.optString("createdByWebhookId", null),
+                        InstantHelper.parseStringOrNull(chatMessage.optString("updatedAt", null)),
+                        InstantHelper.parseStringOrNull(chatMessage.optString("deletedAt", null))
+                );
             }
             case ChatMessage_Arr -> {
                 // TODO

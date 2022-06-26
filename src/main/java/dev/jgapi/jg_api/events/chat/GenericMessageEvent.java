@@ -1,7 +1,7 @@
 package dev.jgapi.jg_api.events.chat;
 
-import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.events.Event;
 
 public abstract class GenericMessageEvent extends Event {

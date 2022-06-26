@@ -4,9 +4,7 @@ import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
 import dev.jgapi.jg_api.entities.channels.ChannelReaction;
-import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
-import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
 import dev.jgapi.jg_api.entities.emotes.Emote;
@@ -17,7 +15,6 @@ import dev.jgapi.jg_api.entities.members.ServerMember;
 import dev.jgapi.jg_api.entities.members.User;
 import dev.jgapi.jg_api.entities.members.UserSummary;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
-import dev.jgapi.jg_api.events.Event;
 import dev.jgapi.jg_api.events.calendar.CalendarEventCreatedEvent;
 import dev.jgapi.jg_api.events.calendar.CalendarEventDeletedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageCreatedEvent;
@@ -76,338 +73,270 @@ public class WebSocketManager {
         return result;
     }
 
-    public void parseWebsocketMessage(JSONObject json) { 
+    public void parseWebsocketMessage(JSONObject json) {
         String eventType = json.getString("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
         JSONObject dataObj = json.getJSONObject("d");
-        String msg_id_replay = json.getString("s"); // Message ID used for replaying events after a disconnect
-        int opcode = json.getInt("op"); // Event name for the given message
-        String server_id = dataObj.getString("serverId");
-
-        /**
-         * ChatMessage Data
-         */
-        JSONObject messageObj = null;
-        String msg_id = null;
-        String type = null;
-        String mServer_id = null;
-        String channelId = null;
-        String content = null;
-        ChatEmbed[] embeds = new ChatEmbed[] {};
-        String[] replyMessageIds = new String[] {};
-        boolean isPrivate = false;
-        boolean isSilent = false;
-        Mentions mentions = null;
-        Instant createdAt = null;
-        String createdBy = null;
-        String createdByWebhookId = null;
-        Instant updatedAt = null;
-
-        if (dataObj.has("message")) {
-            messageObj = dataObj.getJSONObject("message");
-            msg_id = messageObj.getString("id");
-            type = messageObj.optString("type", null);
-            mServer_id = messageObj.optString("serverId", null);
-            channelId = messageObj.getString("channelId");
-            content = messageObj.optString("content", null);
-            embeds = new ChatEmbed[] {};
-            replyMessageIds = new String[] {};
-            isPrivate = messageObj.optBoolean("isPrivate", false);
-            isSilent = messageObj.optBoolean("isSilent", false);
-            mentions = null; // TODO Set up
-            createdAt = Instant.parse(messageObj.getString("createdAt"));
-            createdBy = messageObj.getString("createdBy");
-            createdByWebhookId = messageObj.optString("createdByWebhookId", null);
-            updatedAt = instantHelper(messageObj.optString("updatedAt", null));
-        }
-
-        /**
-         * ServerMember Data
-         */
-        JSONObject memberObj = null;
-        JSONObject userObj = null;
-        String user_id = null;
-        User user = null;
-        int[] roleIds = null;
-        String nickname = null;
-        Instant joinedAt = null;
-        boolean isOwner = false;
-        UserSummary userSummary = null;
-        String reason = null;
-
-        /**
-         * ServerMemberBan Data
-         */
-        JSONObject serverBanObj = null;
-
-        /**
-         * ServerChannel Data
-         */
-        JSONObject serverChannelObj = null;
-
-        /**
-         * Webhook Data
-         */
-        JSONObject webhookObj = null;
-
-        Event event = null;
+        String messageReplayId = json.getString("s"); // Message ID used for replaying events after a disconnect
+        int opCode = json.getInt("op"); // Event name for the given message
+        String serverId = dataObj.getString("serverId");
 
         switch (eventType) {
-            case "ChatMessageCreated":
-            case "ChatMessageUpdated":
-                event = new ChatMessageCreatedEvent(this.jg_api, server_id, new ChatMessage(this.jg_api, msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
-                if (eventType.equals("ChatMessageCreated")) {
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onChatMessageCreatedEvent((ChatMessageCreatedEvent) event);
-                    }
-                } else {
-                    // It's updated, not created
-                    event = new ChatMessageUpdatedEvent(this.jg_api, server_id, new ChatMessage(this.jg_api, msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onChatMessageUpdatedEvent((ChatMessageUpdatedEvent) event);
+            case "ChatMessageCreated", "ChatMessageUpdated", "ChatMessageDeleted" -> {
+                JSONObject messageObj = dataObj.getJSONObject("message");
+
+                // TODO: Setup embeds, replyMessageIds, and mentions.
+                ChatMessage chatMessage = new ChatMessage(
+                        this.jg_api,
+                        messageObj.getString("id"),
+                        messageObj.optString("type", null),
+                        messageObj.optString("serverId", null),
+                        new ServerChannel(
+                                this.jg_api,
+                                messageObj.getString("channelId"),
+                                null, null, null, null, null, null,
+                                messageObj.optString("serverId", null),
+                                null, -1, null, false, null, null
+                        ),
+                        messageObj.optString("content", null),
+                        null, null,
+                        messageObj.optBoolean("isPrivate", false),
+                        messageObj.optBoolean("isSilent", false),
+                        null,
+                        instantHelper(messageObj.optString("createdAt", null)),
+                        messageObj.getString("createdBy"),
+                        messageObj.optString("createdByWebhookId", null),
+                        instantHelper(messageObj.optString("updatedAt", null)),
+                        instantHelper(messageObj.optString("deletedAt", null))
+                );
+
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "ChatMessageCreated" -> listenerAdapter.onChatMessageCreatedEvent(new ChatMessageCreatedEvent(this.jg_api, serverId, chatMessage));
+                        case "ChatMessageUpdated" -> listenerAdapter.onChatMessageUpdatedEvent(new ChatMessageUpdatedEvent(this.jg_api, serverId, chatMessage));
+                        case "ChatMessageDeleted" -> listenerAdapter.onChatMessageDeletedEvent(new ChatMessageDeletedEvent(this.jg_api, serverId, chatMessage));
                     }
                 }
-                break;
-            case "ChatMessageDeleted":
-                event = new ChatMessageDeletedEvent(this.jg_api, server_id, new ChatMessage(this.jg_api, msg_id, type, mServer_id, channelId, content, embeds, replyMessageIds, isPrivate, isSilent, mentions, createdAt, createdBy, createdByWebhookId, updatedAt));
-                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                    adapter.onChatMessageDeletedEvent((ChatMessageDeletedEvent) event);
-                }
-                break;
-            case "TeamMemberJoined":
-                memberObj = dataObj.getJSONObject("member");
-                userObj = memberObj.getJSONObject("user");
-                String userId = userObj.getString("id");
+            }
+            case "TeamMemberJoined" -> {
+                JSONObject memberObj = dataObj.getJSONObject("member");
+                JSONObject userObj = memberObj.getJSONObject("user");
+                String userId = userObj.getString("userId");
 
-                if (userId.equals(jg_api.getClientUser().getId())) {
-                    event = new ServerAddedEvent(this.jg_api, server_id);
-
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onServerAddedEvent((ServerAddedEvent) event);
+                if (this.jg_api.getClientUser().getId().equals(userId)) {
+                    for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                        listenerAdapter.onServerAddedEvent(new ServerAddedEvent(this.jg_api, serverId));
                     }
                 } else {
-                    user = new User(
-                            userObj.getString("id"),
-                            userObj.getString("name"),
-                            userObj.optString("type", "user"),
-                            userObj.optString("avatar", ""),
-                            userObj.optString("banner", ""),
-                            Instant.parse(userObj.getString("createdAt"))
+                    ServerMember serverMember = new ServerMember(
+                            this.jg_api,
+                            new User(
+                                    userObj.getString("id"),
+                                    userObj.optString("type", "user"),
+                                    userObj.getString("name"),
+                                    userObj.optString("avatar", null),
+                                    userObj.optString("banner", null),
+                                    Instant.parse(userObj.getString("createdAt"))
+                            ),
+                            toPrimitive(memberObj.getJSONArray("roleIds").toList().toArray(new Integer[0])),
+                            memberObj.optString("nickname", null),
+                            Instant.parse(memberObj.getString("joinedAt")),
+                            memberObj.optBoolean("isOwner", false)
                     );
 
-                    roleIds = toPrimitive(memberObj.getJSONArray("roleIds").toList().toArray(new Integer[0])); // TODO May need a fix for this, may not work
-                    nickname = memberObj.optString("nickname", "");
-                    isOwner = memberObj.optBoolean("isOwner", false);
-                    joinedAt = Instant.parse(memberObj.getString("joinedAt"));
-                    event = new TeamMemberJoinedEvent(this.jg_api, server_id, new ServerMember(this.jg_api, user, roleIds, nickname, joinedAt, isOwner));
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onTeamMemberJoinedEvent((TeamMemberJoinedEvent) event);
+                    for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                        listenerAdapter.onTeamMemberJoinedEvent(new TeamMemberJoinedEvent(
+                                this.jg_api,
+                                serverId,
+                                serverMember
+                        ));
                     }
                 }
-                break;
-            case "TeamMemberRemoved":
-                userId = dataObj.getString("userId");
+            }
+            case "TeamMemberRemoved" -> {
+                String userId = dataObj.getString("userId");
 
-                if (userId.equals(jg_api.getClientUser().getId())) {
-                    event = new ServerRemovedEvent(this.jg_api, server_id);
-
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onServerRemovedEvent((ServerRemovedEvent) event);
+                if (this.jg_api.getClientUser().getId().equals(userId)) {
+                    for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                        listenerAdapter.onServerRemovedEvent(new ServerRemovedEvent(
+                                this.jg_api,
+                                serverId
+                        ));
                     }
                 } else {
-                    boolean isKick = dataObj.optBoolean("isKick", false);
-                    boolean isBan = dataObj.optBoolean("isBan", false);
-                    event = new TeamMemberRemovedEvent(this.jg_api, server_id, userId, isKick, isBan);
                     for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onTeamMemberRemovedEvent((TeamMemberRemovedEvent) event);
+                        adapter.onTeamMemberRemovedEvent(new TeamMemberRemovedEvent(
+                                this.jg_api,
+                                serverId,
+                                userId,
+                                dataObj.optBoolean("isKick", false),
+                                dataObj.optBoolean("isBan", false)
+                        ));
                     }
                 }
-                break;
-            case "TeamMemberBanned":
-            case "TeamMemberUnbanned":
-                serverBanObj = json.getJSONObject("d.serverMemberBan");
-                userObj = json.getJSONObject("d.serverMemberBan.user");
-                userSummary = new UserSummary(userObj.getString("id"), userObj.getString("type"), userObj.getString("name"), userObj.getString("avatar"));
-                reason = serverBanObj.getString("reason");
-                createdBy = serverBanObj.getString("createdBy");
-                createdAt = Instant.parse(serverBanObj.getString("createdAt"));
+            }
+            case "TeamMemberBanned", "TeamMemberUnbanned" -> {
+                JSONObject serverBanObj = dataObj.getJSONObject("serverMemberBan");
+                JSONObject userObj = dataObj.getJSONObject("user");
 
-                if (eventType.equals("TeamMemberBanned")) {
-                    event = new TeamMemberBannedEvent(this.jg_api, server_id, new ServerMemberBan(this.jg_api, userSummary, reason, createdBy, createdAt));
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onTeamMemberBannedEvent((TeamMemberBannedEvent) event);
-                    }
-                } else {
-                    event = new TeamMemberUnbannedEvent(this.jg_api, server_id, new ServerMemberBan(this.jg_api, userSummary, reason, createdBy, createdAt));
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onTeamMemberUnbannedEvent((TeamMemberUnbannedEvent) event);
-                    }
-                }
-                break;
-            case "TeamMemberUpdated":
-                Object userInfo = dataObj.get("userInfo");
-                event = new TeamMemberUpdatedEvent(this.jg_api, server_id, userInfo);
-                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                    adapter.onTeamMemberUpdatedEvent((TeamMemberUpdatedEvent) event);
-                }
-                break;
-            case "teamRolesUpdated":
-                Object[] memberRoleIds = dataObj.getJSONArray("memberRoleIds").toList().toArray();
-                event = new TeamRolesUpdatedEvent(this.jg_api, server_id, memberRoleIds);
-                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                    adapter.onTeamRolesUpdatedEvent((TeamRolesUpdatedEvent) event);
-                }
-                break;
-            case "TeamChannelCreated":
-            case "TeamChannelUpdated":
-            case "TeamChannelDeleted":
-                serverChannelObj = json.getJSONObject("d.channel");
-                String channel_id = serverChannelObj.getString("id");
-                type = serverChannelObj.getString("type");
-                String name = serverChannelObj.getString("name");
-                String topic = serverChannelObj.getString("topic");
-                createdAt = Instant.parse(serverChannelObj.getString("createdAt"));
-                createdBy = serverChannelObj.getString("createdBy");
-                updatedAt = Instant.parse(serverChannelObj.getString("updatedAt"));
-                String serverId = serverChannelObj.getString("serverId");
-                String parentId = serverChannelObj.getString("parentId");
-                String categoryId = serverChannelObj.getString("categoryId");
-                String groupId = serverChannelObj.getString("groupId");
-                boolean isPublic = serverChannelObj.getBoolean("isPublic");
-                String archivedBy = serverChannelObj.getString("archivedBy");
-                Instant archivedAt = Instant.parse(serverChannelObj.getString("archivedAt"));
-                ServerChannel serverChannel = new ServerChannel(this.jg_api, channel_id, type, name, topic, createdAt, createdBy, updatedAt, serverId, parentId, categoryId, groupId, isPublic, archivedBy, archivedAt);
-                switch (eventType) {
-                    case "TeamChannelCreated" -> event = new TeamChannelCreatedEvent(this.jg_api, server_id, serverChannel);
-                    case "TeamChannelUpdated" -> event = new TeamChannelUpdatedEvent(this.jg_api, server_id, serverChannel);
-                    case "TeamChannelDeleted" -> event = new TeamChannelDeletedEvent(this.jg_api, server_id, serverChannel);
-                }
-                for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
+                ServerMemberBan serverMemberBan = new ServerMemberBan(
+                        this.jg_api,
+                        new UserSummary(
+                                userObj.getString("id"),
+                                userObj.optString("type", "user"),
+                                userObj.getString("name"),
+                                userObj.optString("avatar", null)
+                        ),
+                        serverBanObj.optString("reason", null),
+                        serverBanObj.getString("createdBy"),
+                        Instant.parse(serverBanObj.getString("createdAt"))
+                );
+
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
-                        case "TeamChannelCreated" -> adapter.onTeamChannelCreatedEvent((TeamChannelCreatedEvent) event);
-                        case "TeamChannelUpdated" -> adapter.onTeamChannelUpdatedEvent((TeamChannelUpdatedEvent) event);
-                        case "TeamChannelDeleted" -> adapter.onTeamChannelDeletedEvent((TeamChannelDeletedEvent) event);
+                        case "TeamMemberBanned" -> listenerAdapter.onTeamMemberBannedEvent(new TeamMemberBannedEvent(this.jg_api, serverId, serverMemberBan));
+                        case "TeamMemberUnbanned" -> listenerAdapter.onTeamMemberUnbannedEvent(new TeamMemberUnbannedEvent(this.jg_api, serverId, serverMemberBan));
                     }
                 }
-                break;
-            case "TeamWebhookCreated":
-            case "TeamWebhookUpdated":
-                webhookObj = dataObj.getJSONObject("webhook");
-                String webhook_id = webhookObj.getString("id");
-                name = webhookObj.getString("name");
-                serverId = webhookObj.getString("serverId");
-                channelId = webhookObj.getString("channelId");
-                createdAt = Instant.parse(webhookObj.getString("createdAt"));
-                createdBy = webhookObj.getString("createdBy");
-                Instant deletedAt = Instant.parse(webhookObj.getString("deletedAt"));
-                String token = webhookObj.getString("token");
-                if (eventType.equals("TeamWebhookCreated")) {
-                    event = new TeamWebhookCreatedEvent(this.jg_api, server_id, new Webhook(this.jg_api, webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onTeamWebhookCreatedEvent((TeamWebhookCreatedEvent) event);
-                    }
-                } else {
-                    event = new TeamWebhookUpdatedEvent(this.jg_api, server_id, new Webhook(this.jg_api, webhook_id, name, serverId, channelId, createdAt, createdBy, deletedAt, token));
-                    for (ListenerAdapter adapter : this.jg_api.getListenerAdapters()) {
-                        adapter.onTeamWebhookUpdatedEvent((TeamWebhookUpdatedEvent) event);
+            }
+            case "TeamMemberUpdated" -> {
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    listenerAdapter.onTeamMemberUpdatedEvent(new TeamMemberUpdatedEvent(
+                            this.jg_api,
+                            serverId,
+                            dataObj.get("userInfo")
+                    ));
+                }
+            }
+            case "teamRolesUpdated" -> {
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    listenerAdapter.onTeamRolesUpdatedEvent(new TeamRolesUpdatedEvent(
+                            this.jg_api,
+                            serverId,
+                            dataObj.getJSONArray("memberRoleIds").toList().toArray()
+                    ));
+                }
+            }
+            case "TeamChannelCreated", "TeamChannelUpdated", "TeamChannelDeleted" -> {
+                JSONObject serverChannelObj = dataObj.getJSONObject("channel");
+
+                ServerChannel serverChannel = new ServerChannel(
+                        this.jg_api,
+                        serverChannelObj.getString("id"),
+                        serverChannelObj.getString("type"),
+                        serverChannelObj.getString("name"),
+                        serverChannelObj.optString("topic", null),
+                        Instant.parse(serverChannelObj.getString("createdAt")),
+                        serverChannelObj.getString("createdBy"),
+                        instantHelper(serverChannelObj.optString("updatedAt", null)),
+                        serverChannelObj.getString("serverId"),
+                        serverChannelObj.optString("parentId", null),
+                        serverChannelObj.getInt("categoryId"),
+                        serverChannelObj.getString("groupId"),
+                        serverChannelObj.optBoolean("isPublic", false),
+                        serverChannelObj.optString("archivedBy", null),
+                        instantHelper(serverChannelObj.optString("archivedAt", null))
+                );
+
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "TeamChannelCreated" -> listenerAdapter.onTeamChannelCreatedEvent(new TeamChannelCreatedEvent(this.jg_api, serverId, serverChannel));
+                        case "TeamChannelUpdated" -> listenerAdapter.onTeamChannelUpdatedEvent(new TeamChannelUpdatedEvent(this.jg_api, serverId, serverChannel));
+                        case "TeamChannelDeleted" -> listenerAdapter.onTeamChannelDeletedEvent(new TeamChannelDeletedEvent(this.jg_api, serverId, serverChannel));
                     }
                 }
-                break;
-            case "DocCreated":
-            case "DocUpdated":
-            case "DocDeleted":
+            }
+            case "TeamWebhookCreated", "TeamWebhookUpdated" -> {
+                JSONObject webhookObj = dataObj.getJSONObject("webhook");
+
+                Webhook webhook = new Webhook(
+                        this.jg_api,
+                        webhookObj.getString("id"),
+                        webhookObj.getString("name"),
+                        webhookObj.getString("serverId"),
+                        webhookObj.getString("channelId"),
+                        Instant.parse(webhookObj.getString("createdAt")),
+                        webhookObj.getString("createdBy"),
+                        instantHelper(webhookObj.optString("deletedAt", null)),
+                        webhookObj.optString("token", null)
+                );
+
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "TeamWebhookCreated" -> listenerAdapter.onTeamWebhookCreatedEvent(new TeamWebhookCreatedEvent(this.jg_api, serverId, webhook));
+                        case "TeamWebhookUpdated" -> listenerAdapter.onTeamWebhookUpdatedEvent(new TeamWebhookUpdatedEvent(this.jg_api, serverId, webhook));
+                    }
+                }
+            }
+            case "DocCreated", "DocUpdated", "DocDeleted" -> {
                 JSONObject docObj = dataObj.getJSONObject("doc");
-                int docId = docObj.getInt("id");
-                serverId = docObj.getString("serverId");
-                channelId = docObj.getString("channelId");
-                String title = docObj.getString("title");
-                content = docObj.getString("content");
-                mentions = null; // TODO Set up
-                createdAt = Instant.parse(docObj.getString("createdAt"));
-                createdBy = docObj.getString("createdBy");
-                updatedAt = Instant.parse(docObj.getString("updatedAt"));
-                String updatedBy = docObj.getString("updatedBy");
-                switch (eventType) {
-                    case "DocCreated":
-                        event = new DocCreatedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onDocCreatedEvent((DocCreatedEvent) event);
-                        }
-                        break;
-                    case "DocUpdated":
-                        event = new DocUpdatedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onDocUpdatedEvent((DocUpdatedEvent) event);
-                        }
-                        break;
-                    case "DocDeleted":
-                        event = new DocDeletedEvent(this.jg_api, server_id, new Doc(this.jg_api, docId, serverId, channelId, title, content, mentions, createdAt, createdBy, updatedAt, updatedBy));
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onDocDeletedEvent((DocDeletedEvent) event);
-                        }
-                        break;
+
+                // TODO: SETUP MENTIONS
+                Doc doc = new Doc(
+                        this.jg_api,
+                        docObj.getInt("id"),
+                        docObj.getString("serverId"),
+                        docObj.getString("channelId"),
+                        docObj.getString("title"),
+                        docObj.getString("content"),
+                        null,
+                        Instant.parse(docObj.getString("createdAt")),
+                        docObj.getString("createdBy"),
+                        instantHelper(docObj.optString("updatedAt", null)),
+                        docObj.optString("updatedBy", null)
+                );
+
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "DocCreated" -> listenerAdapter.onDocCreatedEvent(new DocCreatedEvent(this.jg_api, serverId, doc));
+                        case "DocUpdated" -> listenerAdapter.onDocUpdatedEvent(new DocUpdatedEvent(this.jg_api, serverId, doc));
+                        case "DocDeleted" -> listenerAdapter.onDocDeletedEvent(new DocDeletedEvent(this.jg_api, serverId, doc));
+                    }
                 }
-                break;
-            case "ListItemCreated":
-            case "ListItemUpdated":
-            case "ListItemDeleted":
-            case "ListItemCompleted":
-            case "ListItemUncompleted":
+            }
+            case "ListItemCreated", "ListItemUpdated", "ListItemDeleted", "ListItemCompleted", "ListItemUncompleted" -> {
                 JSONObject listItemObj = dataObj.getJSONObject("listItem");
-                String listId = listItemObj.getString("id");
-                serverId = listItemObj.getString("serverId");
-                channelId = listItemObj.getString("channelId");
-                String message = listItemObj.getString("message");
-                mentions = null; // TODO Set up
-                createdAt = Instant.parse(listItemObj.getString("createdAt"));
-                createdBy = listItemObj.getString("createdBy");
-                createdByWebhookId = listItemObj.getString("createdByWebhookId");
-                updatedAt = Instant.parse(listItemObj.getString("updatedAt"));
-                updatedBy = listItemObj.getString("updatedBy");
-                String parentListItemId = listItemObj.getString("parentListItemId");
-                Instant completedAt = Instant.parse(listItemObj.getString("completedAt"));
-                String completedBy = listItemObj.getString("completedBy");
-                JSONObject noteObj = listItemObj.getJSONObject("note");
-                Mentions mentions2 = null; // TODO Set up
-                ListItemNote note = new ListItemNote(mentions2, Instant.parse(noteObj.getString("createdAt")), noteObj.getString("createdBy"), Instant.parse(noteObj.getString("updatedAt")), noteObj.getString("updatedBy"), noteObj.getString("content"));
-                ListItem listItem = new ListItem(this.jg_api, listId, serverId, channelId, message, mentions, createdAt, createdBy, createdByWebhookId, updatedAt, updatedBy, parentListItemId, completedAt, completedBy, note);
-                switch (eventType) {
-                    case "ListItemCreated":
-                        event = new ListItemCreatedEvent(this.jg_api, server_id, listItem);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onListItemCreatedEvent((ListItemCreatedEvent) event);
-                        }
-                        break;
-                    case "ListItemUpdated":
-                        event = new ListItemUpdatedEvent(this.jg_api, server_id, listItem);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onListItemUpdatedEvent((ListItemUpdatedEvent) event);
-                        }
-                        break;
-                    case "ListItemDeleted":
-                        event = new ListItemDeletedEvent(this.jg_api, server_id, listItem);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onListItemDeletedEvent((ListItemDeletedEvent) event);
-                        }
-                        break;
-                    case "ListItemCompleted":
-                        event = new ListItemCompletedEvent(this.jg_api, server_id, listItem);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onListItemCompletedEvent((ListItemCompletedEvent) event);
-                        }
-                        break;
-                    case "ListItemUncompleted":
-                        event = new ListItemUncompletedEvent(this.jg_api, server_id, listItem);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onListItemUncompletedEvent((ListItemUncompletedEvent) event);
-                        }
-                        break;
+                JSONObject noteObj = listItemObj.optJSONObject("note", null);
+
+                // TODO: SETUP MENTIONS
+                ListItem listItem = new ListItem(
+                        this.jg_api,
+                        listItemObj.getString("id"),
+                        listItemObj.getString("serverId"),
+                        listItemObj.getString("channelId"),
+                        listItemObj.getString("message"),
+                        null,
+                        Instant.parse(listItemObj.getString("createdAt")),
+                        listItemObj.getString("createdBy"),
+                        listItemObj.optString("createdByWebhookId", null),
+                        instantHelper(listItemObj.optString("updatedAt", null)),
+                        listItemObj.optString("updatedBy", null),
+                        listItemObj.optString("parentListItemId", null),
+                        instantHelper(listItemObj.optString("completedAt", null)),
+                        listItemObj.optString("completedBy", null),
+                        noteObj == null ? null : new ListItemNote(
+                                Instant.parse(noteObj.getString("createdAt")),
+                                noteObj.getString("createdBy"),
+                                instantHelper(noteObj.optString("updatedAt", null)),
+                                noteObj.optString("updatedBy", null),
+                                null,
+                                noteObj.getString("content")
+                        )
+                );
+
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "ListItemCreated" -> listenerAdapter.onListItemCreatedEvent(new ListItemCreatedEvent(this.jg_api, serverId, listItem));
+                        case "ListItemUpdated" -> listenerAdapter.onListItemUpdatedEvent(new ListItemUpdatedEvent(this.jg_api, serverId, listItem));
+                        case "ListItemDeleted" -> listenerAdapter.onListItemDeletedEvent(new ListItemDeletedEvent(this.jg_api, serverId, listItem));
+                        case "ListItemCompleted" -> listenerAdapter.onListItemCompletedEvent(new ListItemCompletedEvent(this.jg_api, serverId, listItem));
+                        case "ListItemUncompleted" -> listenerAdapter.onListItemUncompletedEvent(new ListItemUncompletedEvent(this.jg_api, serverId, listItem));
+                    }
                 }
-                break;
-            case "CalendarEventCreated":
-            // TODO: Once CalendarEventupdated actually passes a CalendarEvent this needs to be uncommented.
-            // case "CalendarEventUpdated":
-            case "CalendarEventDeleted":
+            }
+            // TODO: Once CalendarEventUpdated actually passes a CalendarEvent it needs to be added here.
+            case "CalendarEventCreated", "CalendarEventDeleted" -> {
                 JSONObject calendarEventObj = dataObj.getJSONObject("calendarEvent");
+
                 //TODO: FIX MENTIONS & CANCELLATION
                 CalendarEvent calendarEvent = new CalendarEvent(
                         this.jg_api,
@@ -427,36 +356,18 @@ public class WebSocketManager {
                         null
                 );
 
-                switch (eventType) {
-                    case "CalendarEventCreated" -> {
-                        event = new CalendarEventCreatedEvent(this.jg_api, server_id, calendarEvent);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onCalendarEventCreatedEvent((CalendarEventCreatedEvent) event);
-                        }
-                    }
-                    // TODO: REFER TO COMMENT ON L407
-                    /*
-                    case "CalendarEventUpdated" -> {
-                        event = new CalendarEventUpdatedEvent(this.jg_api, server_id, calendarEvent);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onCalendarEventUpdatedEvent((CalendarEventUpdatedEvent) event);
-                        }
-                    }
-                    */
-                    case "CalendarEventDeleted" -> {
-                        event = new CalendarEventDeletedEvent(this.jg_api, server_id, calendarEvent);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onCalendarEventDeletedEvent((CalendarEventDeletedEvent) event);
-                        }
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "CalendarEventCreated" -> listenerAdapter.onCalendarEventCreatedEvent(new CalendarEventCreatedEvent(this.jg_api, serverId, calendarEvent));
+                        case "CalendarEventDeleted" -> listenerAdapter.onCalendarEventDeletedEvent(new CalendarEventDeletedEvent(this.jg_api, serverId, calendarEvent));
                     }
                 }
-
-                break;
-            case "ChannelMessageReactionCreated":
-            case "ChannelMessageReactionDeleted":
+            }
+            case "ChannelMessageReactionCreated", "ChannelMessageReactionDeleted" -> {
                 JSONObject reactionObj = dataObj.getJSONObject("reaction");
                 JSONObject emoteObj = reactionObj.getJSONObject("emote");
-                ChannelReaction reaction = new ChannelReaction(
+
+                ChannelReaction channelReaction = new ChannelReaction(
                         this.jg_api,
                         reactionObj.getString("channelId"),
                         reactionObj.getString("messageId"),
@@ -469,34 +380,28 @@ public class WebSocketManager {
                         )
                 );
 
-                switch (eventType) {
-                    case "ChannelMessageReactionCreated" -> {
-                        event = new ChannelMessageReactionCreatedEvent(this.jg_api, server_id, reaction);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onChannelMessageReactionCreatedEvent((ChannelMessageReactionCreatedEvent) event);
-                        }
-                    }
-                    case "ChannelMessageReactionDeleted" -> {
-                        event = new ChannelMessageReactionDeletedEvent(this.jg_api, server_id, reaction);
-                        for (ListenerAdapter adapters : this.jg_api.getListenerAdapters()) {
-                            adapters.onChannelMessageReactionDeletedEvent((ChannelMessageReactionDeletedEvent) event);
-                        }
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "ChannelMessageReactionCreated" -> listenerAdapter.onChannelMessageReactionCreatedEvent(new ChannelMessageReactionCreatedEvent(this.jg_api, serverId, channelReaction));
+                        case "ChannelMessageReactionDeleted" -> listenerAdapter.onChannelMessageReactionDeletedEvent(new ChannelMessageReactionDeletedEvent(this.jg_api, serverId, channelReaction));
                     }
                 }
-
-                break;
+            }
         }
     }
 
     public void parseWebsocketWelcome(JSONObject json) throws InvalidOperationException {
         JSONObject dataObj = json.getJSONObject("d");
         JSONObject userObj = dataObj.getJSONObject("user");
-        String user_id = userObj.getString("id");
-        String name = userObj.getString("name");
-        String type = "bot";
-        Instant createdAt = Instant.parse(userObj.getString("createdAt"));
 
-        User clientUser = new User(user_id, name, type, null, null, createdAt);
+        User clientUser = new User(
+                userObj.getString("id"),
+                userObj.getString("name"),
+                "bot", null, null,
+                Instant.parse(userObj.getString("createdAt"))
+        );
+
+
         this.jg_api.setupClientUser(clientUser);
     }
 

@@ -11,12 +11,12 @@ public class ListItemNote {
     private Instant updatedAt;
     private String updatedBy;
     private String content;
-    public ListItemNote(Mentions mentions, Instant createdAt, String createdBy, Instant updatedAt, String updatedBy, String content) {
-        this.mentions = mentions;
+    public ListItemNote(Instant createdAt, String createdBy, Instant updatedAt, String updatedBy, Mentions mentions, String content) {
         this.createdAt = createdAt;
         this.createdBy = createdBy;
         this.updatedAt = updatedAt;
         this.updatedBy = updatedBy;
+        this.mentions = mentions;
         this.content = content;
     }
 
