@@ -11,6 +11,9 @@ import dev.jgapi.jg_api.websocket.WebSocketManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class JG_API extends Thread {
     private String clientToken;
@@ -21,12 +24,17 @@ public class JG_API extends Thread {
     private RestClient restClient;
     private RestQueue restQueue;
     private boolean running = true;
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     private JG_API(ClientBuilder clientBuilder) {
         this.clientToken = clientBuilder.clientToken;
         this.listenerAdapters = clientBuilder.listenerAdapters;
         this.restQueue = new RestQueue();
         this.restClient = new RestClient(this);
+    }
+
+    public ScheduledExecutorService getExecutorService() {
+        return this.executorService;
     }
 
     public long getNextSeqNumber() {

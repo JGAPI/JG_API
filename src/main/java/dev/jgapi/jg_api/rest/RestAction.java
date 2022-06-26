@@ -41,28 +41,48 @@ public class RestAction<T> {
         this.sequenceNumber = sequenceNumber;
     }
 
-    public RestAction<T> queue() {
+    public void queue() {
         this.queue(null, null);
-        return this;
     }
 
-    public RestAction<T> queue(Consumer<? super T> success) {
+    public void queue(Consumer<? super T> success) {
         this.queue(success, null);
-        return this;
     }
 
-    public RestAction<T> queue(Consumer<? super T> success, Consumer<? super Throwable> failure) {
+    public void queue(Consumer<? super T> success, Consumer<? super Throwable> failure) {
         this.onSuccess = success;
         this.onFailure = failure;
         this.jg_api.queueRestAction(this);
-        return this;
     }
 
-    public RestAction<T> submit() {
-        return this;
+    public void queueAfter(TimeUnit unit, int delay) {
+        RestAction<T> restAction = this;
+        Runnable task = () -> jg_api.queueRestAction(restAction);
+        this.jg_api.getExecutorService().schedule(task, delay, unit);
     }
 
-    public RestAction<T> completeAfter(TimeUnit unit, int delay) {
-        return null;
+    public void queueAfter(TimeUnit unit, int delay, Consumer<? super T> success, Consumer<? super Throwable> failure) {
+        this.onSuccess = success;
+        this.onFailure = failure;
+        RestAction<T> restAction = this;
+        Runnable task = () -> jg_api.queueRestAction(restAction);
+        this.jg_api.getExecutorService().schedule(task, delay, unit);
+    }
+
+    public T complete() {
+        // Execute the RestAction right away
+        // TODO
+    }
+
+    public void completeAfter(TimeUnit unit, int delay) {
+        completeAfter(unit, delay, null, null);
+    }
+
+    public void completeAfter(TimeUnit unit, int delay, Consumer<? super T> success, Consumer<? super Throwable> failure) {
+        this.onSuccess = success;
+        this.onFailure = failure;
+        RestAction<T> restAction = this;
+        Runnable task = restAction::complete;
+        this.jg_api.getExecutorService().schedule(task, delay, unit);
     }
 }
