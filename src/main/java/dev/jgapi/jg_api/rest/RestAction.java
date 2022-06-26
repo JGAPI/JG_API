@@ -1,7 +1,9 @@
 package dev.jgapi.jg_api.rest;
 
 import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -11,6 +13,7 @@ public class RestAction<T> {
     private JG_API jg_api;
     private Consumer<? super T> onSuccess;
     private Consumer<? super Throwable> onFailure;
+    private final int TIMEOUT = 20000;
     public RestAction(long sequenceNumber, Request request, JG_API jg_api) {
         this.request = request;
         this.sequenceNumber = sequenceNumber;
@@ -69,9 +72,26 @@ public class RestAction<T> {
         this.jg_api.getExecutorService().schedule(task, delay, unit);
     }
 
-    public T complete() {
+    public T complete() throws IOException {
         // Execute the RestAction right away
-        // TODO
+        HttpResponseEntity resp = this.getRequest().execute(TIMEOUT);
+        T returnVal = RestQueueUtils.processAction(this.get_JGAPI(), resp.getResponse(), this.getRequest().getRoute().getReturnType());
+        switch (resp.getResponseCode()) {
+            case 200:
+            case 201:
+                if (this.onSuccess != null)
+                    this.onSuccess.accept(returnVal);
+                return returnVal;
+            case 204:
+                // Error
+                // TODO Throw an error
+                break;
+            default:
+                // Error
+                // TODO Throw an error
+        }
+        // TODO Throw an error
+        return null;
     }
 
     public void completeAfter(TimeUnit unit, int delay) {
@@ -82,7 +102,13 @@ public class RestAction<T> {
         this.onSuccess = success;
         this.onFailure = failure;
         RestAction<T> restAction = this;
-        Runnable task = restAction::complete;
+        Runnable task = () -> {
+            try {
+                restAction.complete();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
         this.jg_api.getExecutorService().schedule(task, delay, unit);
     }
 }
