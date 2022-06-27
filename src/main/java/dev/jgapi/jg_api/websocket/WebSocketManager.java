@@ -31,6 +31,7 @@ import dev.jgapi.jg_api.events.teammember.*;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookCreatedEvent;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
 import dev.jgapi.jg_api.exceptions.InvalidOperationException;
+import dev.jgapi.jg_api.util.InstantHelper;
 import org.json.JSONObject;
 
 import java.net.URI;
@@ -102,11 +103,11 @@ public class WebSocketManager {
                         messageObj.optBoolean("isPrivate", false),
                         messageObj.optBoolean("isSilent", false),
                         null,
-                        instantHelper(messageObj.optString("createdAt", null)),
-                        messageObj.getString("createdBy"),
+                        InstantHelper.parseStringOrNull(messageObj.optString("createdAt", null)),
+                        messageObj.optString("createdBy", null),
                         messageObj.optString("createdByWebhookId", null),
-                        instantHelper(messageObj.optString("updatedAt", null)),
-                        instantHelper(messageObj.optString("deletedAt", null))
+                        InstantHelper.parseStringOrNull(messageObj.optString("updatedAt", null)),
+                        InstantHelper.parseStringOrNull(messageObj.optString("deletedAt", null))
                 );
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
@@ -120,7 +121,7 @@ public class WebSocketManager {
             case "TeamMemberJoined" -> {
                 JSONObject memberObj = dataObj.getJSONObject("member");
                 JSONObject userObj = memberObj.getJSONObject("user");
-                String userId = userObj.getString("userId");
+                String userId = userObj.getString("id");
 
                 if (this.jg_api.getClientUser().getId().equals(userId)) {
                     for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
@@ -131,7 +132,7 @@ public class WebSocketManager {
                             this.jg_api,
                             new User(
                                     this.jg_api,
-                                    userObj.getString("id"),
+                                    userId,
                                     userObj.optString("type", "user"),
                                     userObj.getString("name"),
                                     userObj.optString("avatar", null),
@@ -228,14 +229,14 @@ public class WebSocketManager {
                         serverChannelObj.optString("topic", null),
                         Instant.parse(serverChannelObj.getString("createdAt")),
                         serverChannelObj.getString("createdBy"),
-                        instantHelper(serverChannelObj.optString("updatedAt", null)),
+                        InstantHelper.parseStringOrNull(serverChannelObj.optString("updatedAt", null)),
                         serverChannelObj.getString("serverId"),
                         serverChannelObj.optString("parentId", null),
                         serverChannelObj.getInt("categoryId"),
                         serverChannelObj.getString("groupId"),
                         serverChannelObj.optBoolean("isPublic", false),
                         serverChannelObj.optString("archivedBy", null),
-                        instantHelper(serverChannelObj.optString("archivedAt", null))
+                        InstantHelper.parseStringOrNull(serverChannelObj.optString("archivedAt", null))
                 );
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
@@ -257,7 +258,7 @@ public class WebSocketManager {
                         webhookObj.getString("channelId"),
                         Instant.parse(webhookObj.getString("createdAt")),
                         webhookObj.getString("createdBy"),
-                        instantHelper(webhookObj.optString("deletedAt", null)),
+                        InstantHelper.parseStringOrNull(webhookObj.optString("deletedAt", null)),
                         webhookObj.optString("token", null)
                 );
 
@@ -282,7 +283,7 @@ public class WebSocketManager {
                         null,
                         Instant.parse(docObj.getString("createdAt")),
                         docObj.getString("createdBy"),
-                        instantHelper(docObj.optString("updatedAt", null)),
+                        InstantHelper.parseStringOrNull(docObj.optString("updatedAt", null)),
                         docObj.optString("updatedBy", null)
                 );
 
@@ -309,15 +310,15 @@ public class WebSocketManager {
                         Instant.parse(listItemObj.getString("createdAt")),
                         listItemObj.getString("createdBy"),
                         listItemObj.optString("createdByWebhookId", null),
-                        instantHelper(listItemObj.optString("updatedAt", null)),
+                        InstantHelper.parseStringOrNull(listItemObj.optString("updatedAt", null)),
                         listItemObj.optString("updatedBy", null),
                         listItemObj.optString("parentListItemId", null),
-                        instantHelper(listItemObj.optString("completedAt", null)),
+                        InstantHelper.parseStringOrNull(listItemObj.optString("completedAt", null)),
                         listItemObj.optString("completedBy", null),
                         noteObj == null ? null : new ListItemNote(
                                 Instant.parse(noteObj.getString("createdAt")),
                                 noteObj.getString("createdBy"),
-                                instantHelper(noteObj.optString("updatedAt", null)),
+                                InstantHelper.parseStringOrNull(noteObj.optString("updatedAt", null)),
                                 noteObj.optString("updatedBy", null),
                                 null,
                                 noteObj.getString("content")
@@ -388,6 +389,7 @@ public class WebSocketManager {
                     }
                 }
             }
+            default -> System.out.println("Unhandled eventType: " + eventType);
         }
     }
 
@@ -428,15 +430,5 @@ public class WebSocketManager {
 
     public void disconnect() {
         this.disconnect("Requested by Client");
-    }
-
-    private Instant instantHelper(String stringTime) {
-        Instant instantTime = null;
-
-        if (stringTime != null) {
-            instantTime = Instant.parse(stringTime);
-        }
-
-        return instantTime;
     }
 }

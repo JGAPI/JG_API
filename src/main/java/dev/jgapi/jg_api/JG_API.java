@@ -12,7 +12,6 @@ import dev.jgapi.jg_api.websocket.WebSocketManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -108,8 +107,7 @@ public class JG_API extends Thread {
 
     public static class ClientBuilder {
         private String clientToken;
-        private List<ListenerAdapter> listenerAdapters = new ArrayList<ListenerAdapter>();
-
+        private final List<ListenerAdapter> listenerAdapters = new ArrayList<>();
         /**
          * Build the Client
          */
