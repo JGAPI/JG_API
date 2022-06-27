@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RestUtils {
     public static <T> T processAction(JG_API jg_api, String jsonResponse, Routing.ReturnType returnType) {
@@ -25,7 +27,21 @@ public class RestUtils {
                 return (T) Boolean.TRUE;
             }
             case ServerModel -> {
-                return (T) new ServerModel(jg_api, json.getString("id"), json.getString("ownerId"), json.optString("type", null), json.getString("name"), json.optString("url", null), json.optString("about", null), json.optString("avatar", null), json.optString("banner", null), json.optString("timezone", null), json.optBoolean("isVerified", false), json.optString("defaultChannelId", null), Instant.parse(json.getString("createdAt")));
+                return (T) new ServerModel(
+                        jg_api,
+                        json.getString("id"),
+                        json.getString("ownerId"),
+                        json.optString("type", null),
+                        json.getString("name"),
+                        json.optString("url", null),
+                        json.optString("about", null),
+                        json.optString("avatar", null),
+                        json.optString("banner", null),
+                        json.optString("timezone", null),
+                        json.optBoolean("isVerified", false),
+                        json.optString("defaultChannelId", null),
+                        Instant.parse(json.getString("createdAt"))
+                );
             }
             case ServerChannel -> {
                 JSONObject channel = json.getJSONObject("channel");
@@ -47,38 +63,19 @@ public class RestUtils {
                         InstantHelper.parseStringOrNull(channel.optString("archivedAt", null)));
             }
             case ChatMessage -> {
-                JSONObject chatMessage = json.getJSONObject("message");
-                JSONArray embedsJSON = chatMessage.optJSONArray("embeds");
-                String[] replyMessageIds = null; // TODO Set up
-                ChatEmbed[] embeds = null; // TODO Set up
-                Mentions mentions = null; // TODO Set up
-                return (T) new ChatMessage(
-                        jg_api,
-                        chatMessage.getString("id"),
-                        chatMessage.getString("type"),
-                        chatMessage.optString("serverId", null),
-                        new ServerChannel(
-                                jg_api,
-                                chatMessage.getString("channelId"),
-                                null, null, null, null, null, null,
-                                chatMessage.optString("serverId", null),
-                                null, -1, null, false, null, null
-                        ),
-                        chatMessage.getString("content"),
-                        null, null,
-                        chatMessage.optBoolean("isPrivate", false),
-                        chatMessage.optBoolean("isSilent", false),
-                        null,
-                        Instant.parse(chatMessage.getString("createdAt")),
-                        chatMessage.getString("createdBy"),
-                        chatMessage.optString("createdByWebhookId", null),
-                        InstantHelper.parseStringOrNull(chatMessage.optString("updatedAt", null)),
-                        InstantHelper.parseStringOrNull(chatMessage.optString("deletedAt", null))
-                );
+                JSONObject chatMessageObj = json.getJSONObject("message");
+                return (T) parseChatMessageObj(chatMessageObj, jg_api);
             }
             case ChatMessage_Arr -> {
-                // TODO
-                return null;
+                List<ChatMessage> chatMessages = new ArrayList<>();
+                JSONArray chatMessagesArr = json.getJSONArray("messages");
+
+                for (int i = 0; i < chatMessagesArr.length(); i ++) {
+                    JSONObject chatMessageObj = chatMessagesArr.getJSONObject(i);
+                    chatMessages.add(parseChatMessageObj(chatMessageObj, jg_api));
+                }
+
+                return (T) chatMessages;
             }
             case Nickname -> {
                 return (T) json.getString("nickname");
@@ -154,5 +151,37 @@ public class RestUtils {
             }
         }
         return null;
+    }
+
+    // Util Methods
+    private static ChatMessage parseChatMessageObj(JSONObject chatMessageObj, JG_API jg_api) {
+        JSONArray embedsJSON = chatMessageObj.optJSONArray("embeds");
+        String[] replyMessageIds = null; // TODO Set up
+        ChatEmbed[] embeds = null; // TODO Set up
+        Mentions mentions = null; // TODO Set up
+
+        return new ChatMessage(
+                jg_api,
+                chatMessageObj.getString("id"),
+                chatMessageObj.getString("type"),
+                chatMessageObj.optString("serverId", null),
+                new ServerChannel(
+                        jg_api,
+                        chatMessageObj.getString("channelId"),
+                        null, null, null, null, null, null,
+                        chatMessageObj.optString("serverId", null),
+                        null, -1, null, false, null, null
+                ),
+                chatMessageObj.getString("content"),
+                null, null,
+                chatMessageObj.optBoolean("isPrivate", false),
+                chatMessageObj.optBoolean("isSilent", false),
+                null,
+                Instant.parse(chatMessageObj.getString("createdAt")),
+                chatMessageObj.getString("createdBy"),
+                chatMessageObj.optString("createdByWebhookId", null),
+                InstantHelper.parseStringOrNull(chatMessageObj.optString("updatedAt", null)),
+                InstantHelper.parseStringOrNull(chatMessageObj.optString("deletedAt", null))
+        );
     }
 }
