@@ -36,7 +36,7 @@ public class ServerMemberBan extends GuildedObject {
         return this.createdAt;
     }
 
-    public RestAction delete(String serverId) {
+    public RestAction<Boolean> delete(String serverId) {
         return jg_api.getRestClient().deleteServerBan(serverId, this.userSummary.getId());
     }
 }

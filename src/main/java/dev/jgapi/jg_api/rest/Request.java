@@ -3,7 +3,9 @@ package dev.jgapi.jg_api.rest;
 import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -48,16 +50,29 @@ public class Request {
             String headerVal = this.getHeaders().get(headerKey);
             con.setRequestProperty(headerKey, headerVal);
         }
-        String json = this.body.toString();
-        byte[] out = json.getBytes(StandardCharsets.UTF_8);
+        byte[] out = this.getBody().toString().getBytes(StandardCharsets.UTF_8);
+        con.setFixedLengthStreamingMode(out.length);;
+        con.setConnectTimeout(timeout);
+        con.connect();
         try(OutputStream os = con.getOutputStream()) {
             os.write(out);
         }
-        con.setConnectTimeout(timeout);
-        con.connect();
-        String responseMessage = con.getResponseMessage();
+        String responseMessage = readFullyAsString(con.getInputStream(), "UTF-8");
         int responseCode = con.getResponseCode();
         con.disconnect();
         return new HttpResponseEntity(responseMessage, responseCode);
+    }
+    private String readFullyAsString(InputStream inputStream, String encoding) throws IOException {
+        return readFully(inputStream).toString(encoding);
+    }
+
+    private ByteArrayOutputStream readFully(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length = 0;
+        while ((length = inputStream.read(buffer)) != -1) {
+            baos.write(buffer, 0, length);
+        }
+        return baos;
     }
 }

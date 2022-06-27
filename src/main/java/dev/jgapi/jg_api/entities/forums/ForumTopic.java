@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.entities.forums;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
 

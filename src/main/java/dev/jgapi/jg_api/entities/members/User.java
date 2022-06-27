@@ -1,8 +1,11 @@
 package dev.jgapi.jg_api.entities.members;
 
+import dev.jgapi.jg_api.JG_API;
+import dev.jgapi.jg_api.entities.GuildedObject;
+
 import java.time.Instant;
 
-public class User {
+public class User extends GuildedObject {
     private String id;
     private String name;
     private String type;
@@ -17,7 +20,8 @@ public class User {
      * @param type The type of User. Either "client" or "bot".
      * @param createdAt The date of User Creation. Parsed to an {@link Instant} value.
      */
-    public User(String id, String name, String type, String avatar_uri, String banner_uri, Instant createdAt) {
+    public User(JG_API jg_api, String id, String name, String type, String avatar_uri, String banner_uri, Instant createdAt) {
+        super(jg_api);
         this.id = id;
         this.name = name;
         this.type = type != null ? type : "user";

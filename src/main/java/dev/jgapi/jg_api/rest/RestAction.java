@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.rest;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
+import dev.jgapi.jg_api.util.RestUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +76,7 @@ public class RestAction<T> {
     public T complete() throws IOException {
         // Execute the RestAction right away
         HttpResponseEntity resp = this.getRequest().execute(TIMEOUT);
-        T returnVal = RestQueueUtils.processAction(this.get_JGAPI(), resp.getResponse(), this.getRequest().getRoute().getReturnType());
+        T returnVal = RestUtils.processAction(this.get_JGAPI(), resp.getResponse(), this.getRequest().getRoute().getReturnType());
         switch (resp.getResponseCode()) {
             case 200:
             case 201:

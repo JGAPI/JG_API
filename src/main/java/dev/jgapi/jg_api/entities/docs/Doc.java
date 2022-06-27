@@ -72,16 +72,16 @@ public class Doc extends GuildedObject {
         return this.updatedBy;
     }
 
-    public RestAction delete() {
+    public RestAction<Boolean> delete() {
         return jg_api.getRestClient().deleteDoc(this.channelId, this.id);
     }
-    public RestAction update(String title, String content) {
+    public RestAction<Doc> update(String title, String content) {
         return jg_api.getRestClient().updateDoc(this.channelId, this.id, title, content);
     }
-    public RestAction setTitle(String title) {
+    public RestAction<Doc> setTitle(String title) {
         return jg_api.getRestClient().updateDoc(this.channelId, this.id, title, this.content);
     }
-    public RestAction setContent(String content) {
+    public RestAction<Doc> setContent(String content) {
         return jg_api.getRestClient().updateDoc(this.channelId, this.id, this.title, content);
     }
 }

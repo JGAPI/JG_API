@@ -1,16 +1,10 @@
 package dev.jgapi.jg_api.rest;
 
 
-import dev.jgapi.jg_api.JG_API;
-import dev.jgapi.jg_api.entities.channels.ServerChannel;
-import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
-import dev.jgapi.jg_api.util.InstantHelper;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import dev.jgapi.jg_api.util.RestUtils;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +22,9 @@ public class RestQueue {
     public void queue(RestAction<Object> restAction) {
         this.RestQueue.add(restAction);
     }
+    public void reorganizeBySequenceNumbers() {
+        // TODO Reorganize queue order by RestAction sequenceNumbers
+    }
     public void removeBySequenceNumber(long seqNumber) {
         this.RestQueue.removeIf(item -> item.getSequenceNumber() == seqNumber);
     }
@@ -39,7 +36,7 @@ public class RestQueue {
         switch (resp.getResponseCode()) {
             case 200:
             case 201:
-                action.getOnSuccess().accept(RestQueueUtils.processAction(action.get_JGAPI(), resp.getResponse(), action.getRequest().getRoute().getReturnType()));
+                action.getOnSuccess().accept(RestUtils.processAction(action.get_JGAPI(), resp.getResponse(), action.getRequest().getRoute().getReturnType()));
                 break;
             case 204:
                 // Error

@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.entities.members;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
 import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
@@ -41,16 +42,16 @@ public class ServerMember extends GuildedObject {
         return this.isOwner;
     }
 
-    public RestAction setNickname(String serverId, String nickname) {
+    public RestAction<String> setNickname(String serverId, String nickname) {
         return jg_api.getRestClient().updateNickname(serverId, this.user.getId(), nickname);
     }
-    public RestAction deleteNickname(String serverId) {
+    public RestAction<Boolean> deleteNickname(String serverId) {
         return jg_api.getRestClient().deleteNickname(serverId, this.user.getId());
     }
-    public RestAction kickMember(String serverId) {
+    public RestAction<Boolean> kickMember(String serverId) {
         return jg_api.getRestClient().kickMember(serverId, this.user.getId());
     }
-    public RestAction banMember(String serverId, String reason) {
+    public RestAction<ServerMemberBan> banMember(String serverId, String reason) {
         return jg_api.getRestClient().createServerBan(serverId, this.user.getId(), reason);
     }
 }

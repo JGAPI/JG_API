@@ -1,17 +1,20 @@
-package dev.jgapi.jg_api.rest;
+package dev.jgapi.jg_api.util;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
-import dev.jgapi.jg_api.util.InstantHelper;
+import dev.jgapi.jg_api.entities.members.ServerMember;
+import dev.jgapi.jg_api.entities.members.User;
+import dev.jgapi.jg_api.entities.server.ServerModel;
+import dev.jgapi.jg_api.rest.Routing;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.Instant;
 
-public class RestQueueUtils {
+public class RestUtils {
     public static <T> T processAction(JG_API jg_api, String jsonResponse, Routing.ReturnType returnType) {
         // Example:
         // new RestAction<Webhook>(this.jg_api.getNextSeqNumber(), request, this.jg_api).queue(webhook -> { webhook.getServerId(); });
@@ -22,7 +25,7 @@ public class RestQueueUtils {
                 return (T) Boolean.TRUE;
             }
             case ServerModel -> {
-                return null;
+                return (T) new ServerModel(jg_api, json.getString("id"), json.getString("ownerId"), json.optString("type", null), json.getString("name"), json.optString("url", null), json.optString("about", null), json.optString("avatar", null), json.optString("banner", null), json.optString("timezone", null), json.optBoolean("isVerified", false), json.optString("defaultChannelId", null), Instant.parse(json.getString("createdAt")));
             }
             case ServerChannel -> {
                 JSONObject channel = json.getJSONObject("channel");
@@ -46,9 +49,9 @@ public class RestQueueUtils {
             case ChatMessage -> {
                 JSONObject chatMessage = json.getJSONObject("message");
                 JSONArray embedsJSON = chatMessage.optJSONArray("embeds");
-                String[] replyMessageIds = null;
-                ChatEmbed[] embeds = null;
-                Mentions mentions = null;
+                String[] replyMessageIds = null; // TODO Set up
+                ChatEmbed[] embeds = null; // TODO Set up
+                Mentions mentions = null; // TODO Set up
                 return (T) new ChatMessage(
                         jg_api,
                         chatMessage.getString("id"),
@@ -78,11 +81,14 @@ public class RestQueueUtils {
                 return null;
             }
             case Nickname -> {
-                // TODO
-                return null;
+                return (T) json.getString("nickname");
             }
             case ServerMember -> {
-                return null;
+                JSONObject jMember = json.getJSONObject("member");
+                JSONObject jUser = jMember.getJSONObject("user");
+                User user = new User(jg_api, jUser.getString("id"), jUser.getString("name"), jUser.getString("type"), jUser.optString("avatar", null), jUser.optString("banner", null), Instant.parse(jUser.getString("createdAt")));
+                int[] roleIds = null; // TODO Set this up
+                return (T) new ServerMember(jg_api, user, roleIds, jMember.optString("nickname", null), Instant.parse(jMember.getString("joinedAt")), jMember.optBoolean("isOwner", false));
             }
             case ServerMemberSummary_Arr -> {
                 // TODO

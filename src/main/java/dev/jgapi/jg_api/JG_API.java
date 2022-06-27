@@ -9,11 +9,13 @@ import dev.jgapi.jg_api.rest.RestClient;
 import dev.jgapi.jg_api.rest.RestQueue;
 import dev.jgapi.jg_api.websocket.WebSocketManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class JG_API extends Thread {
     private String clientToken;
@@ -24,17 +26,22 @@ public class JG_API extends Thread {
     private RestClient restClient;
     private RestQueue restQueue;
     private boolean running = true;
+    private boolean queueEnabled = false;
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     private JG_API(ClientBuilder clientBuilder) {
         this.clientToken = clientBuilder.clientToken;
         this.listenerAdapters = clientBuilder.listenerAdapters;
         this.restQueue = new RestQueue();
-        this.restClient = new RestClient(this);
+        this.restClient = new RestClient(this, this.clientToken);
     }
 
     public ScheduledExecutorService getExecutorService() {
         return this.executorService;
+    }
+
+    public void setQueueEnabled(boolean queueEnabled) {
+        this.queueEnabled = queueEnabled;
     }
 
     public long getNextSeqNumber() {
@@ -72,7 +79,22 @@ public class JG_API extends Thread {
         // We want to send a heartbeat every so often
         while (this.running) {
             // keep alive
-            // TODO: Need to send a heartbeat every so often
+            if (this.queueEnabled) {
+                // The queue is enabled, we want to run the queue every so often
+                this.getExecutorService().schedule(() -> {
+                    try {
+                        restQueue.processQueue();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }, 30000, TimeUnit.MILLISECONDS);
+            } else {
+                try {
+                    restQueue.processQueue();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 

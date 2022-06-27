@@ -87,16 +87,16 @@ public class ChatMessage extends GuildedObject {
         return this.updatedAt;
     }
 
-    public RestAction delete() {
+    public RestAction<ChatMessage> delete() {
         return jg_api.getRestClient().deleteMessage(this.getChannel().getId(), this.id);
     }
-    public RestAction update(String content, ChatEmbed[] embeds) {
+    public RestAction<ChatMessage> update(String content, ChatEmbed[] embeds) {
         return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, content, embeds);
     }
-    public RestAction setContent(String content) {
+    public RestAction<ChatMessage> setContent(String content) {
         return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, content, this.embeds);
     }
-    public RestAction setEmbeds(ChatEmbed[] embeds) {
+    public RestAction<ChatMessage> setEmbeds(ChatEmbed[] embeds) {
         return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, this.content, embeds);
     }
 }

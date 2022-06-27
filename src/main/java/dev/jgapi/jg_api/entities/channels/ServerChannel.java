@@ -3,6 +3,7 @@ package dev.jgapi.jg_api.entities.channels;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
+import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.rest.RestAction;
 
 import java.time.Instant;
@@ -96,32 +97,31 @@ public class ServerChannel extends GuildedObject {
         return this.archivedAt;
     }
 
-    public RestAction delete() {
+    public RestAction<ServerChannel> delete() {
         return this.jg_api.getRestClient().deleteChannel(this.id);
     }
-    public RestAction update(String name, String topic, boolean isPublic) {
+    public RestAction<ServerChannel> update(String name, String topic, boolean isPublic) {
         return this.jg_api.getRestClient().updateChannel(this.id, name, topic, isPublic);
     }
-    public RestAction setName(String name) {
+    public RestAction<ServerChannel> setName(String name) {
         return this.jg_api.getRestClient().updateChannel(this.id, name, this.topic, this.isPublic);
     }
-    public RestAction setTopic(String topic) {
+    public RestAction<ServerChannel> setTopic(String topic) {
         return this.jg_api.getRestClient().updateChannel(this.id, this.name, topic, this.isPublic);
     }
-    public RestAction setPublic(boolean isPublic) {
+    public RestAction<ServerChannel> setPublic(boolean isPublic) {
         return this.jg_api.getRestClient().updateChannel(this.id, this.name, this.topic, isPublic);
     }
 
-    public RestAction sendMessage(String content, boolean isPrivate, boolean isSilent, String[] replyMessageIds, ChatEmbed[] chatEmbeds) {
+    public RestAction<ChatMessage> sendMessage(String content, boolean isPrivate, boolean isSilent, String[] replyMessageIds, ChatEmbed[] chatEmbeds) {
         return this.jg_api.getRestClient().createChannelMessage(this.id, isPrivate, isSilent, replyMessageIds, content, chatEmbeds);
     }
 
-    public RestAction sendMessage(String content) {
-        System.out.println(content);
+    public RestAction<ChatMessage> sendMessage(String content) {
         return this.sendMessage(content, false, false, null, null);
     }
 
-    public RestAction sendMessage(ChatEmbed[] chatEmbeds) {
+    public RestAction<ChatMessage> sendMessage(ChatEmbed[] chatEmbeds) {
         return this.sendMessage(null, false, false, null, chatEmbeds);
     }
 }

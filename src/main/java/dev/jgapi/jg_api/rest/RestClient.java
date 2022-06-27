@@ -20,14 +20,16 @@ import java.util.HashMap;
 
 public class RestClient {
     private JG_API jg_api;
+    private String clientToken;
 
-    public RestClient(JG_API jg_api) {
+    public RestClient(JG_API jg_api, String clientToken) {
         this.jg_api = jg_api;
+        this.clientToken = clientToken;
     }
 
     private HashMap<String, String> getHeaders() {
         HashMap<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer ");
+        headers.put("Authorization", "Bearer " + this.clientToken);
         headers.put("Accept", "application/json");
         headers.put("Content-type", "application/json");
         return headers;

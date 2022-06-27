@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.entities.emotes;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.rest.RestAction;
 
 public class Emote extends GuildedObject {
     private int id;
