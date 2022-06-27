@@ -130,6 +130,7 @@ public class WebSocketManager {
                     ServerMember serverMember = new ServerMember(
                             this.jg_api,
                             new User(
+                                    this.jg_api,
                                     userObj.getString("id"),
                                     userObj.optString("type", "user"),
                                     userObj.getString("name"),
@@ -395,6 +396,7 @@ public class WebSocketManager {
         JSONObject userObj = dataObj.getJSONObject("user");
 
         User clientUser = new User(
+                this.jg_api,
                 userObj.getString("id"),
                 userObj.getString("name"),
                 "bot", null, null,
