@@ -99,4 +99,27 @@ public class ChatMessage extends GuildedObject {
     public RestAction<ChatMessage> setEmbeds(ChatEmbed[] embeds) {
         return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, this.content, embeds);
     }
+
+    public RestAction<ChatMessage> reply(String content, ChatEmbed[] embeds, boolean isPrivate, boolean isSilent) {
+        return jg_api.getRestClient().createChannelMessage(
+                this.getChannel().getId(),
+                isPrivate,
+                isSilent,
+                new String[]{this.getId()},
+                content,
+                embeds
+        );
+    }
+    public RestAction<ChatMessage> reply(String content, boolean isPrivate, boolean isSilent) {
+        return this.reply(content, null, isPrivate, isSilent);
+    }
+    public RestAction<ChatMessage> reply(ChatEmbed[] embeds, boolean isPrivate, boolean isSilent) {
+        return this.reply(null, embeds, isPrivate, isSilent);
+    }
+    public RestAction<ChatMessage> reply(String content) {
+        return this.reply(content, null, false, false);
+    }
+    public RestAction<ChatMessage> reply(ChatEmbed[] embeds) {
+        return this.reply(null, embeds, false, false);
+    }
 }
