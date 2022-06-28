@@ -12,6 +12,7 @@ import dev.jgapi.jg_api.websocket.WebSocketManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,7 @@ public class JG_API extends Thread {
         return this.restQueue.getNextSequenceNumber();
     }
 
-    public void queueRestAction(RestAction restAction) {
+    public void queueRestAction(RestAction<?> restAction) {
         this.restQueue.queue(restAction);
     }
 
@@ -88,9 +89,18 @@ public class JG_API extends Thread {
                     }
                 }, 30000, TimeUnit.MILLISECONDS);
             } else {
+                if (!this.restQueue.isQueueEmpty()) {
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            this.restQueue.processQueue();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
                 try {
-                    restQueue.processQueue();
-                } catch (IOException e) {
+                    sleep(100);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }

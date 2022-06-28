@@ -12,14 +12,11 @@ public class RestQueue {
     private List<RestAction<?>> RestQueue = new ArrayList<>();
     private long seqNumber = 0;
     private final int TIMEOUT = 20000;
-    public void add(RestAction<Object> action) {
-        this.RestQueue.add(action);
-    }
     public long getNextSequenceNumber() {
         this.seqNumber++;
         return (this.seqNumber);
     }
-    public void queue(RestAction<Object> restAction) {
+    public void queue(RestAction<?> restAction) {
         this.RestQueue.add(restAction);
     }
     public void reorganizeBySequenceNumbers() {
@@ -30,13 +27,13 @@ public class RestQueue {
     }
 
     public void processRestAction(RestAction<?> action) throws IOException {
-        if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
         HttpResponseEntity resp = action.getRequest().execute(TIMEOUT);
         switch (resp.getResponseCode()) {
             case 200:
             case 201:
-                action.getOnSuccess().accept(RestUtils.processAction(action.get_JGAPI(), resp.getResponse(), action.getRequest().getRoute().getReturnType()));
+                if (action.getOnSuccess() != null)
+                    action.getOnSuccess().accept(RestUtils.processAction(action.get_JGAPI(), resp.getResponse(), action.getRequest().getRoute().getReturnType()));
                 break;
             case 204:
                 // Error
@@ -51,7 +48,7 @@ public class RestQueue {
     public void processQueue() throws IOException {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
-        RestAction<?> action = this.RestQueue.get(0);
+        RestAction<?> action = this.RestQueue.remove(0);
         this.processRestAction(action);
     }
 
@@ -64,6 +61,6 @@ public class RestQueue {
         return (count >= 1);
     }
     public boolean isQueueEmpty() {
-        return this.RestQueue.isEmpty();
+        return this.RestQueue.size() == 0;
     }
 }
