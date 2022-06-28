@@ -113,6 +113,10 @@ public class ServerChannel extends GuildedObject {
         return this.jg_api.getRestClient().updateChannel(this.id, this.name, this.topic, isPublic);
     }
 
+    public RestAction<ChatMessage[]> getMessages() {
+        return this.jg_api.getRestClient().getMessages(this.id, Instant.now(), Instant.ofEpochSecond(0), 100, false);
+    }
+
     public RestAction<ChatMessage> sendMessage(String content, boolean isPrivate, boolean isSilent, String[] replyMessageIds, ChatEmbed[] chatEmbeds) {
         return this.jg_api.getRestClient().createChannelMessage(this.id, isPrivate, isSilent, replyMessageIds, content, chatEmbeds);
     }
