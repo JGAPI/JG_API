@@ -84,24 +84,33 @@ public class JG_API extends Thread {
                 this.getExecutorService().schedule(() -> {
                     try {
                         restQueue.processQueue();
+                        restQueue.processQueue();
+                        restQueue.processQueue();
+                        restQueue.processQueue();
+                        restQueue.processQueue();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }, 30000, TimeUnit.MILLISECONDS);
+                }, 10000, TimeUnit.MILLISECONDS);
             } else {
-                if (!this.restQueue.isQueueEmpty()) {
-                    CompletableFuture.runAsync(() -> {
+                CompletableFuture.runAsync(() -> {
+                    if (!this.restQueue.isQueueEmpty()) {
+                        System.out.println("Processing Queue");
                         try {
+                            this.restQueue.processQueue();
+                            this.restQueue.processQueue();
+                            this.restQueue.processQueue();
+                            this.restQueue.processQueue();
                             this.restQueue.processQueue();
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                    });
-                }
+                    }
+                });
                 try {
                     sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
