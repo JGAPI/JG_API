@@ -11,6 +11,8 @@ import dev.jgapi.jg_api.entities.listitems.ListItem;
 import dev.jgapi.jg_api.entities.listitems.ListItemNote;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
 import dev.jgapi.jg_api.entities.members.ServerMember;
+import dev.jgapi.jg_api.entities.members.ServerMemberSummary;
+import dev.jgapi.jg_api.entities.members.SocialLink;
 import dev.jgapi.jg_api.entities.server.ServerModel;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
 import org.json.JSONObject;
@@ -233,7 +235,7 @@ public class RestClient {
         Request request = new Request(Routing.Members.KICK_MEMBER, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<ServerMember[]> getMembers(String serverId) {
+    public RestAction<ServerMemberSummary[]> getMembers(String serverId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{serverId}", String.valueOf(serverId));
@@ -501,9 +503,9 @@ public class RestClient {
         // Set up the body of the request
         body.put("amount", amount);
         Request request = new Request(Routing.Server_XP.AWARD_XP_TO_ROLE, routeReplacements, getHeaders(), body);
-        return new RestAction(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<JSONObject> getSocialLinks(String serverId, String userId, String type) {
+    public RestAction<SocialLink> getSocialLinks(String serverId, String userId, String type) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{serverId}", serverId);

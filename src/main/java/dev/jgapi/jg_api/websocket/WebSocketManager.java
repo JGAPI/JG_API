@@ -3,6 +3,7 @@ package dev.jgapi.jg_api.websocket;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
+import dev.jgapi.jg_api.entities.calendars.CalendarEventCancellation;
 import dev.jgapi.jg_api.entities.channels.ChannelReaction;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
@@ -66,11 +67,12 @@ public class WebSocketManager {
     }
 
     private int[] toPrimitive(Integer[] IntegerArray) {
-
         int[] result = new int[IntegerArray.length];
+
         for (int i = 0; i < IntegerArray.length; i++) {
             result[i] = IntegerArray[i];
         }
+
         return result;
     }
 
@@ -338,6 +340,7 @@ public class WebSocketManager {
             // TODO: Once CalendarEventUpdated actually passes a CalendarEvent it needs to be added here.
             case "CalendarEventCreated", "CalendarEventDeleted" -> {
                 JSONObject calendarEventObj = dataObj.getJSONObject("calendarEvent");
+                JSONObject cancellationObj = calendarEventObj.optJSONObject("cancellation", null);
 
                 //TODO: FIX MENTIONS & CANCELLATION
                 CalendarEvent calendarEvent = new CalendarEvent(
@@ -355,7 +358,10 @@ public class WebSocketManager {
                         calendarEventObj.optBoolean("isPrivate", false),
                         null,
                         Instant.parse(calendarEventObj.getString("createdAt")),
-                        null
+                        cancellationObj == null ? null : new CalendarEventCancellation(
+                                cancellationObj.optString("description", null),
+                                cancellationObj.optString("createdBy", null)
+                        )
                 );
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {

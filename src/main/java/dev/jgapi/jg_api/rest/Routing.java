@@ -50,8 +50,7 @@ public class Routing {
         ServerMemberBan_Arr,
         ForumTopic,
         ListItem,
-        ListItemSummary_Arr,
-        ListItem_Update_Obj,
+        ListItem_Arr,
         Doc,
         Doc_Arr,
         XP_Member_Total,
@@ -99,7 +98,7 @@ public class Routing {
     }
     public static class ListItems {
         public static final Routing CREATE_LIST_ITEM = new Routing("POST", "/channels/{channelId}/items", ReturnType.ListItem);
-        public static final Routing GET_LIST_ITEMS = new Routing("GET", "/channels/{channelId}/items", ReturnType.ListItemSummary_Arr);
+        public static final Routing GET_LIST_ITEMS = new Routing("GET", "/channels/{channelId}/items", ReturnType.ListItem_Arr);
         public static final Routing GET_LIST_ITEM = new Routing("GET", "/channels/{channelId}/{listItemId}", ReturnType.ListItem);
         public static final Routing UPDATE_LIST_ITEM = new Routing("PUT", "/channels/{channelId}/items/{listItemId}", ReturnType.ListItem);
         public static final Routing DELETE_LIST_ITEM = new Routing("DELETE", "/channels/{channelId}/items/{listItemId}", ReturnType.NONE);
@@ -119,7 +118,7 @@ public class Routing {
     }
     public static class Server_XP {
         public static final Routing AWARD_XP_TO_MEMBER = new Routing("POST", "/servers/{serverId}/members/{userId}/xp", ReturnType.XP_Member_Total);
-        public static final Routing AWARD_XP_TO_ROLE = new Routing("POST", "/servers/{serverId}/roles/{roleId}/xp", ReturnType.XP_Role_Total);
+        public static final Routing AWARD_XP_TO_ROLE = new Routing("POST", "/servers/{serverId}/roles/{roleId}/xp", ReturnType.NONE);
     }
     public static class Social_Links {
         public static final Routing GET_MEMBER_SOCIAL_LINKS = new Routing("GET", "/servers/{serverId}/members/{userId}/social-links/{type}", ReturnType.Social_Links_Obj);
