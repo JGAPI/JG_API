@@ -42,6 +42,14 @@ public class Request {
             String value = this.getRouteReplacements().get(key);
             endpointReplace = endpointReplace.replace(key, value);
         }
+        endpointReplace += "?";
+        if (this.getRoute().getMethod().equals("GET")) {
+            for (String key : this.getBody().keySet()) {
+                endpointReplace += key + "=" + this.getBody().get(key).toString() + "&";
+            }
+        }
+        if (this.getBody().length() > 0)
+            endpointReplace = endpointReplace.substring(0, (endpointReplace.length() - 1));
         URL url = new URL(this.getRoute().getUrl() + this.getRoute().getVersion() + endpointReplace);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod(this.route.getMethod());
@@ -50,12 +58,17 @@ public class Request {
             String headerVal = this.getHeaders().get(headerKey);
             con.setRequestProperty(headerKey, headerVal);
         }
-        byte[] out = this.getBody().toString().getBytes(StandardCharsets.UTF_8);
-        con.setFixedLengthStreamingMode(out.length);;
+        byte[] out = null;
+        if (this.getBody().toString().length() > 0 && !this.getRoute().getMethod().equals("GET")) {
+            out = this.getBody().toString().getBytes(StandardCharsets.UTF_8);
+            con.setFixedLengthStreamingMode(out.length);
+        }
         con.setConnectTimeout(timeout);
         con.connect();
-        try(OutputStream os = con.getOutputStream()) {
-            os.write(out);
+        if (this.getBody().toString().length() > 0 && !this.getRoute().getMethod().equals("GET")) {
+            try (OutputStream os = con.getOutputStream()) {
+                os.write(out);
+            }
         }
         String responseMessage = readFullyAsString(con.getInputStream(), "UTF-8");
         int responseCode = con.getResponseCode();

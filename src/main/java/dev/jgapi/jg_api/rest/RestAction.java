@@ -76,6 +76,7 @@ public class RestAction<T> {
     public T complete() throws IOException {
         // Execute the RestAction right away
         HttpResponseEntity resp = this.getRequest().execute(TIMEOUT);
+        System.out.println(resp.getResponse());
         T returnVal = RestUtils.processAction(this.get_JGAPI(), resp.getResponse(), this.getRequest().getRoute().getReturnType());
         switch (resp.getResponseCode()) {
             case 200:
