@@ -75,7 +75,7 @@ public class RestUtils {
                     chatMessages.add(parseChatMessageObj(chatMessageObj, jg_api));
                 }
 
-                return (T) chatMessages;
+                return (T) chatMessages.toArray(ChatMessage[]::new);
             }
             case Nickname -> {
                 return (T) json.getString("nickname");
