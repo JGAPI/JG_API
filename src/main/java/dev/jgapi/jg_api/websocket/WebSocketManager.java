@@ -3,18 +3,16 @@ package dev.jgapi.jg_api.websocket;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
-import dev.jgapi.jg_api.entities.calendars.CalendarEventCancellation;
 import dev.jgapi.jg_api.entities.channels.ChannelReaction;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
-import dev.jgapi.jg_api.entities.emotes.Emote;
 import dev.jgapi.jg_api.entities.listitems.ListItem;
-import dev.jgapi.jg_api.entities.listitems.ListItemNote;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
+import dev.jgapi.jg_api.entities.members.MemberRoleIds;
 import dev.jgapi.jg_api.entities.members.ServerMember;
 import dev.jgapi.jg_api.entities.members.User;
-import dev.jgapi.jg_api.entities.members.UserSummary;
+import dev.jgapi.jg_api.entities.members.UserInfo;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
 import dev.jgapi.jg_api.events.calendar.CalendarEventCreatedEvent;
 import dev.jgapi.jg_api.events.calendar.CalendarEventDeletedEvent;
@@ -32,13 +30,15 @@ import dev.jgapi.jg_api.events.teammember.*;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookCreatedEvent;
 import dev.jgapi.jg_api.events.teamwebhook.TeamWebhookUpdatedEvent;
 import dev.jgapi.jg_api.exceptions.InvalidOperationException;
-import dev.jgapi.jg_api.util.InstantHelper;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebSocketManager {
     private WebSocket webSocket;
@@ -66,16 +66,6 @@ public class WebSocketManager {
 
     }
 
-    private int[] toPrimitive(Integer[] IntegerArray) {
-        int[] result = new int[IntegerArray.length];
-
-        for (int i = 0; i < IntegerArray.length; i++) {
-            result[i] = IntegerArray[i];
-        }
-
-        return result;
-    }
-
     public void parseWebsocketMessage(JSONObject json) {
         String eventType = json.getString("t"); // An operation code corresponding to the nature of the sent message (for example, success, failure, etc.)
         JSONObject dataObj = json.getJSONObject("d");
@@ -85,32 +75,7 @@ public class WebSocketManager {
 
         switch (eventType) {
             case "ChatMessageCreated", "ChatMessageUpdated", "ChatMessageDeleted" -> {
-                JSONObject messageObj = dataObj.getJSONObject("message");
-
-                // TODO: Setup embeds, replyMessageIds, and mentions.
-                ChatMessage chatMessage = new ChatMessage(
-                        this.jg_api,
-                        messageObj.getString("id"),
-                        messageObj.optString("type", null),
-                        messageObj.optString("serverId", null),
-                        new ServerChannel(
-                                this.jg_api,
-                                messageObj.getString("channelId"),
-                                null, null, null, null, null, null,
-                                messageObj.optString("serverId", null),
-                                null, -1, null, false, null, null
-                        ),
-                        messageObj.optString("content", null),
-                        null, null,
-                        messageObj.optBoolean("isPrivate", false),
-                        messageObj.optBoolean("isSilent", false),
-                        null,
-                        InstantHelper.parseStringOrNull(messageObj.optString("createdAt", null)),
-                        messageObj.optString("createdBy", null),
-                        messageObj.optString("createdByWebhookId", null),
-                        InstantHelper.parseStringOrNull(messageObj.optString("updatedAt", null)),
-                        InstantHelper.parseStringOrNull(messageObj.optString("deletedAt", null))
-                );
+                ChatMessage chatMessage = ChatMessage.parseChatMessageObj(dataObj.getJSONObject("message"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -123,29 +88,13 @@ public class WebSocketManager {
             case "TeamMemberJoined" -> {
                 JSONObject memberObj = dataObj.getJSONObject("member");
                 JSONObject userObj = memberObj.getJSONObject("user");
-                String userId = userObj.getString("id");
 
-                if (this.jg_api.getClientUser().getId().equals(userId)) {
+                if (this.jg_api.getClientUser().getId().equals(userObj.getString("id"))) {
                     for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                         listenerAdapter.onServerAddedEvent(new ServerAddedEvent(this.jg_api, serverId));
                     }
                 } else {
-                    ServerMember serverMember = new ServerMember(
-                            this.jg_api,
-                            new User(
-                                    this.jg_api,
-                                    userId,
-                                    userObj.optString("type", "user"),
-                                    userObj.getString("name"),
-                                    userObj.optString("avatar", null),
-                                    userObj.optString("banner", null),
-                                    Instant.parse(userObj.getString("createdAt"))
-                            ),
-                            toPrimitive(memberObj.getJSONArray("roleIds").toList().toArray(new Integer[0])),
-                            memberObj.optString("nickname", null),
-                            Instant.parse(memberObj.getString("joinedAt")),
-                            memberObj.optBoolean("isOwner", false)
-                    );
+                    ServerMember serverMember = ServerMember.parseServerMemberObj(memberObj,jg_api);
 
                     for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                         listenerAdapter.onTeamMemberJoinedEvent(new TeamMemberJoinedEvent(
@@ -179,21 +128,7 @@ public class WebSocketManager {
                 }
             }
             case "TeamMemberBanned", "TeamMemberUnbanned" -> {
-                JSONObject serverBanObj = dataObj.getJSONObject("serverMemberBan");
-                JSONObject userObj = dataObj.getJSONObject("user");
-
-                ServerMemberBan serverMemberBan = new ServerMemberBan(
-                        this.jg_api,
-                        new UserSummary(
-                                userObj.getString("id"),
-                                userObj.optString("type", "user"),
-                                userObj.getString("name"),
-                                userObj.optString("avatar", null)
-                        ),
-                        serverBanObj.optString("reason", null),
-                        serverBanObj.getString("createdBy"),
-                        Instant.parse(serverBanObj.getString("createdAt"))
-                );
+                ServerMemberBan serverMemberBan = ServerMemberBan.parseServerMemberBanObj(dataObj.getJSONObject("serverMemberBan"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -203,43 +138,27 @@ public class WebSocketManager {
                 }
             }
             case "TeamMemberUpdated" -> {
+                UserInfo userInfo = UserInfo.parseUserInfoObj(dataObj.getJSONObject("userInfo"), jg_api);
+
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
-                    listenerAdapter.onTeamMemberUpdatedEvent(new TeamMemberUpdatedEvent(
-                            this.jg_api,
-                            serverId,
-                            dataObj.get("userInfo")
-                    ));
+                    listenerAdapter.onTeamMemberUpdatedEvent(new TeamMemberUpdatedEvent(this.jg_api, serverId, userInfo));
                 }
             }
             case "teamRolesUpdated" -> {
+                JSONArray memberRoleIdsArr = dataObj.getJSONArray("memberRoleIds");
+                List<MemberRoleIds> memberRoleIds = new ArrayList<>();
+
+                for (int i = 0; i < memberRoleIdsArr.length(); i++) {
+                    JSONObject memberRoleIdsObj = memberRoleIdsArr.getJSONObject(i);
+                    memberRoleIds.add(MemberRoleIds.parseMemberRoleIdsObj(memberRoleIdsObj, jg_api));
+                }
+
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
-                    listenerAdapter.onTeamRolesUpdatedEvent(new TeamRolesUpdatedEvent(
-                            this.jg_api,
-                            serverId,
-                            dataObj.getJSONArray("memberRoleIds").toList().toArray()
-                    ));
+                    listenerAdapter.onTeamRolesUpdatedEvent(new TeamRolesUpdatedEvent(this.jg_api, serverId, memberRoleIds.toArray(MemberRoleIds[]::new)));
                 }
             }
             case "TeamChannelCreated", "TeamChannelUpdated", "TeamChannelDeleted" -> {
-                JSONObject serverChannelObj = dataObj.getJSONObject("channel");
-
-                ServerChannel serverChannel = new ServerChannel(
-                        this.jg_api,
-                        serverChannelObj.getString("id"),
-                        serverChannelObj.getString("type"),
-                        serverChannelObj.getString("name"),
-                        serverChannelObj.optString("topic", null),
-                        Instant.parse(serverChannelObj.getString("createdAt")),
-                        serverChannelObj.getString("createdBy"),
-                        InstantHelper.parseStringOrNull(serverChannelObj.optString("updatedAt", null)),
-                        serverChannelObj.getString("serverId"),
-                        serverChannelObj.optString("parentId", null),
-                        serverChannelObj.getInt("categoryId"),
-                        serverChannelObj.getString("groupId"),
-                        serverChannelObj.optBoolean("isPublic", false),
-                        serverChannelObj.optString("archivedBy", null),
-                        InstantHelper.parseStringOrNull(serverChannelObj.optString("archivedAt", null))
-                );
+                ServerChannel serverChannel = ServerChannel.parseServerChannelObj(dataObj.getJSONObject("channel"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -250,19 +169,7 @@ public class WebSocketManager {
                 }
             }
             case "TeamWebhookCreated", "TeamWebhookUpdated" -> {
-                JSONObject webhookObj = dataObj.getJSONObject("webhook");
-
-                Webhook webhook = new Webhook(
-                        this.jg_api,
-                        webhookObj.getString("id"),
-                        webhookObj.getString("name"),
-                        webhookObj.getString("serverId"),
-                        webhookObj.getString("channelId"),
-                        Instant.parse(webhookObj.getString("createdAt")),
-                        webhookObj.getString("createdBy"),
-                        InstantHelper.parseStringOrNull(webhookObj.optString("deletedAt", null)),
-                        webhookObj.optString("token", null)
-                );
+                Webhook webhook = Webhook.parseWebhookObj(dataObj.getJSONObject("webhook"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -272,22 +179,7 @@ public class WebSocketManager {
                 }
             }
             case "DocCreated", "DocUpdated", "DocDeleted" -> {
-                JSONObject docObj = dataObj.getJSONObject("doc");
-
-                // TODO: SETUP MENTIONS
-                Doc doc = new Doc(
-                        this.jg_api,
-                        docObj.getInt("id"),
-                        docObj.getString("serverId"),
-                        docObj.getString("channelId"),
-                        docObj.getString("title"),
-                        docObj.getString("content"),
-                        null,
-                        Instant.parse(docObj.getString("createdAt")),
-                        docObj.getString("createdBy"),
-                        InstantHelper.parseStringOrNull(docObj.optString("updatedAt", null)),
-                        docObj.optString("updatedBy", null)
-                );
+                Doc doc = Doc.parseDocObj(dataObj.getJSONObject("doc"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -298,34 +190,7 @@ public class WebSocketManager {
                 }
             }
             case "ListItemCreated", "ListItemUpdated", "ListItemDeleted", "ListItemCompleted", "ListItemUncompleted" -> {
-                JSONObject listItemObj = dataObj.getJSONObject("listItem");
-                JSONObject noteObj = listItemObj.optJSONObject("note", null);
-
-                // TODO: SETUP MENTIONS
-                ListItem listItem = new ListItem(
-                        this.jg_api,
-                        listItemObj.getString("id"),
-                        listItemObj.getString("serverId"),
-                        listItemObj.getString("channelId"),
-                        listItemObj.getString("message"),
-                        null,
-                        Instant.parse(listItemObj.getString("createdAt")),
-                        listItemObj.getString("createdBy"),
-                        listItemObj.optString("createdByWebhookId", null),
-                        InstantHelper.parseStringOrNull(listItemObj.optString("updatedAt", null)),
-                        listItemObj.optString("updatedBy", null),
-                        listItemObj.optString("parentListItemId", null),
-                        InstantHelper.parseStringOrNull(listItemObj.optString("completedAt", null)),
-                        listItemObj.optString("completedBy", null),
-                        noteObj == null ? null : new ListItemNote(
-                                Instant.parse(noteObj.getString("createdAt")),
-                                noteObj.getString("createdBy"),
-                                InstantHelper.parseStringOrNull(noteObj.optString("updatedAt", null)),
-                                noteObj.optString("updatedBy", null),
-                                null,
-                                noteObj.getString("content")
-                        )
-                );
+                ListItem listItem = ListItem.parseListItemObj(dataObj.getJSONObject("listItem"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -339,30 +204,7 @@ public class WebSocketManager {
             }
             // TODO: Once CalendarEventUpdated actually passes a CalendarEvent it needs to be added here.
             case "CalendarEventCreated", "CalendarEventDeleted" -> {
-                JSONObject calendarEventObj = dataObj.getJSONObject("calendarEvent");
-                JSONObject cancellationObj = calendarEventObj.optJSONObject("cancellation", null);
-
-                //TODO: FIX MENTIONS & CANCELLATION
-                CalendarEvent calendarEvent = new CalendarEvent(
-                        this.jg_api,
-                        calendarEventObj.getInt("id"),
-                        calendarEventObj.getString("serverId"),
-                        calendarEventObj.getString("channelId"),
-                        calendarEventObj.getString("name"),
-                        calendarEventObj.optString("description", null),
-                        calendarEventObj.optString("location", null),
-                        calendarEventObj.optString("url", null),
-                        calendarEventObj.optInt("color", 0),
-                        Instant.parse(calendarEventObj.getString("startsAt")),
-                        calendarEventObj.optInt("duration", 1),
-                        calendarEventObj.optBoolean("isPrivate", false),
-                        null,
-                        Instant.parse(calendarEventObj.getString("createdAt")),
-                        cancellationObj == null ? null : new CalendarEventCancellation(
-                                cancellationObj.optString("description", null),
-                                cancellationObj.optString("createdBy", null)
-                        )
-                );
+                CalendarEvent calendarEvent = CalendarEvent.parseCalendarEventObj(dataObj.getJSONObject("calendarEvent"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
@@ -372,21 +214,7 @@ public class WebSocketManager {
                 }
             }
             case "ChannelMessageReactionCreated", "ChannelMessageReactionDeleted" -> {
-                JSONObject reactionObj = dataObj.getJSONObject("reaction");
-                JSONObject emoteObj = reactionObj.getJSONObject("emote");
-
-                ChannelReaction channelReaction = new ChannelReaction(
-                        this.jg_api,
-                        reactionObj.getString("channelId"),
-                        reactionObj.getString("messageId"),
-                        reactionObj.getString("createdBy"),
-                        new Emote(
-                                this.jg_api,
-                                emoteObj.getInt("id"),
-                                emoteObj.getString("name"),
-                                emoteObj.getString("url")
-                        )
-                );
+                ChannelReaction channelReaction = ChannelReaction.parseChannelReactionObj(dataObj.getJSONObject("reaction"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {

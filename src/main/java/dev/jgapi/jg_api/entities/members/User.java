@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.entities.members;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -28,6 +29,18 @@ public class User extends GuildedObject {
         this.avatar_uri = avatar_uri;
         this.banner_uri = banner_uri;
         this.createdAt = createdAt;
+    }
+
+    public static User parseUserObj(JSONObject userObj, JG_API jg_api) {
+        return new User(
+                jg_api,
+                userObj.getString("id"),
+                userObj.optString("type", "user"),
+                userObj.getString("name"),
+                userObj.optString("avatar", null),
+                userObj.optString("banner", null),
+                Instant.parse(userObj.getString("createdAt"))
+        );
     }
 
     /**

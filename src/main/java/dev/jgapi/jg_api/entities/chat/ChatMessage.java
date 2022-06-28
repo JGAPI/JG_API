@@ -5,6 +5,8 @@ import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -42,6 +44,35 @@ public class ChatMessage extends GuildedObject {
         this.createdByWebhookId = createdByWebhookId;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
+    }
+
+    public static ChatMessage parseChatMessageObj(JSONObject chatMessageObj, JG_API jg_api) {
+        JSONObject mentionsObj = chatMessageObj.optJSONObject("mentions", null);
+
+        // TODO: Setup Embeds and replyMessageIds
+        return new ChatMessage(
+                jg_api,
+                chatMessageObj.getString("id"),
+                chatMessageObj.getString("type"),
+                chatMessageObj.optString("serverId", null),
+                new ServerChannel(
+                        jg_api,
+                        chatMessageObj.getString("channelId"),
+                        null, null, null, null, null, null,
+                        chatMessageObj.optString("serverId", null),
+                        null, -1, null, false, null, null
+                ),
+                chatMessageObj.getString("content"),
+                null, null,
+                chatMessageObj.optBoolean("isPrivate", false),
+                chatMessageObj.optBoolean("isSilent", false),
+                mentionsObj == null ? null : Mentions.parseMentionsObj(mentionsObj),
+                Instant.parse(chatMessageObj.getString("createdAt")),
+                chatMessageObj.getString("createdBy"),
+                chatMessageObj.optString("createdByWebhookId", null),
+                UtilClass.parseStringOrNull(chatMessageObj.optString("updatedAt", null)),
+                UtilClass.parseStringOrNull(chatMessageObj.optString("deletedAt", null))
+        );
     }
 
     public String getId() {

@@ -4,6 +4,8 @@ import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -22,6 +24,7 @@ public class ListItem extends GuildedObject {
     private Instant completedAt;
     private String completedBy;
     private ListItemNote note;
+
     public ListItem(JG_API jg_api, String id, String serverId, String channelId, String message, Mentions mentions, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt, String updatedBy, String parentListItemId, Instant completedAt, String completedBy, ListItemNote note) {
         super(jg_api);
         this.id = id;
@@ -38,6 +41,36 @@ public class ListItem extends GuildedObject {
         this.completedAt = completedAt;
         this.completedBy = completedBy;
         this.note = note;
+    }
+
+    public static ListItem parseListItemObj(JSONObject listItemObj, JG_API jg_api) {
+        JSONObject noteObj = listItemObj.optJSONObject("note", null);
+        JSONObject mentionsObj = listItemObj.optJSONObject("mentions", null);
+
+        return new ListItem(
+                jg_api,
+                listItemObj.getString("id"),
+                listItemObj.getString("serverId"),
+                listItemObj.getString("channelId"),
+                listItemObj.getString("message"),
+                mentionsObj == null ? null : Mentions.parseMentionsObj(mentionsObj),
+                Instant.parse(listItemObj.getString("createdAy")),
+                listItemObj.getString("createdBy"),
+                listItemObj.optString("createdByWebhookId", null),
+                UtilClass.parseStringOrNull(listItemObj.optString("updatedAt", null)),
+                listItemObj.optString("updatedBy", null),
+                listItemObj.optString("parentListItemId", null),
+                UtilClass.parseStringOrNull(listItemObj.optString("completedAt", null)),
+                listItemObj.optString("completedBy", null),
+                noteObj == null ? null : new ListItemNote(
+                        Instant.parse(noteObj.getString("createdAt")),
+                        noteObj.getString("createdBy"),
+                        UtilClass.parseStringOrNull(noteObj.optString("updatedAt", null)),
+                        noteObj.optString("updatedBy", null),
+                        null,
+                        noteObj.getString("content")
+                )
+        );
     }
 
     public String getId() {

@@ -3,6 +3,7 @@ package dev.jgapi.jg_api.entities.calendars;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -21,6 +22,7 @@ public class CalendarEvent extends GuildedObject {
     private Mentions mentions;
     private Instant createdAt;
     private Object cancellation;
+
     public CalendarEvent(JG_API jg_api, int calendarId, String serverId, String channelId, String name, String description, String location, String url, int color, Instant startsAt, int duration, boolean isPrivate, Mentions mentions, Instant createdAt, Object cancellation) {
         super(jg_api);
         this.calendarId = calendarId;
@@ -37,6 +39,32 @@ public class CalendarEvent extends GuildedObject {
         this.mentions = mentions;
         this.createdAt = createdAt;
         this.cancellation = cancellation;
+    }
+
+    public static CalendarEvent parseCalendarEventObj(JSONObject calendarEventObj, JG_API jg_api) {
+        JSONObject mentionsObj = calendarEventObj.optJSONObject("mentions", null);
+        JSONObject cancellationObj = calendarEventObj.optJSONObject("cancellation", null);
+
+        return new CalendarEvent(
+                jg_api,
+                calendarEventObj.getInt("id"),
+                calendarEventObj.getString("serverId"),
+                calendarEventObj.getString("channelId"),
+                calendarEventObj.getString("name"),
+                calendarEventObj.optString("description", null),
+                calendarEventObj.optString("location", null),
+                calendarEventObj.optString("url", null),
+                calendarEventObj.optInt("color", 0),
+                Instant.parse(calendarEventObj.getString("startsAt")),
+                calendarEventObj.optInt("duration", 1),
+                calendarEventObj.optBoolean("isPrivate", false),
+                mentionsObj == null ? null : Mentions.parseMentionsObj(mentionsObj),
+                Instant.parse(calendarEventObj.getString("createdAt")),
+                cancellationObj == null ? null : new CalendarEventCancellation(
+                        cancellationObj.optString("description", null),
+                        cancellationObj.optString("createdBy", null)
+                )
+        );
     }
 
     public int getCalendarId() {

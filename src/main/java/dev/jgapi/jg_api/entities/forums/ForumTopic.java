@@ -2,7 +2,8 @@ package dev.jgapi.jg_api.entities.forums;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
-import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -27,6 +28,21 @@ public class ForumTopic extends GuildedObject {
         this.createdBy = createdBy;
         this.createdByWebhookId = createdByWebhookId;
         this.updatedAt = updatedAt;
+    }
+
+    public static ForumTopic parseForumTopicObj(JSONObject forumTopicObj, JG_API jg_api) {
+        return new ForumTopic(
+                jg_api,
+                forumTopicObj.getString("id"),
+                forumTopicObj.getString("serverId"),
+                forumTopicObj.getString("channelId"),
+                forumTopicObj.optString("title", null),
+                forumTopicObj.optString("content", null),
+                Instant.parse(forumTopicObj.getString("createdAt")),
+                forumTopicObj.getString("createdBy"),
+                forumTopicObj.optString("createdByWebhookId", null),
+                UtilClass.parseStringOrNull(forumTopicObj.optString("updatedAt", null))
+        );
     }
 
     public String getId() {

@@ -5,6 +5,8 @@ import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.chat.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -23,6 +25,7 @@ public class ServerChannel extends GuildedObject {
     private boolean isPublic;
     private String archivedBy;
     private Instant archivedAt;
+
     public ServerChannel(JG_API jg_api, String id, String type, String name, String topic, Instant createdAt, String createdBy, Instant updatedAt, String serverId, String parentId, int categoryId, String groupId, boolean isPublic, String archivedBy, Instant archivedAt) {
         super(jg_api);
         this.id = id;
@@ -39,6 +42,26 @@ public class ServerChannel extends GuildedObject {
         this.isPublic = isPublic;
         this.archivedBy = archivedBy;
         this.archivedAt = archivedAt;
+    }
+
+    public static ServerChannel parseServerChannelObj(JSONObject serverChannelObj, JG_API jg_api) {
+        return new ServerChannel(
+                jg_api,
+                serverChannelObj.getString("id"),
+                serverChannelObj.getString("type"),
+                serverChannelObj.getString("name"),
+                serverChannelObj.optString("topic", null),
+                Instant.parse(serverChannelObj.getString("createdAt")),
+                serverChannelObj.getString("createdBy"),
+                UtilClass.parseStringOrNull(serverChannelObj.optString("updatedAt", null)),
+                serverChannelObj.getString("serverId"),
+                serverChannelObj.optString("parentId", null),
+                serverChannelObj.getInt("categoryId"),
+                serverChannelObj.getString("groupId"),
+                serverChannelObj.optBoolean("isPublic", false),
+                serverChannelObj.optString("archivedBy", null),
+                UtilClass.parseStringOrNull(serverChannelObj.optString("archivedAt", null))
+        );
     }
 
     public String getId() {

@@ -3,6 +3,8 @@ package dev.jgapi.jg_api.entities.webhooks;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -15,6 +17,7 @@ public class Webhook extends GuildedObject {
     private String createdBy;
     private Instant deletedAt;
     private String token;
+
     public Webhook(JG_API jg_api, String id, String name, String serverId, String channelId, Instant createdAt, String createdBy, Instant deletedAt, String token) {
         super(jg_api);
         this.id = id;
@@ -25,6 +28,20 @@ public class Webhook extends GuildedObject {
         this.createdBy = createdBy;
         this.deletedAt = deletedAt;
         this.token = token;
+    }
+
+    public static Webhook parseWebhookObj(JSONObject webhookObj, JG_API jg_api) {
+        return new Webhook(
+                jg_api,
+                webhookObj.getString("id"),
+                webhookObj.getString("name"),
+                webhookObj.getString("serverId"),
+                webhookObj.getString("channelId"),
+                Instant.parse(webhookObj.getString("createdAt")),
+                webhookObj.getString("createdBy"),
+                UtilClass.parseStringOrNull(webhookObj.optString("deletedAt", null)),
+                webhookObj.optString("token", null)
+        );
     }
 
     public String getId() {

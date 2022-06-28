@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.entities.server;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -33,6 +34,24 @@ public class ServerModel extends GuildedObject {
         this.isVerified = isVerified;
         this.defaultChannelId = defaultChannelId;
         this.createdAt = createdAt;
+    }
+
+    public static ServerModel parseServerModelObj(JSONObject serverObj, JG_API jg_api) {
+        return new ServerModel(
+            jg_api,
+            serverObj.getString("id"),
+            serverObj.getString("ownerId"),
+            serverObj.optString("type", null),
+            serverObj.getString("name"),
+            serverObj.optString("url", null),
+            serverObj.optString("about", null),
+            serverObj.optString("avatar", null),
+            serverObj.optString("banner", null),
+            serverObj.optString("timezone", null),
+            serverObj.optBoolean("isVerified", false),
+            serverObj.optString("defaultChannelId", null),
+            Instant.parse(serverObj.getString("createdAt"))
+        );
     }
 
     public String getId() {

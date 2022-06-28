@@ -4,6 +4,8 @@ import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
 import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -20,6 +22,17 @@ public class ServerMember extends GuildedObject {
         this.nickname = nickname;
         this.joinedAt = joinedAt;
         this.isOwner = isOwner;
+    }
+
+    public static ServerMember parseServerMemberObj(JSONObject memberObj, JG_API jg_api) {
+        return new ServerMember(
+                jg_api,
+                User.parseUserObj(memberObj.getJSONObject("user"), jg_api),
+                UtilClass.toPrimitive(memberObj.getJSONArray("roleIds").toList().toArray(new Integer[0])),
+                memberObj.optString("nickname", null),
+                Instant.parse(memberObj.getString("joinedAt")),
+                memberObj.optBoolean("isOwner", false)
+        );
     }
 
     public User getUser() {

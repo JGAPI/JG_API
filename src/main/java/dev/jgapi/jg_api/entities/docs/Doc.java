@@ -4,6 +4,8 @@ import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.rest.RestAction;
+import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONObject;
 
 import java.time.Instant;
 
@@ -18,6 +20,7 @@ public class Doc extends GuildedObject {
     private String createdby;
     private Instant updatedAt;
     private String updatedBy;
+
     public Doc(JG_API jg_api, int id, String serverId, String channelId, String title, String content, Mentions mentions, Instant createdAt, String createdBy, Instant updatedAt, String updatedBy) {
         super(jg_api);
         this.id = id;
@@ -30,6 +33,24 @@ public class Doc extends GuildedObject {
         this.createdby = createdBy;
         this.updatedAt = updatedAt;
         this.updatedBy = updatedBy;
+    }
+
+    public static Doc parseDocObj(JSONObject docObj, JG_API jg_api) {
+        JSONObject mentionsObj = docObj.optJSONObject("mentions", null);
+
+        return new Doc(
+                jg_api,
+                docObj.getInt("id"),
+                docObj.getString("serverId"),
+                docObj.getString("channelId"),
+                docObj.getString("title"),
+                docObj.getString("content"),
+                mentionsObj == null ? null : Mentions.parseMentionsObj(mentionsObj),
+                Instant.parse(docObj.getString("createdAt")),
+                docObj.getString("createdBy"),
+                UtilClass.parseStringOrNull(docObj.optString("updatedAt", null)),
+                docObj.optString("updatedBy", null)
+        );
     }
 
     public int getId() {
