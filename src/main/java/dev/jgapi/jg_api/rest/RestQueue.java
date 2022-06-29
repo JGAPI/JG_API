@@ -1,10 +1,5 @@
 package dev.jgapi.jg_api.rest;
 
-
-import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
-import dev.jgapi.jg_api.util.RestUtils;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,30 +21,29 @@ public class RestQueue {
         this.RestQueue.removeIf(item -> item.getSequenceNumber() == seqNumber);
     }
 
-    public void processRestAction(RestAction<?> action) throws IOException {
+    public void processRestAction(RestAction<?> action) {
         // It's not empty, we want to process it
-        HttpResponseEntity resp = action.getRequest().execute(TIMEOUT);
-        switch (resp.getResponseCode()) {
-            case 200:
-            case 201:
-                if (action.getOnSuccess() != null)
-                    action.getOnSuccess().accept(RestUtils.processAction(action.get_JGAPI(), resp.getResponse(), action.getRequest().getRoute().getReturnType()));
-                break;
-            case 204:
-                // Error
-                // TODO Accept onFailure consumer
-                break;
-            default:
-                // Error
-                // TODO Accept onFailure consumer
+        try {
+            action.complete();
+        } catch (Exception ex) {
+            // Ignore the errors cause it's already gonna be passed via onSuccess an onFailure
         }
     }
 
-    public void processQueue() throws IOException {
+    public void processQueue() {
         if (this.isQueueEmpty()) return;
         // It's not empty, we want to process it
         RestAction<?> action = this.RestQueue.remove(0);
         this.processRestAction(action);
+    }
+
+    public void processQueue(int count) {
+        for (int i=0; i < count; i++) {
+            if (this.isQueueEmpty()) return;
+            // It's not empty, we want to process it
+            RestAction<?> action = this.RestQueue.remove(0);
+            this.processRestAction(action);
+        }
     }
 
     public List<RestAction<?>> getQueuedRestActions() {

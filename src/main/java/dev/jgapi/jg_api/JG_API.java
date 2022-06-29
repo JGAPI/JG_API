@@ -82,29 +82,13 @@ public class JG_API extends Thread {
             if (this.queueEnabled) {
                 // The queue is enabled, we want to run the queue every so often
                 this.getExecutorService().schedule(() -> {
-                    try {
-                        restQueue.processQueue();
-                        restQueue.processQueue();
-                        restQueue.processQueue();
-                        restQueue.processQueue();
-                        restQueue.processQueue();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    restQueue.processQueue(5); // Runs this method 5 times
                 }, 10000, TimeUnit.MILLISECONDS);
             } else {
                 CompletableFuture.runAsync(() -> {
                     if (!this.restQueue.isQueueEmpty()) {
                         System.out.println("Processing Queue");
-                        try {
-                            this.restQueue.processQueue();
-                            this.restQueue.processQueue();
-                            this.restQueue.processQueue();
-                            this.restQueue.processQueue();
-                            this.restQueue.processQueue();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        this.restQueue.processQueue();
                     }
                 });
                 try {

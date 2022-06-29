@@ -20,7 +20,6 @@ public class WebSocketListener implements WebSocket.Listener {
 
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-        System.out.println("Text: " + data);
         JSONObject json = new JSONObject(data.toString());
         int opcode = json.getInt("op");
         switch (opcode) {
@@ -43,25 +42,21 @@ public class WebSocketListener implements WebSocket.Listener {
 
     @Override
     public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-        System.out.println("Binary: " + data);
         return WebSocket.Listener.super.onBinary(webSocket, data, last);
     }
 
     @Override
     public CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
-        System.out.println("Ping: " + message);
         return WebSocket.Listener.super.onPing(webSocket, message);
     }
 
     @Override
     public CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
-        System.out.println("Pong: " + message);
         return WebSocket.Listener.super.onPong(webSocket, message);
     }
 
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        System.out.println(statusCode + " " + reason);
         return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
     }
 

@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.rest;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.http.HttpResponseEntity;
+import dev.jgapi.jg_api.exceptions.RestActionException;
 import dev.jgapi.jg_api.util.RestUtils;
 
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class RestAction<T> {
         this.jg_api.getExecutorService().schedule(task, delay, unit);
     }
 
-    public T complete() throws IOException {
+    public T complete() throws IOException, RestActionException {
         // Execute the RestAction right away
         HttpResponseEntity resp = this.getRequest().execute(TIMEOUT);
         System.out.println(resp.getResponse());
@@ -84,16 +85,15 @@ public class RestAction<T> {
                 if (this.onSuccess != null)
                     this.onSuccess.accept(returnVal);
                 return returnVal;
-            case 204:
-                // Error
-                // TODO Throw an error
-                break;
             default:
                 // Error
-                // TODO Throw an error
+                if (this.onFailure != null)
+                    if (returnVal instanceof Throwable)
+                        this.onFailure.accept((Throwable) returnVal);
         }
-        // TODO Throw an error
-        return null;
+        if (this.onFailure != null)
+            this.onFailure.accept(new RestActionException("RestAction processing failed... Check your code please."));
+        throw new RestActionException("RestAction processing failed... Check your code please.");
     }
 
     public void completeAfter(TimeUnit unit, int delay) {
@@ -107,7 +107,7 @@ public class RestAction<T> {
         Runnable task = () -> {
             try {
                 restAction.complete();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         };
