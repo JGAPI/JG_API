@@ -15,7 +15,7 @@ public class RestAction<T> {
     private JG_API jg_api;
     private Consumer<? super T> onSuccess;
     private Consumer<? super Throwable> onFailure;
-    private final int TIMEOUT = 20000;
+    private int TIMEOUT = 20000;
     public RestAction(long sequenceNumber, Request request, JG_API jg_api) {
         this.request = request;
         this.sequenceNumber = sequenceNumber;
@@ -24,6 +24,14 @@ public class RestAction<T> {
 
     public JG_API get_JGAPI() {
         return this.jg_api;
+    }
+
+    public int getTimeout() {
+        return this.TIMEOUT;
+    }
+
+    public void setTimeout(int timeout) {
+        this.TIMEOUT = timeout;
     }
 
     public Consumer<? super T> getOnSuccess() {
@@ -44,6 +52,7 @@ public class RestAction<T> {
 
     public void setSequenceNumber(int sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
+        this.jg_api.reorganizeRestQueue();
     }
 
     public void queue() {

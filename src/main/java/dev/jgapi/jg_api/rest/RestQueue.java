@@ -1,12 +1,13 @@
 package dev.jgapi.jg_api.rest;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RestQueue {
     private List<RestAction<?>> RestQueue = new ArrayList<>();
     private long seqNumber = 0;
-    private final int TIMEOUT = 20000;
     public long getNextSequenceNumber() {
         this.seqNumber++;
         return (this.seqNumber);
@@ -15,7 +16,7 @@ public class RestQueue {
         this.RestQueue.add(restAction);
     }
     public void reorganizeBySequenceNumbers() {
-        // TODO Reorganize queue order by RestAction sequenceNumbers
+        Collections.sort(this.RestQueue, Comparator.comparingLong(RestAction::getSequenceNumber));
     }
     public void removeBySequenceNumber(long seqNumber) {
         this.RestQueue.removeIf(item -> item.getSequenceNumber() == seqNumber);

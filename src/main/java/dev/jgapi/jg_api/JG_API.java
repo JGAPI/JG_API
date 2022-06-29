@@ -48,6 +48,10 @@ public class JG_API extends Thread {
         return this.restQueue.getNextSequenceNumber();
     }
 
+    public void reorganizeRestQueue() {
+        this.restQueue.reorganizeBySequenceNumbers();
+    }
+
     public void queueRestAction(RestAction<?> restAction) {
         this.restQueue.queue(restAction);
     }
