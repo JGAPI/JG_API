@@ -9,7 +9,6 @@ import dev.jgapi.jg_api.rest.RestClient;
 import dev.jgapi.jg_api.rest.RestQueue;
 import dev.jgapi.jg_api.websocket.WebSocketManager;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -80,7 +79,7 @@ public class JG_API extends Thread {
 
     @Override
     public void run() {
-        // We want to send a heartbeat every so often
+        // TODO We need to figure out a better way to handle the queue when it is enabled, this is terrible...
         while (this.running) {
             // keep alive
             if (this.queueEnabled) {
