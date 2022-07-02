@@ -3,6 +3,7 @@ package dev.jgapi.jg_api.entities.calendars;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
+import dev.jgapi.jg_api.rest.RestAction;
 import org.json.JSONObject;
 
 import java.time.Instant;
@@ -122,4 +123,22 @@ public class CalendarEvent extends GuildedObject {
     public Object getCancellation() {
         return this.cancellation;
     }
+
+    public RestAction<CalendarEvent> setName(String name) {}
+
+    public RestAction<CalendarEvent> setDescription(String description) {}
+
+    public RestAction<CalendarEvent> setLocation(String location) {}
+
+    public RestAction<CalendarEvent> setStart(Instant startsAt) {}
+
+    public RestAction<CalendarEvent> setURL(String url) {}
+
+    public RestAction<CalendarEvent> setColor(int color) {}
+
+    public RestAction<CalendarEvent> setDuration(int duration) {}
+
+    public RestAction<CalendarEvent> setPrivate(boolean isPrivate) {}
+
+    public RestAction<CalendarEvent> update(String name, String description, String location, Instant startsAt, String url, int color, int duration, boolean isPrivate) {}
 }
