@@ -4,11 +4,15 @@ import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
 import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
+import dev.jgapi.jg_api.entities.chat.embeds.*;
 import dev.jgapi.jg_api.rest.RestAction;
 import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatMessage extends GuildedObject {
     private String id;
@@ -48,8 +52,38 @@ public class ChatMessage extends GuildedObject {
 
     public static ChatMessage parseChatMessageObj(JSONObject chatMessageObj, JG_API jg_api) {
         JSONObject mentionsObj = chatMessageObj.optJSONObject("mentions", null);
-
-        // TODO: Setup Embeds and replyMessageIds
+        JSONArray replyMessageIdsObj = chatMessageObj.optJSONArray("replyMessageIds");
+        List<String> replyMessageIdsList = new ArrayList<>();
+        for (int i = 0; i < replyMessageIdsObj.length(); i++) {
+            replyMessageIdsList.add(replyMessageIdsObj.optString(i));
+        }
+        String[] replyMessageIds = replyMessageIdsList.toArray(new String[0]);
+        JSONArray embedsObj = chatMessageObj.getJSONArray("embeds");
+        List<ChatEmbed> embedList = new ArrayList<>();
+        for (int i = 0; i < embedsObj.length(); i++) {
+            JSONObject embedObject = embedsObj.getJSONObject(i);
+            String title = embedObject.optString("title", null);
+            String description = embedObject.optString("description", null);
+            String url = embedObject.optString("url", null);
+            int color = embedObject.optInt("color", -1);
+            JSONObject footObj = embedObject.optJSONObject("footer");
+            EmbedFooter footer = new EmbedFooter(footObj.optString("icon_url", null), footObj.optString("text", null));
+            String timestamp = embedObject.optString("timestamp", null);
+            EmbedThumbnail embedThumbnail = new EmbedThumbnail(embedObject.optJSONObject("thumbnail").optString("url", null));
+            EmbedImage embedImage = new EmbedImage(embedObject.optJSONObject("image").optString("url", null));
+            JSONObject authorObj = embedObject.optJSONObject("author");
+            EmbedAuthor embedAuthor = new EmbedAuthor(authorObj.optString("name", null), authorObj.optString("url", null), authorObj.optString("icon_url", null));
+            JSONArray fields = embedObject.optJSONArray("fields");
+            List<EmbedField> fieldList = new ArrayList<>();
+            for (int j = 0; j < fields.length(); j++) {
+                JSONObject field = fields.getJSONObject(j);
+                EmbedField embedField = new EmbedField(field.optString("name", null), field.optString("value", null), field.optBoolean("inline", false));
+                fieldList.add(embedField);
+            }
+            EmbedField[] embedFields = fieldList.toArray(new EmbedField[0]);
+            embedList.add(new ChatEmbed(jg_api, title, description, url, color, footer, Instant.parse(timestamp), embedThumbnail, embedImage, embedAuthor, embedFields));
+        }
+        ChatEmbed[] embeds = embedList.toArray(new ChatEmbed[0]);
         return new ChatMessage(
                 jg_api,
                 chatMessageObj.getString("id"),
@@ -62,8 +96,7 @@ public class ChatMessage extends GuildedObject {
                         chatMessageObj.optString("serverId", null),
                         null, -1, null, false, null, null
                 ),
-                chatMessageObj.getString("content"),
-                null, null,
+                chatMessageObj.getString("content"), embeds, replyMessageIds,
                 chatMessageObj.optBoolean("isPrivate", false),
                 chatMessageObj.optBoolean("isSilent", false),
                 mentionsObj == null ? null : Mentions.parseMentionsObj(mentionsObj),
@@ -119,16 +152,16 @@ public class ChatMessage extends GuildedObject {
     }
 
     public RestAction<ChatMessage> delete() {
-        return jg_api.getRestClient().deleteMessage(this.getChannel().getId(), this.id);
-    }
-    public RestAction<ChatMessage> update(String content, ChatEmbed[] embeds) {
-        return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, content, embeds);
+        return this.jg_api.getRestClient().deleteMessage(this.getChannel().getId(), this.id);
     }
     public RestAction<ChatMessage> setContent(String content) {
-        return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, content, this.embeds);
+        return this.jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, content, this.embeds);
     }
     public RestAction<ChatMessage> setEmbeds(ChatEmbed[] embeds) {
-        return jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, this.content, embeds);
+        return this.jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, this.content, embeds);
+    }
+    public RestAction<ChatMessage> update(String content, ChatEmbed[] embeds) {
+        return this.jg_api.getRestClient().updateMessage(this.getChannel().getId(), this.id, content, embeds);
     }
 
     public RestAction<ChatMessage> reply(String content, ChatEmbed[] embeds, boolean isPrivate, boolean isSilent) {

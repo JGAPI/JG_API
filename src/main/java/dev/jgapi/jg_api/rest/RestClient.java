@@ -3,7 +3,7 @@ package dev.jgapi.jg_api.rest;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
-import dev.jgapi.jg_api.entities.chat.ChatEmbed;
+import dev.jgapi.jg_api.entities.chat.embeds.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
 import dev.jgapi.jg_api.entities.forums.ForumTopic;
@@ -659,17 +659,33 @@ public class RestClient {
         Request request = new Request(Routing.CalendarEvents.GET_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<CalendarEvent> updateCalendarEvent(String channelId, String calendarEventId, CalendarEvent calendarEvent) {
+    public RestAction<CalendarEvent> updateCalendarEvent(String channelId, int calendarEventId, CalendarEvent calendarEvent) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", channelId);
-        routeReplacements.put("{calendarEventId}", calendarEventId);
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
         // Set up the body of the request
         setupCalendarEventBody(calendarEvent, body);
         Request request = new Request(Routing.CalendarEvents.UPDATE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-
+    public RestAction<CalendarEvent> updateCalendarEvent(String channelId, int calendarEventId, String name, String description, String location, Instant startsAt, String url, int color, int duration, boolean isPrivate) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", channelId);
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
+        // Set up the body of the request
+        body.put("name", name);
+        body.put("description", description);
+        body.put("location", location);
+        body.put("startsAt", startsAt);
+        body.put("url", url);
+        body.put("color", color);
+        body.put("duration", duration);
+        body.put("isPrivate", isPrivate);
+        Request request = new Request(Routing.CalendarEvents.UPDATE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
     public RestAction<Boolean> deleteCalendarEvent(String channelId, String calendarEventId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();

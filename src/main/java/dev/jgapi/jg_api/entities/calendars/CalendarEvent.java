@@ -124,21 +124,39 @@ public class CalendarEvent extends GuildedObject {
         return this.cancellation;
     }
 
-    public RestAction<CalendarEvent> setName(String name) {}
+    public RestAction<CalendarEvent> setName(String name) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, name, this.description, this.location, this.startsAt, this.url, this.color, this.duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setDescription(String description) {}
+    public RestAction<CalendarEvent> setDescription(String description) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, description, this.location, this.startsAt, this.url, this.color, this.duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setLocation(String location) {}
+    public RestAction<CalendarEvent> setLocation(String location) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, location, this.startsAt, this.url, this.color, this.duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setStart(Instant startsAt) {}
+    public RestAction<CalendarEvent> setStart(Instant startsAt) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, this.location, startsAt, this.url, this.color, this.duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setURL(String url) {}
+    public RestAction<CalendarEvent> setURL(String url) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, this.location, this.startsAt, url, this.color, this.duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setColor(int color) {}
+    public RestAction<CalendarEvent> setColor(int color) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, this.location, this.startsAt, this.url, color, this.duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setDuration(int duration) {}
+    public RestAction<CalendarEvent> setDuration(int duration) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, this.location, this.startsAt, this.url, this.color, duration, this.isPrivate);
+    }
 
-    public RestAction<CalendarEvent> setPrivate(boolean isPrivate) {}
+    public RestAction<CalendarEvent> setPrivate(boolean isPrivate) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, this.location, this.startsAt, this.url, this.color, this.duration, isPrivate);
+    }
 
-    public RestAction<CalendarEvent> update(String name, String description, String location, Instant startsAt, String url, int color, int duration, boolean isPrivate) {}
+    public RestAction<CalendarEvent> update(String name, String description, String location, Instant startsAt, String url, int color, int duration, boolean isPrivate) {
+        return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, name, description, location, startsAt, url, color, duration, isPrivate);
+    }
 }

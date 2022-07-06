@@ -133,18 +133,18 @@ public class ListItem extends GuildedObject {
         return jg_api.getRestClient().deleteListitem(this.channelId, this.id);
     }
     public RestAction<ListItem> update(String message, ListItemNote note) {
-        return jg_api.getRestClient().updateListItem(this.channelId, this.id, message, note);
+        return this.jg_api.getRestClient().updateListItem(this.channelId, this.id, message, note);
     }
     public RestAction<ListItem> setMessage(String message) {
-        return jg_api.getRestClient().updateListItem(this.channelId, this.id, message, this.note);
+        return this.jg_api.getRestClient().updateListItem(this.channelId, this.id, message, this.note);
     }
     public RestAction<ListItem> setNote(ListItemNote note) {
-        return jg_api.getRestClient().updateListItem(this.channelId, this.id, this.message, note);
+        return this.jg_api.getRestClient().updateListItem(this.channelId, this.id, this.message, note);
     }
     public RestAction<Boolean> complete() {
-        return jg_api.getRestClient().completeListItem(this.channelId, this.id);
+        return this.jg_api.getRestClient().completeListItem(this.channelId, this.id);
     }
     public RestAction<Boolean> uncomplete() {
-        return jg_api.getRestClient().uncompleteListItem(this.channelId, this.id);
+        return this.jg_api.getRestClient().uncompleteListItem(this.channelId, this.id);
     }
 }

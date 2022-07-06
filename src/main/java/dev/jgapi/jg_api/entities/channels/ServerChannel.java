@@ -2,7 +2,7 @@ package dev.jgapi.jg_api.entities.channels;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
-import dev.jgapi.jg_api.entities.chat.ChatEmbed;
+import dev.jgapi.jg_api.entities.chat.embeds.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.rest.RestAction;
 import dev.jgapi.jg_api.util.UtilClass;
@@ -123,9 +123,6 @@ public class ServerChannel extends GuildedObject {
     public RestAction<ServerChannel> delete() {
         return this.jg_api.getRestClient().deleteChannel(this.id);
     }
-    public RestAction<ServerChannel> update(String name, String topic, boolean isPublic) {
-        return this.jg_api.getRestClient().updateChannel(this.id, name, topic, isPublic);
-    }
     public RestAction<ServerChannel> setName(String name) {
         return this.jg_api.getRestClient().updateChannel(this.id, name, this.topic, this.isPublic);
     }
@@ -134,6 +131,9 @@ public class ServerChannel extends GuildedObject {
     }
     public RestAction<ServerChannel> setPublic(boolean isPublic) {
         return this.jg_api.getRestClient().updateChannel(this.id, this.name, this.topic, isPublic);
+    }
+    public RestAction<ServerChannel> update(String name, String topic, boolean isPublic) {
+        return this.jg_api.getRestClient().updateChannel(this.id, name, topic, isPublic);
     }
 
     public RestAction<ChatMessage[]> getMessages() {
