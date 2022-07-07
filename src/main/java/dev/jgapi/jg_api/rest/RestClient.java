@@ -686,11 +686,11 @@ public class RestClient {
         Request request = new Request(Routing.CalendarEvents.UPDATE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<Boolean> deleteCalendarEvent(String channelId, String calendarEventId) {
+    public RestAction<Boolean> deleteCalendarEvent(String channelId, int calendarEventId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", channelId);
-        routeReplacements.put("{calendarEventId}", calendarEventId);
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
         Request request = new Request(Routing.CalendarEvents.DELETE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }

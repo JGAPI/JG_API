@@ -22,9 +22,9 @@ public class CalendarEvent extends GuildedObject {
     private boolean isPrivate;
     private Mentions mentions;
     private Instant createdAt;
-    private Object cancellation;
+    private CalendarEventCancellation cancellation;
 
-    public CalendarEvent(JG_API jg_api, int calendarId, String serverId, String channelId, String name, String description, String location, String url, int color, Instant startsAt, int duration, boolean isPrivate, Mentions mentions, Instant createdAt, Object cancellation) {
+    public CalendarEvent(JG_API jg_api, int calendarId, String serverId, String channelId, String name, String description, String location, String url, int color, Instant startsAt, int duration, boolean isPrivate, Mentions mentions, Instant createdAt, CalendarEventCancellation cancellation) {
         super(jg_api);
         this.calendarId = calendarId;
         this.serverId = serverId;
@@ -120,7 +120,7 @@ public class CalendarEvent extends GuildedObject {
         return this.createdAt;
     }
 
-    public Object getCancellation() {
+    public CalendarEventCancellation getCancellation() {
         return this.cancellation;
     }
 
@@ -154,6 +154,10 @@ public class CalendarEvent extends GuildedObject {
 
     public RestAction<CalendarEvent> setPrivate(boolean isPrivate) {
         return this.jg_api.getRestClient().updateCalendarEvent(this.channelId, this.calendarId, this.name, this.description, this.location, this.startsAt, this.url, this.color, this.duration, isPrivate);
+    }
+
+    public RestAction<Boolean> delete() {
+        return this.jg_api.getRestClient().deleteCalendarEvent(this.channelId, this.calendarId);
     }
 
     public RestAction<CalendarEvent> update(String name, String description, String location, Instant startsAt, String url, int color, int duration, boolean isPrivate) {
