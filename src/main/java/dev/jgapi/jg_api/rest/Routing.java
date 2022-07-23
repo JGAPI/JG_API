@@ -49,6 +49,7 @@ public class Routing {
         ServerMemberBan,
         ServerMemberBan_Arr,
         ForumTopic,
+        ForumTopic_Arr,
         ListItem,
         ListItem_Arr,
         Doc,
@@ -60,7 +61,9 @@ public class Routing {
         Webhook,
         Webhook_Arr,
         CalendarEvent_Arr,
-        CalendarEvent
+        CalendarEvent,
+        CalendarEventRsvp,
+        CalendarEventRsvp_Arr
     }
 
     public static class Servers {
@@ -95,6 +98,10 @@ public class Routing {
     }
     public static class Forums {
         public static final Routing CREATE_TOPIC = new Routing("POST", "/channels/{channelId}/topics", ReturnType.ForumTopic);
+        public static final Routing GET_TOPICS = new Routing("GET", "/channels/{channelId}/topics", ReturnType.ForumTopic);
+        public static final Routing GET_TOPIC = new Routing("GET", "/channels/{channelId}/topics/{forumTopicId}", ReturnType.ForumTopic_Arr);
+        public static final Routing UPDATE_TOPIC = new Routing("PATCH", "/channels/{channelId}/topics/{forumTopicId}", ReturnType.ForumTopic);
+        public static final Routing DELETE_TOPIC = new Routing("DELETE", "/channels/{channelId}/topics/{forumTopicId}", ReturnType.NONE);
     }
     public static class ListItems {
         public static final Routing CREATE_LIST_ITEM = new Routing("POST", "/channels/{channelId}/items", ReturnType.ListItem);
@@ -146,6 +153,10 @@ public class Routing {
         public static final Routing GET_CALENDAR_EVENT = new Routing("GET", "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
         public static final Routing UPDATE_CALENDAR_EVENT = new Routing("PATCH", "/channels/{channelId}/events/{calendarEventId}", ReturnType.CalendarEvent);
         public static final Routing DELETE_CALENDAR_EVENT = new Routing("DELETE", "/channels/{channelId}/events/{calendarEventId}", ReturnType.NONE);
+        public static final Routing GET_CALENDAR_EVENT_RSVP = new Routing("GET", "/channels/{channelId}/events/{calendarEventId}/rsvps/{userId}", ReturnType.CalendarEventRsvp);
+        public static final Routing GET_CALENDAR_EVENT_RSVPS = new Routing("GET", "/channels/{channelId}/events/{calendarEventId}/rsvps", ReturnType.CalendarEventRsvp_Arr);
+        public static final Routing UPDATE_CALENDAR_EVENT_RSVP = new Routing("PUT", "/channels/{channelId}/events/{calendarEventId}/rsvps/{userId}", ReturnType.CalendarEventRsvp);
+        public static final Routing DELETE_CALENDAR_EVENT_RSVP = new Routing("DELETE", "/channels/{channelId}/events/{calendarEventId}/rsvps/{userId}", ReturnType.NONE);
     }
 
     private final String version = "v1";

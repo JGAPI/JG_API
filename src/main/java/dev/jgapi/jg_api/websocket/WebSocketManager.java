@@ -223,6 +223,8 @@ public class WebSocketManager {
                     }
                 }
             }
+            case "ForumTopicCreated", "ForumTopicUpdated", "ForumTopicDeleted" -> {}
+            case "CalendarEventRsvpUpdated", "CalendarRsvpManyUpdated", "CalendarRsvpDeleted" -> {}
             default -> System.out.println("Unhandled eventType: " + eventType);
         }
     }

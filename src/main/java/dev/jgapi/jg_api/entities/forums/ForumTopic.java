@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import java.time.Instant;
 
 public class ForumTopic extends GuildedObject {
-    private String id;
+    private int id;
     private String serverId;
     private String channelId;
     private String title;
@@ -17,7 +17,7 @@ public class ForumTopic extends GuildedObject {
     private String createdBy;
     private String createdByWebhookId;
     private Instant updatedAt;
-    public ForumTopic(JG_API jg_api, String id, String serverId, String channelId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+    public ForumTopic(JG_API jg_api, int id, String serverId, String channelId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
         super(jg_api);
         this.id = id;
         this.serverId = serverId;
@@ -33,7 +33,7 @@ public class ForumTopic extends GuildedObject {
     public static ForumTopic parseForumTopicObj(JSONObject forumTopicObj, JG_API jg_api) {
         return new ForumTopic(
                 jg_api,
-                forumTopicObj.getString("id"),
+                forumTopicObj.getInt("id"),
                 forumTopicObj.getString("serverId"),
                 forumTopicObj.getString("channelId"),
                 forumTopicObj.optString("title", null),
@@ -45,7 +45,7 @@ public class ForumTopic extends GuildedObject {
         );
     }
 
-    public String getId() {
+    public int getId() {
         return this.id;
     }
 

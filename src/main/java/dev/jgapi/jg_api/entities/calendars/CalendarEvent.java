@@ -64,7 +64,7 @@ public class CalendarEvent extends GuildedObject {
      *
      * @param calendarEventObj
      * @param jg_api
-     * @return CalendarEvent
+     * @return CalendarEvent entity
      */
     public static CalendarEvent parseCalendarEventObj(JSONObject calendarEventObj, JG_API jg_api) {
         JSONObject mentionsObj = calendarEventObj.optJSONObject("mentions", null);
@@ -94,7 +94,7 @@ public class CalendarEvent extends GuildedObject {
 
     /**
      *
-     * @return calendarId
+     * @return 
      */
     public int getCalendarId() {
         return this.calendarId;

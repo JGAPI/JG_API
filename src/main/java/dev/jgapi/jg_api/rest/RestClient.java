@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.rest;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
+import dev.jgapi.jg_api.entities.calendars.CalendarEventRsvp;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.embeds.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
@@ -694,6 +695,17 @@ public class RestClient {
         Request request = new Request(Routing.CalendarEvents.DELETE_CALENDAR_EVENT, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
+
+    public RestAction<ForumTopic[]> getForumTopics(String channelId) {}
+    public RestAction<ForumTopic> getForumTopic(String channelId, String forumTopicId) {}
+    public RestAction<ForumTopic> updateForumTopic(String channelId, String forumTopicId, ForumTopic forumTopic) {}
+    public RestAction<ForumTopic> updateForumTopic(String channelId, String forumTopicId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {}
+    public RestAction<Boolean> deleteForumTopic(String channelId, String forumTopicId) {}
+
+    public RestAction<CalendarEventRsvp> getCalendarEventRsvp(String channelId, int calendarEventId, String userId) {}
+    public RestAction<CalendarEventRsvp[]> getCalendarEventRsvps(String channelId, String calendarEventId) {}
+    public RestAction<CalendarEventRsvp> updateCalendarEventRsvp(String channelId, String calendarEventId, String userId, String status) {}
+    public RestAction<Boolean> deleteCalendarEventRsvp(String channelId, String calendarEventId, String userId) {}
 
     // Generic body setup to clean up code a bit.
     private JSONObject setupCalendarEventBody(CalendarEvent calendarEvent, JSONObject body) {
