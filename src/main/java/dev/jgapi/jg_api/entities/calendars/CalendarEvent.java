@@ -82,7 +82,7 @@ public class CalendarEvent extends GuildedObject {
                 calendarEventObj.optString("location", null),
                 calendarEventObj.optString("url", null),
                 calendarEventObj.optInt("color", 0),
-                calendarEventObj.optInt("rsvpLimit", 0),
+                calendarEventObj.optInt("rsvpLimit", 99999999),
                 Instant.parse(calendarEventObj.getString("startsAt")),
                 calendarEventObj.optInt("duration", 1),
                 calendarEventObj.optBoolean("isPrivate", false),
