@@ -17,6 +17,7 @@ public class CalendarEvent extends GuildedObject {
     private String location;
     private String url;
     private int color;
+    private int rsvpLimit;
     private Instant startsAt;
     private int duration;
     private boolean isPrivate;
@@ -42,7 +43,7 @@ public class CalendarEvent extends GuildedObject {
      * @param createdAt
      * @param cancellation
      */
-    public CalendarEvent(JG_API jg_api, int calendarId, String serverId, String channelId, String name, String description, String location, String url, int color, Instant startsAt, int duration, boolean isPrivate, Mentions mentions, Instant createdAt, CalendarEventCancellation cancellation) {
+    public CalendarEvent(JG_API jg_api, int calendarId, String serverId, String channelId, String name, String description, String location, String url, int color, int rsvpLimit, Instant startsAt, int duration, boolean isPrivate, Mentions mentions, Instant createdAt, CalendarEventCancellation cancellation) {
         super(jg_api);
         this.calendarId = calendarId;
         this.serverId = serverId;
@@ -52,6 +53,7 @@ public class CalendarEvent extends GuildedObject {
         this.location = location;
         this.url = url;
         this.color = color;
+        this.rsvpLimit = rsvpLimit;
         this.startsAt = startsAt;
         this.duration = duration;
         this.isPrivate = isPrivate;
@@ -80,6 +82,7 @@ public class CalendarEvent extends GuildedObject {
                 calendarEventObj.optString("location", null),
                 calendarEventObj.optString("url", null),
                 calendarEventObj.optInt("color", 0),
+                calendarEventObj.optInt("rsvpLimit", 0),
                 Instant.parse(calendarEventObj.getString("startsAt")),
                 calendarEventObj.optInt("duration", 1),
                 calendarEventObj.optBoolean("isPrivate", false),
@@ -154,6 +157,14 @@ public class CalendarEvent extends GuildedObject {
      */
     public int getColor() {
         return this.color;
+    }
+
+    /**
+     *
+     * @return rsvpLimit
+     */
+    public int getRsvpLimit() {
+        return this.rsvpLimit;
     }
 
     /**
