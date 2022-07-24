@@ -1,7 +1,8 @@
-package dev.jgapi.jg_api.entities.calendars;
+package dev.jgapi.jg_api.entities.calendars.rsvp;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -28,6 +29,19 @@ public class CalendarEventRsvp extends GuildedObject {
         this.createdAt = createdAt;
         this.updatedBy = updatedBy;
         this.updatedAt = updatedAt;
+    }
+
+    public static CalendarEventRsvp parseCalendarEventRsvpObject(JSONObject calendarEventRsvp, JG_API jg_api) {
+        int calendarEventId = calendarEventRsvp.getInt("calendarEventId");
+        UUID channelId = UUID.fromString(calendarEventRsvp.getString("channelId"));
+        String serverId = calendarEventRsvp.getString("serverId");
+        String userId = calendarEventRsvp.getString("userId");
+        String status = calendarEventRsvp.getString("status");
+        String createdBy = calendarEventRsvp.getString("createdBy");
+        Instant createdAt = Instant.parse(calendarEventRsvp.getString("createdAt"));
+        String updatedBy = calendarEventRsvp.optString("updatedBy");
+        Instant updatedAt = calendarEventRsvp.optString("updatedAt").isEmpty() ? null : Instant.parse(calendarEventRsvp.optString("updatedAt"));
+        return new CalendarEventRsvp(jg_api, calendarEventId, channelId, serverId, userId, status, createdBy, createdAt, updatedBy, updatedAt);
     }
 
     public int getCalendarEventId() {

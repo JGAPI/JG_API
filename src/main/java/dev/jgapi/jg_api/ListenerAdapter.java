@@ -1,8 +1,14 @@
 package dev.jgapi.jg_api;
 
 import dev.jgapi.jg_api.events.calendar.*;
+import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpDeletedEvent;
+import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpManyUpdatedEvent;
+import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpUpdatedEvent;
 import dev.jgapi.jg_api.events.chat.*;
 import dev.jgapi.jg_api.events.docs.*;
+import dev.jgapi.jg_api.events.forums.ForumTopicCreatedEvent;
+import dev.jgapi.jg_api.events.forums.ForumTopicDeletedEvent;
+import dev.jgapi.jg_api.events.forums.ForumTopicUpdatedEvent;
 import dev.jgapi.jg_api.events.library.*;
 import dev.jgapi.jg_api.events.listitem.*;
 import dev.jgapi.jg_api.events.teamchannel.*;
@@ -86,4 +92,14 @@ public abstract class ListenerAdapter {
     public void onCalendarEventCreatedEvent(CalendarEventCreatedEvent event) {}
     public void onCalendarEventUpdatedEvent(CalendarEventUpdatedEvent event) {}
     public void onCalendarEventDeletedEvent(CalendarEventDeletedEvent event) {}
+    public void onCalendarEventRsvpUpdatedEvent(CalendarEventRsvpUpdatedEvent event) {}
+    public void onCalendarEventRsvpManyUpdatedEvent(CalendarEventRsvpManyUpdatedEvent event) {}
+    public void onCalendarEventRsvpDeletedEvent(CalendarEventRsvpDeletedEvent event) {}
+
+    /**
+     * Forum Events
+     */
+    public void onForumTopicCreatedEvent(ForumTopicCreatedEvent event) {}
+    public void onForumTopicUpdatedEvent(ForumTopicUpdatedEvent event) {}
+    public void onForumTopicDeletedEvent(ForumTopicDeletedEvent event) {}
 }

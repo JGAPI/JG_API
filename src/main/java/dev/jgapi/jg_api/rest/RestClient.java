@@ -2,7 +2,7 @@ package dev.jgapi.jg_api.rest;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
-import dev.jgapi.jg_api.entities.calendars.CalendarEventRsvp;
+import dev.jgapi.jg_api.entities.calendars.rsvp.CalendarEventRsvp;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.embeds.ChatEmbed;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
@@ -288,26 +288,6 @@ public class RestClient {
         routeReplacements.put("{serverId}", String.valueOf(serverId));
         // Set up the body of the request
         Request request = new Request(Routing.MemberBans.GET_BANS, routeReplacements, getHeaders(), body);
-        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
-    }
-    public RestAction<ForumTopic> createForumTopic(String channelId, ForumTopic forumTopic) {
-        JSONObject body = new JSONObject();
-        HashMap<String, String> routeReplacements = new HashMap<>();
-        routeReplacements.put("{channelId}", String.valueOf(channelId));
-        // Set up the body of the request
-        body.put("title", forumTopic.getTitle());
-        body.put("content", forumTopic.getContent());
-        Request request = new Request(Routing.Forums.CREATE_TOPIC, routeReplacements, getHeaders(), body);
-        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
-    }
-    public RestAction<ForumTopic> createForumTopic(String channelId, String title, String content) {
-        JSONObject body = new JSONObject();
-        HashMap<String, String> routeReplacements = new HashMap<>();
-        routeReplacements.put("{channelId}", String.valueOf(channelId));
-        // Set up the body of the request
-        body.put("title", title);
-        body.put("content", content);
-        Request request = new Request(Routing.Forums.CREATE_TOPIC, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
     public RestAction<ListItem> createListItem(String channelId, ListItem listItem) {
@@ -696,16 +676,106 @@ public class RestClient {
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
 
-    public RestAction<ForumTopic[]> getForumTopics(String channelId) {}
-    public RestAction<ForumTopic> getForumTopic(String channelId, String forumTopicId) {}
-    public RestAction<ForumTopic> updateForumTopic(String channelId, String forumTopicId, ForumTopic forumTopic) {}
-    public RestAction<ForumTopic> updateForumTopic(String channelId, String forumTopicId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {}
-    public RestAction<Boolean> deleteForumTopic(String channelId, String forumTopicId) {}
+    public RestAction<ForumTopic> createForumTopic(String channelId, ForumTopic forumTopic) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        // Set up the body of the request
+        body.put("title", forumTopic.getTitle());
+        body.put("content", forumTopic.getContent());
+        Request request = new Request(Routing.Forums.CREATE_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<ForumTopic> createForumTopic(String channelId, String title, String content) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        // Set up the body of the request
+        body.put("title", title);
+        body.put("content", content);
+        Request request = new Request(Routing.Forums.CREATE_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<ForumTopic[]> getForumTopics(String channelId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        Request request = new Request(Routing.Forums.GET_TOPICS, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<ForumTopic> getForumTopic(String channelId, String forumTopicId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{forumTopicId}", forumTopicId);
+        Request request = new Request(Routing.Forums.GET_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<ForumTopic> updateForumTopic(String channelId, String forumTopicId, ForumTopic forumTopic) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{forumTopicId}", forumTopicId);
+        body.put("title", forumTopic.getTitle());
+        body.put("content", forumTopic.getContent());
+        Request request = new Request(Routing.Forums.UPDATE_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<ForumTopic> updateForumTopic(String channelId, String forumTopicId, String title, String content) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{forumTopicId}", forumTopicId);
+        body.put("title", title);
+        body.put("content", content);
+        Request request = new Request(Routing.Forums.UPDATE_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<Boolean> deleteForumTopic(String channelId, String forumTopicId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{forumTopicId}", forumTopicId);
+        Request request = new Request(Routing.Forums.DELETE_TOPIC, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
 
-    public RestAction<CalendarEventRsvp> getCalendarEventRsvp(String channelId, int calendarEventId, String userId) {}
-    public RestAction<CalendarEventRsvp[]> getCalendarEventRsvps(String channelId, String calendarEventId) {}
-    public RestAction<CalendarEventRsvp> updateCalendarEventRsvp(String channelId, String calendarEventId, String userId, String status) {}
-    public RestAction<Boolean> deleteCalendarEventRsvp(String channelId, String calendarEventId, String userId) {}
+    public RestAction<CalendarEventRsvp> getCalendarEventRsvp(String channelId, int calendarEventId, String userId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
+        routeReplacements.put("{userId}", userId);
+        Request request = new Request(Routing.CalendarEvents.GET_CALENDAR_EVENT_RSVP, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<CalendarEventRsvp[]> getCalendarEventRsvps(String channelId, String calendarEventId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
+        Request request = new Request(Routing.CalendarEvents.GET_CALENDAR_EVENT_RSVPS, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<CalendarEventRsvp> updateCalendarEventRsvp(String channelId, String calendarEventId, String userId, String status) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
+        routeReplacements.put("{userId}", userId);
+        body.put("status", status);
+        Request request = new Request(Routing.CalendarEvents.UPDATE_CALENDAR_EVENT_RSVP, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
+    public RestAction<Boolean> deleteCalendarEventRsvp(String channelId, String calendarEventId, String userId) {
+        JSONObject body = new JSONObject();
+        HashMap<String, String> routeReplacements = new HashMap<>();
+        routeReplacements.put("{channelId}", String.valueOf(channelId));
+        routeReplacements.put("{calendarEventId}", String.valueOf(calendarEventId));
+        routeReplacements.put("{userId}", userId);
+        Request request = new Request(Routing.CalendarEvents.DELETE_CALENDAR_EVENT_RSVP, routeReplacements, getHeaders(), body);
+        return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
+    }
 
     // Generic body setup to clean up code a bit.
     private JSONObject setupCalendarEventBody(CalendarEvent calendarEvent, JSONObject body) {

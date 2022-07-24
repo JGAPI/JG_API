@@ -2,6 +2,7 @@ package dev.jgapi.jg_api.util;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
+import dev.jgapi.jg_api.entities.calendars.rsvp.CalendarEventRsvp;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
@@ -76,9 +77,6 @@ public class RestUtils {
 
                 return (T) serverMemberBans.toArray(ChatMessage[]::new);
             }
-            case ForumTopic -> {
-                return (T) ForumTopic.parseForumTopicObj(responseObj.getJSONObject("forumTopic"), jg_api);
-            }
             case ListItem -> {
                 return (T) ListItem.parseListItemObj(responseObj.getJSONObject("listItem"), jg_api);
             }
@@ -139,6 +137,30 @@ public class RestUtils {
                 }
 
                 return (T) calendarEvents.toArray(CalendarEvent[]::new);
+            }
+            case ForumTopic -> {
+                return (T) ForumTopic.parseForumTopicObj(responseObj.getJSONObject("forumTopic"), jg_api);
+            }
+            case ForumTopic_Arr -> {
+                List<ForumTopic> forumTopics = new ArrayList<>();
+                JSONArray forumTopicsArr = responseObj.getJSONArray("forumTopics");
+
+                for (int i = 0; i < forumTopicsArr.length(); i++) {
+                    forumTopics.add(ForumTopic.parseForumTopicObj(forumTopicsArr.getJSONObject(i), jg_api));
+                }
+                return (T) forumTopics.toArray(ForumTopic[]::new);
+            }
+            case CalendarEventRsvp -> {
+                return (T) CalendarEventRsvp.parseCalendarEventRsvpObject(responseObj.getJSONObject("calendarEventRsvp"), jg_api);
+            }
+            case CalendarEventRsvp_Arr -> {
+                List<CalendarEventRsvp> calendarEventRsvps = new ArrayList<>();
+                JSONArray calendarEventRsvpsArr = responseObj.getJSONArray("calendarEventRsvps");
+
+                for (int i = 0; i < calendarEventRsvpsArr.length(); i++) {
+                    calendarEventRsvps.add(CalendarEventRsvp.parseCalendarEventRsvpObject(calendarEventRsvpsArr.getJSONObject(i), jg_api));
+                }
+                return (T) calendarEventRsvps.toArray(CalendarEventRsvp[]::new);
             }
         }
         return null;

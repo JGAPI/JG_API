@@ -3,10 +3,12 @@ package dev.jgapi.jg_api.websocket;
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.ListenerAdapter;
 import dev.jgapi.jg_api.entities.calendars.CalendarEvent;
+import dev.jgapi.jg_api.entities.calendars.rsvp.CalendarEventRsvp;
 import dev.jgapi.jg_api.entities.channels.ChannelReaction;
 import dev.jgapi.jg_api.entities.channels.ServerChannel;
 import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.entities.docs.Doc;
+import dev.jgapi.jg_api.entities.forums.ForumTopic;
 import dev.jgapi.jg_api.entities.listitems.ListItem;
 import dev.jgapi.jg_api.entities.memberbans.ServerMemberBan;
 import dev.jgapi.jg_api.entities.members.MemberRoleIds;
@@ -16,12 +18,19 @@ import dev.jgapi.jg_api.entities.members.UserInfo;
 import dev.jgapi.jg_api.entities.webhooks.Webhook;
 import dev.jgapi.jg_api.events.calendar.CalendarEventCreatedEvent;
 import dev.jgapi.jg_api.events.calendar.CalendarEventDeletedEvent;
+import dev.jgapi.jg_api.events.calendar.CalendarEventUpdatedEvent;
+import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpDeletedEvent;
+import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpManyUpdatedEvent;
+import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpUpdatedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageCreatedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageDeletedEvent;
 import dev.jgapi.jg_api.events.chat.ChatMessageUpdatedEvent;
 import dev.jgapi.jg_api.events.docs.DocCreatedEvent;
 import dev.jgapi.jg_api.events.docs.DocDeletedEvent;
 import dev.jgapi.jg_api.events.docs.DocUpdatedEvent;
+import dev.jgapi.jg_api.events.forums.ForumTopicCreatedEvent;
+import dev.jgapi.jg_api.events.forums.ForumTopicDeletedEvent;
+import dev.jgapi.jg_api.events.forums.ForumTopicUpdatedEvent;
 import dev.jgapi.jg_api.events.library.ServerAddedEvent;
 import dev.jgapi.jg_api.events.library.ServerRemovedEvent;
 import dev.jgapi.jg_api.events.listitem.*;
@@ -202,14 +211,14 @@ public class WebSocketManager {
                     }
                 }
             }
-            // TODO: Once CalendarEventUpdated actually passes a CalendarEvent it needs to be added here.
-            case "CalendarEventCreated", "CalendarEventDeleted" -> {
+            case "CalendarEventCreated", "CalendarEventUpdated", "CalendarEventDeleted" -> {
                 CalendarEvent calendarEvent = CalendarEvent.parseCalendarEventObj(dataObj.getJSONObject("calendarEvent"), jg_api);
 
                 for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
                     switch (eventType) {
                         case "CalendarEventCreated" -> listenerAdapter.onCalendarEventCreatedEvent(new CalendarEventCreatedEvent(this.jg_api, serverId, calendarEvent));
                         case "CalendarEventDeleted" -> listenerAdapter.onCalendarEventDeletedEvent(new CalendarEventDeletedEvent(this.jg_api, serverId, calendarEvent));
+                        case "CalendarEventUpdated" -> listenerAdapter.onCalendarEventUpdatedEvent(new CalendarEventUpdatedEvent(this.jg_api, serverId, calendarEvent));
                     }
                 }
             }
@@ -223,8 +232,37 @@ public class WebSocketManager {
                     }
                 }
             }
-            case "ForumTopicCreated", "ForumTopicUpdated", "ForumTopicDeleted" -> {}
-            case "CalendarEventRsvpUpdated", "CalendarRsvpManyUpdated", "CalendarRsvpDeleted" -> {}
+            case "ForumTopicCreated", "ForumTopicUpdated", "ForumTopicDeleted" -> {
+                ForumTopic forumTopic = ForumTopic.parseForumTopicObj(dataObj.getJSONObject("forumTopic"), jg_api);
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "ForumTopicCreated" -> listenerAdapter.onForumTopicCreatedEvent(new ForumTopicCreatedEvent(this.jg_api, serverId, forumTopic));
+                        case "ForumTopicUpdated" -> listenerAdapter.onForumTopicUpdatedEvent(new ForumTopicUpdatedEvent(this.jg_api, serverId, forumTopic));
+                        case "ForumTopicDeleted" -> listenerAdapter.onForumTopicDeletedEvent(new ForumTopicDeletedEvent(this.jg_api, serverId, forumTopic));
+                    }
+                }
+            }
+            case "CalendarEventRsvpUpdated", "CalendarEventRsvpDeleted" -> {
+                CalendarEventRsvp calendarEventRsvp = CalendarEventRsvp.parseCalendarEventRsvpObject(dataObj.getJSONObject("calendarEventRsvp"), jg_api);
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    switch (eventType) {
+                        case "CalendarEventRsvpUpdated" -> listenerAdapter.onCalendarEventRsvpUpdatedEvent(new CalendarEventRsvpUpdatedEvent(this.jg_api, serverId, calendarEventRsvp));
+                        case "CalendarEventRsvpDeleted" -> listenerAdapter.onCalendarEventRsvpDeletedEvent(new CalendarEventRsvpDeletedEvent(this.jg_api, serverId, calendarEventRsvp));
+                    }
+                }
+            }
+            case "CalendarRsvpManyUpdated" -> {
+                JSONArray calendarEventRsvps = dataObj.getJSONArray("calendarEventRsvps");
+                List<CalendarEventRsvp> calendarEventRsvpList = new ArrayList<>();
+                for (int i = 0; i < calendarEventRsvps.length(); i++) {
+                    JSONObject calendarEventRsvpObj = calendarEventRsvps.getJSONObject(i);
+                    CalendarEventRsvp calendarEventRsvp = CalendarEventRsvp.parseCalendarEventRsvpObject(calendarEventRsvpObj, jg_api);
+                    calendarEventRsvpList.add(calendarEventRsvp);
+                }
+                for (ListenerAdapter listenerAdapter : this.jg_api.getListenerAdapters()) {
+                    listenerAdapter.onCalendarEventRsvpManyUpdatedEvent(new CalendarEventRsvpManyUpdatedEvent(this.jg_api, serverId, calendarEventRsvpList.toArray(CalendarEventRsvp[]::new)));
+                }
+            }
             default -> System.out.println("Unhandled eventType: " + eventType);
         }
     }
