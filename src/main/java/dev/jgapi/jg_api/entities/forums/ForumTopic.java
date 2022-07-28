@@ -2,10 +2,14 @@ package dev.jgapi.jg_api.entities.forums;
 
 import dev.jgapi.jg_api.JG_API;
 import dev.jgapi.jg_api.entities.GuildedObject;
+import dev.jgapi.jg_api.entities.channels.Mentions;
 import dev.jgapi.jg_api.util.UtilClass;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class ForumTopic extends GuildedObject {
     private int id;
@@ -17,7 +21,8 @@ public class ForumTopic extends GuildedObject {
     private String createdBy;
     private String createdByWebhookId;
     private Instant updatedAt;
-    public ForumTopic(JG_API jg_api, int id, String serverId, String channelId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt) {
+    private Mentions mentions;
+    public ForumTopic(JG_API jg_api, int id, String serverId, String channelId, String title, String content, Instant createdAt, String createdBy, String createdByWebhookId, Instant updatedAt, Mentions mentions) {
         super(jg_api);
         this.id = id;
         this.serverId = serverId;
@@ -28,9 +33,15 @@ public class ForumTopic extends GuildedObject {
         this.createdBy = createdBy;
         this.createdByWebhookId = createdByWebhookId;
         this.updatedAt = updatedAt;
+        this.mentions = mentions;
     }
 
     public static ForumTopic parseForumTopicObj(JSONObject forumTopicObj, JG_API jg_api) {
+        JSONObject mentionsObj = forumTopicObj.optJSONObject("mentions");
+        Mentions mentions = null;
+        if (mentionsObj != null) {
+            mentions = Mentions.parseMentionsObj(mentionsObj);
+        }
         return new ForumTopic(
                 jg_api,
                 forumTopicObj.getInt("id"),
@@ -41,7 +52,8 @@ public class ForumTopic extends GuildedObject {
                 Instant.parse(forumTopicObj.getString("createdAt")),
                 forumTopicObj.getString("createdBy"),
                 forumTopicObj.optString("createdByWebhookId", null),
-                UtilClass.parseStringOrNull(forumTopicObj.optString("updatedAt", null))
+                UtilClass.parseStringOrNull(forumTopicObj.optString("updatedAt", null)),
+                mentions
         );
     }
 
