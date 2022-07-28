@@ -1,5 +1,6 @@
 package dev.jgapi.jg_api;
 
+import dev.jgapi.jg_api.entities.chat.ChatMessage;
 import dev.jgapi.jg_api.events.calendar.*;
 import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpDeletedEvent;
 import dev.jgapi.jg_api.events.calendar.rsvp.CalendarEventRsvpManyUpdatedEvent;

@@ -180,7 +180,7 @@ public class RestClient {
         Request request = new Request(Routing.Messages.UPDATE_MESSAGE, routeReplacements, getHeaders(), body);
         return new RestAction<>(this.jg_api.getNextSeqNumber(), request, this.jg_api);
     }
-    public RestAction<ChatMessage> deleteMessage(String channelId, String messageId) {
+    public RestAction<Boolean> deleteMessage(String channelId, String messageId) {
         JSONObject body = new JSONObject();
         HashMap<String, String> routeReplacements = new HashMap<>();
         routeReplacements.put("{channelId}", String.valueOf(channelId));

@@ -151,7 +151,7 @@ public class ChatMessage extends GuildedObject {
         return this.updatedAt;
     }
 
-    public RestAction<ChatMessage> delete() {
+    public RestAction<Boolean> delete() {
         return this.jg_api.getRestClient().deleteMessage(this.getChannel().getId(), this.id);
     }
     public RestAction<ChatMessage> setContent(String content) {
